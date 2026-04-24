@@ -252,7 +252,8 @@
             <div style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #e0e0e0;">
                 <h3 style="font-size: 13px; margin-bottom: 15px; color: var(--text-muted); font-weight:bold;">DELIVERY ADDRESS</h3>
                 <input type="text" id="cName" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main);" placeholder="Full Name">
-                <input type="tel" id="cPhone" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:#f8fafc; color:var(--text-muted);" placeholder="Mobile Number" readonly>
+                
+                <input type="tel" id="cPhone" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main);" placeholder="Mobile Number" maxlength="10">
                 
                 <textarea id="cAddress" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main); height:70px; resize:none;" placeholder="Full Address (House No, Area, Landmark)"></textarea>
                 <input type="number" id="cPin" class="search-wrapper" style="width:100%; margin-bottom:15px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main);" placeholder="Pincode">
@@ -458,7 +459,6 @@
         catch(e) { return false; }
     }
 
-    // ✅ FIXED: Helper to safely parse Firebase arrays that might contain nulls
     function safeParse(data) {
         if (!data) return [];
         if (Array.isArray(data)) {
@@ -494,7 +494,7 @@
             renderCategories();
         });
 
-        // ✅ FIXED: Product Fetching (Null handling to prevent crashes)
+        // Fetch Products
         db.ref('products').on('value', snap => {
             const data = snap.val();
             let parsedProducts = safeParse(data);
@@ -502,7 +502,6 @@
             if(parsedProducts.length > 0) {
                 allProducts = parsedProducts;
             } else {
-                // Auto-Recovery System: Add default products if DB is completely empty
                 const defaultProducts = [
                     { id: 1, name: "Premium Basmati Rice", price: 450, emoji: "🍚", category: "Grocery", stock: 50 },
                     { id: 2, name: "Fresh Apples 1kg", price: 120, emoji: "🍎", category: "Grocery", stock: 20 }
@@ -849,7 +848,6 @@
         const searchQuery = searchInput ? searchInput.value.toLowerCase() : '';
         const sortMethod = document.getElementById('sortSelect') ? document.getElementById('sortSelect').value : 'default';
 
-        // ✅ FIXED: Safe filtering for older products without category
         if (currentCategory !== 'All') {
             products = products.filter(p => p && (p.category || 'Grocery') === currentCategory);
         }
@@ -1070,7 +1068,6 @@
         document.getElementById('locStatus').style.color = "var(--text-muted)";
         closeModal('checkoutModal');
         
-        // ✅ FIXED: Send user directly to Orders tab
         switchCustomerTab('orders', document.getElementById('navOrders'));
 
         setTimeout(() => {
@@ -1128,7 +1125,6 @@
         document.getElementById('customerOrdersView').style.display = 'none';
         document.getElementById('customerProfileView').style.display = 'none';
 
-        // ✅ FIXED: Corrected logic so user sees orders tab properly
         if(tab === 'home') {
             document.getElementById('customerDashboard').style.display = 'block';
             filterAndSortProducts();
@@ -1136,7 +1132,6 @@
             if(!loggedInUser) {
                 showToast("Please sign in to see your orders");
                 openAuthPage();
-                // Revert to Home tab active state
                 document.getElementById('navOrders').classList.remove('active');
                 document.getElementById('navHome').classList.add('active'); 
                 return;
