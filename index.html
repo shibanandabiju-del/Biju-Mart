@@ -7,25 +7,25 @@
   
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   
   <style>
-        /* --- Premium Modern Variables --- */
+        /* --- Premium Modern Variables (Flipkart Theme) --- */
         :root {
-            --primary: #6366f1; 
-            --secondary: #ec4899; 
+            --primary: #2874f0; 
+            --secondary: #ff9f00; 
             --dark-bg: #0f172a;
-            --light-bg: #f8fafc;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --success: #10b981;
-            --danger: #ef4444;
+            --light-bg: #f1f3f6; 
+            --card-bg: #ffffff;
+            --text-main: #212121;
+            --text-muted: #878787;
+            --success: #388e3c;
+            --danger: #ff6161;
             --whatsapp: #25D366; 
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100%; font-family: 'Segoe UI', Roboto, sans-serif; background: var(--light-bg); }
+        html, body { height: 100%; font-family: Roboto, 'Segoe UI', sans-serif; background: var(--light-bg); }
         body { max-width: 480px; margin: 0 auto; position: relative; color: var(--text-main); background: var(--light-bg); box-shadow: 0 0 40px rgba(0,0,0,0.05); }
         
         .app-view { display: none; width: 100%; height: 100%; flex-direction: column; overflow: hidden; position: absolute; top:0; left:0; background: var(--light-bg); }
@@ -33,50 +33,64 @@
         .main-content { flex: 1; overflow-y: auto; padding-bottom: 80px; scrollbar-width: none; }
         .main-content::-webkit-scrollbar { display: none; }
 
-        /* --- Header Premium --- */
-        .header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 40; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        .header-logo { font-size: 22px; font-weight: 900; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; color: transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; }
-        .header-logo img { height: 28px; max-width: 150px; object-fit: contain; }
+        /* --- Header Premium (Flipkart Style) --- */
+        .header { background: white; padding: 10px 15px; position: sticky; top: 0; z-index: 40; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 20px; font-weight: 900; color: var(--primary); display: flex; align-items: center; font-style: italic; letter-spacing: -0.5px; }
+        .header-logo img { height: 28px; max-width: 130px; object-fit: contain; }
         
-        .icon-btn { background: #f1f5f9; border: none; color: var(--text-main); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: 0.2s; }
-        .icon-btn:active { transform: scale(0.95); }
-        .badge { position: absolute; top: -5px; right: -5px; background: var(--secondary); color: white; font-size: 11px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+        .icon-btn { background: transparent; border: none; color: var(--text-main); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: 0.2s; }
+        .badge { position: absolute; top: -2px; right: -2px; background: var(--danger); color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid white; }
 
-        /* --- Login Banner --- */
-        .login-banner { background: linear-gradient(135deg, var(--primary), #818cf8); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .login-banner div { font-size: 14px; font-weight: 600; }
+        /* --- Flipkart Style Search Bar --- */
+        .search-wrapper { display: flex; background: #f0f5ff; border-radius: 8px; padding: 10px 12px; align-items: center; border: 1px solid #e0e0e0; }
+        .search-wrapper input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 14px; color: var(--text-main); background: transparent; }
 
         /* --- PROMO BANNERS SLIDER --- */
-        .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 15px 20px 0; gap: 15px; }
+        .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 15px 15px 0; gap: 10px; }
         .banner-slider::-webkit-scrollbar { display: none; }
-        .banner-slide { min-width: 100%; height: 140px; border-radius: 12px; scroll-snap-align: center; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: #e2e8f0; }
+        .banner-slide { min-width: 100%; height: 150px; border-radius: 8px; scroll-snap-align: center; object-fit: cover; background: #e2e8f0; }
         
-        /* --- Searching, Sorting & Categories --- */
-        .tools-bar { padding: 15px 20px 0; }
-        .search-wrapper { display: flex; background: white; border-radius: 12px; padding: 10px 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        .search-wrapper input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 14px; color: var(--text-main); background: transparent; }
-        
-        .cat-scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin-bottom: 15px; padding-bottom: 5px; }
-        .cat-pill { padding: 8px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: 0.3s; }
-        .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-        .sort-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; margin-bottom: 10px; }
-        .sort-select { border: none; background: transparent; font-weight: bold; color: var(--primary); outline: none; font-size: 14px; }
+        /* --- Flipkart Style Categories --- */
+        .cat-scroll { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding: 15px; background: white; margin-bottom: 10px; }
+        .cat-scroll::-webkit-scrollbar { display: none; }
+        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; opacity: 0.8; transition: 0.3s; min-width: 60px; }
+        .cat-item.active { opacity: 1; }
+        .cat-icon-circle { width: 45px; height: 45px; background: #f0f5ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.3s; }
+        .cat-item.active .cat-icon-circle { background: var(--primary); color: white; box-shadow: 0 4px 8px rgba(40, 116, 240, 0.3); }
+        .cat-item span { font-size: 11px; font-weight: 600; color: var(--text-main); white-space: nowrap; }
 
         /* --- Products Grid --- */
-        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px 20px; }
-        .product-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; transition: 0.3s; position: relative; border: 1px solid #f1f5f9; }
-        .product-image { background: #f8fafc; height: 140px; display: flex; align-items: center; justify-content: center; font-size: 50px; overflow: hidden; position: relative; }
-        .product-img-real { width: 100%; height: 100%; object-fit: cover; }
-        .stock-badge { position: absolute; top: 10px; right: 10px; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; background: rgba(255,255,255,0.95); z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .products-grid-container { background: white; padding-top: 15px; padding-bottom: 20px; border-radius: 12px 12px 0 0; }
+        .grid-greeting { padding: 0 15px 15px; font-size: 16px; font-weight: 800; color: var(--text-main); }
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 15px; }
+        .product-card { background: white; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; border: 1px solid #f1f3f6; }
+        .product-image { background: #f8fafc; height: 150px; display: flex; align-items: center; justify-content: center; font-size: 50px; overflow: hidden; position: relative; padding: 10px; }
+        .product-img-real { width: 100%; height: 100%; object-fit: contain; }
+        .stock-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 4px; background: rgba(255,255,255,0.95); z-index: 10; border: 1px solid #eee; }
         .stock-badge.low { color: var(--danger); }
         .stock-badge.ok { color: var(--success); }
-        .product-info { padding: 12px; flex: 1; display: flex; flex-direction: column; }
-        .product-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; color: var(--text-main); }
-        .product-cat { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
-        .product-price { font-size: 16px; font-weight: 900; color: var(--primary); margin-bottom: 12px; }
-        .btn-add-cart { background: var(--dark-bg); color: white; border: none; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: auto; transition: 0.2s; }
-        .btn-add-cart:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .product-info { padding: 10px; flex: 1; display: flex; flex-direction: column; }
+        .product-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; line-height: 1.4; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-price { font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; margin-top: 4px; }
+        
+        .btn-add-cart { background: var(--primary); color: white; border: none; padding: 8px; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: auto; transition: 0.2s; text-transform: uppercase; width: 100%; }
+        .btn-add-cart:disabled { background: #e0e0e0; color: #9e9e9e; cursor: not-allowed; }
+        
+        /* Qty Control Buttons */
+        .qty-controls { display:flex; justify-content:space-between; align-items:center; background:#f0f5ff; border-radius:4px; padding:4px; margin-top:auto; }
+        .btn-qty { border:1px solid var(--primary); background:white; color:var(--primary); width:28px; height:28px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:16px; display:flex; align-items:center; justify-content:center;}
+        .qty-val { font-weight:bold; font-size:14px; color:var(--text-main); }
+
+        /* --- Floating Support Button --- */
+        .support-fab { position: fixed; bottom: 80px; right: 20px; background: var(--secondary); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 90; cursor: pointer; }
+        .support-menu { position: fixed; bottom: 140px; right: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 10px; display: none; flex-direction: column; gap: 10px; z-index: 91; border: 1px solid #eee; }
+        .support-menu.active { display: flex; animation: fadeIn 0.2s; }
+        .support-btn { display: flex; align-items: center; gap: 10px; padding: 10px 15px; border: none; background: #f8fafc; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 150px; }
+        .btn-wa { color: var(--whatsapp); }
+        .btn-email { color: var(--danger); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- Admin Panel --- */
         .admin-bg { background: var(--dark-bg); color: white; }
@@ -91,26 +105,24 @@
         .admin-input:focus { border-color: var(--primary); }
         .btn-admin { background: var(--primary); color: white; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s;}
         .inventory-item { display: flex; flex-direction: column; padding: 12px; border-bottom: 1px solid #334155; background: #0f172a; border-radius: 8px; margin-bottom: 10px; }
-        
         .btn-small { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
         .btn-danger-small { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
 
         /* --- Shared Modals & Nav --- */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: white; border-top: 1px solid #e0e0e0; display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .nav-item.active { color: var(--primary); }
+        
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--light-bg); z-index: 100; flex-direction: column; max-width: 480px; margin: 0 auto; left: 50%; transform: translateX(-50%); }
         .modal.active { display: flex; }
-        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--text-main); color: white; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
-        /* --- Payment Options UI --- */
-        .payment-option { display: flex; align-items: center; gap: 15px; padding: 15px; background: white; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; }
-        .payment-option.active { border-color: var(--primary); background: #f0f4ff; }
-        .radio-custom { width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .payment-option { display: flex; align-items: center; gap: 15px; padding: 15px; background: white; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; }
+        .payment-option.active { border-color: var(--primary); background: #f0f5ff; }
+        .radio-custom { width: 20px; height: 20px; border: 2px solid #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         .payment-option.active .radio-custom { border-color: var(--primary); }
         .payment-option.active .radio-custom::after { content: ''; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; }
 
-        /* --- FULL SCREEN AUTH PAGE --- */
         .auth-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; flex-direction: column; max-width: 480px; margin: 0 auto; left: 50%; transform: translateX(-50%); overflow-y: auto; }
         .auth-page.active { display: flex; animation: slideInRight 0.3s forwards; }
         @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(-50%); } }
@@ -122,12 +134,12 @@
         .auth-body { padding: 30px 20px; flex: 1; }
         
         .otp-container { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
-        .otp-box { width: 55px; height: 60px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 24px; text-align: center; font-weight: 800; outline: none; transition: 0.3s; color: var(--primary); background: #f8fafc; }
-        .otp-box:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .otp-box { width: 50px; height: 55px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 24px; text-align: center; font-weight: 800; outline: none; transition: 0.3s; color: var(--primary); background: #f8fafc; }
+        .otp-box:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(40, 116, 240, 0.1); }
         .otp-msg { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px; color: var(--text-muted); height: 20px; }
         
-        .cart-img-real { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; }
-        .admin-img-real { width: 30px; height: 30px; object-fit: cover; border-radius: 6px; }
+        .cart-img-real { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; border: 1px solid #eee; padding:2px; }
+        .admin-img-real { width: 30px; height: 30px; object-fit: cover; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -135,54 +147,38 @@
   <div class="app-view active" id="customerApp">
     
     <div class="header">
-        <div class="header-logo" id="dynamicLogoCustomer">Biju Mart</div>
-        <div style="display:flex; gap:12px; align-items:center;">
-            <span id="userGreeting" style="font-size:12px; font-weight:bold; color:var(--text-muted); display:none;"></span>
-            <button class="icon-btn" onclick="openAdminLogin()"><i data-lucide="shield"></i></button>
-            <button class="icon-btn" onclick="openCart()"><i data-lucide="shopping-bag"></i>
-                <div class="badge" id="cartBadge" style="display: none;">0</div>
-            </button>
+        <div class="header-top-row">
+            <div class="header-logo" id="dynamicLogoCustomer">Biju Mart</div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="icon-btn" onclick="openAdminLogin()"><i data-lucide="shield" style="width:20px;"></i></button>
+            </div>
         </div>
-    </div>
-
-    <div class="banner-slider" id="promoBanners" style="display:none;"></div>
-
-    <div class="login-banner" id="loginBannerBtn" onclick="openAuthPage()">
-        <div>Sign in for personalized experience</div>
-        <i data-lucide="chevron-right"></i>
+        <div class="search-wrapper">
+            <i data-lucide="search" style="color:#878787; width:20px;"></i>
+            <input type="text" id="searchInput" placeholder="Search for products..." onkeyup="filterAndSortProducts()">
+        </div>
     </div>
 
     <div class="main-content" id="customerDashboard">
-        <div class="tools-bar">
-            <div class="search-wrapper">
-                <i data-lucide="search" style="color:#94a3b8; width:18px;"></i>
-                <input type="text" id="searchInput" placeholder="Search products..." onkeyup="filterAndSortProducts()">
-            </div>
-            
-            <div class="cat-scroll" id="categoryFilters">
-                </div>
+        
+        <div class="cat-scroll" id="categoryFilters"></div>
 
-            <div class="sort-row">
-                <span>Top Products</span>
-                <select class="sort-select" id="sortSelect" onchange="filterAndSortProducts()">
-                    <option value="default">Sort by Default</option>
-                    <option value="low">Price: Low to High</option>
-                    <option value="high">Price: High to Low</option>
-                </select>
-            </div>
+        <div class="banner-slider" id="promoBanners" style="display:none;"></div>
+
+        <div class="products-grid-container" id="productGridContainer">
+            <div class="grid-greeting" id="gridGreetingTitle">Best items for you</div>
+            <div class="products-grid" id="customerProductsGrid"></div>
         </div>
-
-        <div class="products-grid" id="customerProductsGrid"></div>
     </div>
 
     <div class="main-content" id="customerOrdersView" style="display:none; padding: 20px;">
-        <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">Order History</h2>
+        <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">My Orders</h2>
         <div id="customerOrdersList"></div>
     </div>
 
     <div class="main-content" id="customerProfileView" style="display:none; padding: 20px;">
-        <div style="background: white; padding: 30px 20px; border-radius: 16px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-            <div style="width: 80px; height: 80px; background: #e0e7ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+        <div style="background: white; padding: 30px 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #f1f3f6;">
+            <div style="width: 80px; height: 80px; background: #f0f5ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
                 <i data-lucide="user" style="width: 40px; height: 40px; color: var(--primary);"></i>
             </div>
             <h2 id="profileNameDisplay" style="font-size: 22px; font-weight: 800; margin-bottom: 5px;">User</h2>
@@ -193,9 +189,21 @@
                     <span style="display: flex; gap: 10px;"><i data-lucide="package"></i> My Orders</span>
                     <i data-lucide="chevron-right"></i>
                 </button>
-                <button class="btn-admin" style="background: var(--danger); margin-top: 15px;" onclick="logoutCustomer()">Logout Securely</button>
+                <button class="btn-admin" style="background: white; color:var(--danger); border: 1px solid var(--danger); margin-top: 15px;" onclick="logoutCustomer()">Logout Securely</button>
             </div>
         </div>
+    </div>
+
+    <div class="support-fab" onclick="toggleSupportMenu()">
+        <i data-lucide="headphones"></i>
+    </div>
+    <div class="support-menu" id="supportMenu">
+        <button class="support-btn btn-wa" onclick="contactSupport('wa')">
+            <i data-lucide="message-circle"></i> WhatsApp
+        </button>
+        <button class="support-btn btn-email" onclick="contactSupport('email')">
+            <i data-lucide="mail"></i> Email Us
+        </button>
     </div>
 
     <div class="bottom-nav">
@@ -203,60 +211,86 @@
             <i data-lucide="home"></i> <span>Home</span>
         </div>
         <div class="nav-item" id="navOrders" onclick="switchCustomerTab('orders', this)">
-            <i data-lucide="package"></i> <span>Orders</span>
+            <i data-lucide="package"></i> <span>My Orders</span>
         </div>
         <div class="nav-item" id="navAccount" onclick="handleAccountTabClick(this)">
             <i data-lucide="user"></i> <span id="accountNavText">Account</span>
         </div>
+        <div class="nav-item" onclick="openCart()">
+            <div style="position:relative;">
+                <i data-lucide="shopping-cart"></i>
+                <div class="badge" id="cartBadge" style="display: none;">0</div>
+            </div>
+            <span>Cart</span>
+        </div>
     </div>
 
     <div class="modal" id="cartModal">
-        <div class="header" style="border-bottom:none; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-            <i data-lucide="arrow-left" onclick="closeModal('cartModal')" style="cursor:pointer;"></i>
-            <span style="font-weight:bold; font-size:16px;">Shopping Cart</span>
+        <div class="header" style="box-shadow:0 1px 3px rgba(0,0,0,0.1); flex-direction:row;">
+            <i data-lucide="arrow-left" onclick="closeModal('cartModal')" style="cursor:pointer; width:24px;"></i>
+            <span style="font-weight:bold; font-size:16px;">My Cart</span>
             <div style="width:24px;"></div>
         </div>
-        <div style="padding: 20px; flex:1; overflow-y:auto;" id="cartItemsList"></div>
-        <div style="padding: 20px; background: white; border-top: 1px solid #e2e8f0;">
-            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin-bottom:15px;">
-                <span>Total:</span> <span id="cartTotal" style="color:var(--primary)">₹0</span>
+        <div style="padding: 15px; flex:1; overflow-y:auto; background:#f1f3f6;" id="cartItemsList"></div>
+        <div style="padding: 15px; background: white; border-top: 1px solid #e0e0e0; display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <div style="font-size:12px; color:var(--text-muted); font-weight:bold;">Total Amount</div>
+                <div id="cartTotal" style="color:var(--text-main); font-weight:900; font-size:18px;">₹0</div>
             </div>
-            <button class="btn-add-cart" style="width:100%; font-size:15px; padding:15px; background:var(--primary);" onclick="proceedToCheckout()">Proceed to Checkout</button>
+            <button class="btn-add-cart" style="width:50%; font-size:14px; padding:12px;" onclick="proceedToCheckout()">Place Order</button>
         </div>
     </div>
 
     <div class="modal" id="checkoutModal">
-        <div class="header"><i data-lucide="arrow-left" onclick="closeModal('checkoutModal')" style="cursor:pointer;"></i> <span style="font-weight:bold;">Checkout</span> <div style="width:24px;"></div></div>
-        <div style="padding: 20px; flex:1; overflow-y:auto;">
-            <h3 style="font-size: 14px; margin-bottom: 10px; color: var(--text-muted);">DELIVERY DETAILS</h3>
-            <input type="text" id="cName" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #ddd; padding:15px; background:white; color:var(--text-main);" placeholder="Full Name">
-            <input type="tel" id="cPhone" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #ddd; padding:15px; background:white; color:var(--text-main);" placeholder="Mobile Number" readonly>
-            <input type="text" id="cAddress" class="search-wrapper" style="width:100%; margin-bottom:25px; border:1px solid #ddd; padding:15px; background:white; color:var(--text-main);" placeholder="Delivery Address" value="Puri, Odisha">
+        <div class="header" style="flex-direction:row;">
+            <i data-lucide="arrow-left" onclick="closeModal('checkoutModal')" style="cursor:pointer; width:24px;"></i> 
+            <span style="font-weight:bold; font-size:16px;">Order Details</span> 
+            <div style="width:24px;"></div>
+        </div>
+        <div style="padding: 15px; flex:1; overflow-y:auto; background:#f1f3f6;">
             
-            <h3 style="font-size: 14px; margin-bottom: 10px; color: var(--text-muted);">PAYMENT METHOD</h3>
-            <div class="payment-option active" id="payCOD" onclick="selectPaymentMethod('COD')">
-                <div class="radio-custom"></div>
-                <div><div style="font-weight: bold; font-size: 15px; color: var(--text-main);">Cash on Delivery</div><div style="font-size: 12px; color: var(--text-muted); margin-top:2px;">Pay directly when you receive</div></div>
+            <div style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #e0e0e0;">
+                <h3 style="font-size: 13px; margin-bottom: 15px; color: var(--text-muted); font-weight:bold;">DELIVERY ADDRESS</h3>
+                <input type="text" id="cName" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main);" placeholder="Full Name">
+                <input type="tel" id="cPhone" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:#f8fafc; color:var(--text-muted);" placeholder="Mobile Number" readonly>
+                
+                <textarea id="cAddress" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main); height:70px; resize:none;" placeholder="Full Address (House No, Area, Landmark)"></textarea>
+                <input type="number" id="cPin" class="search-wrapper" style="width:100%; margin-bottom:15px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main);" placeholder="Pincode">
+                
+                <button onclick="captureLocation()" style="width:100%; background:#f0f5ff; color:var(--primary); border:1px solid var(--primary); padding:10px; border-radius:6px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
+                    <i data-lucide="map-pin" style="width:16px;"></i> Send Live Location
+                </button>
+                <div id="locStatus" style="font-size:11px; text-align:center; margin-top:5px; color:var(--text-muted);">Optional: Helps delivery boy find you</div>
             </div>
-            <div class="payment-option" id="payUPI" onclick="selectPaymentMethod('UPI')">
-                <div class="radio-custom"></div>
-                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <div><div style="font-weight: bold; font-size: 15px; color: var(--text-main);">UPI</div><div style="font-size: 12px; color: var(--text-muted); margin-top:2px;">GPay, PhonePe, Paytm</div></div>
+            
+            <div style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #e0e0e0;">
+                <h3 style="font-size: 13px; margin-bottom: 15px; color: var(--text-muted); font-weight:bold;">PAYMENT OPTIONS</h3>
+                <div class="payment-option active" id="payCOD" onclick="selectPaymentMethod('COD')">
+                    <div class="radio-custom"></div>
+                    <div><div style="font-weight: bold; font-size: 14px; color: var(--text-main);">Cash on Delivery</div></div>
+                </div>
+                <div class="payment-option" id="payUPI" onclick="selectPaymentMethod('UPI')">
+                    <div class="radio-custom"></div>
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                        <div>
+                            <div style="font-weight: bold; font-size: 14px; color: var(--text-main);">Pay via UPI App</div>
+                            <div style="font-size: 12px; color: var(--success); font-weight:bold; margin-top:2px;">PhonePe, GPay, Paytm (Direct)</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="payment-option" id="payCARD" onclick="selectPaymentMethod('Card')">
-                <div class="radio-custom"></div>
-                <div><div style="font-weight: bold; font-size: 15px; color: var(--text-main);">Credit / Debit Card</div><div style="font-size: 12px; color: var(--text-muted); margin-top:2px;">Visa, MasterCard, RuPay</div></div>
-            </div>
-            <br>
         </div>
-        <div style="padding: 20px; background: white; border-top: 1px solid #e2e8f0;">
-            <button class="btn-add-cart" style="width:100%; font-size:15px; padding:15px; background:var(--success);" onclick="placeOrder()">Place Order (<span id="checkoutTotal">₹0</span>)</button>
+        <div style="padding: 15px; background: white; border-top: 1px solid #e0e0e0; display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <div style="font-size:12px; color:var(--text-muted); font-weight:bold;">Payable</div>
+                <div id="checkoutTotal" style="color:var(--text-main); font-weight:900; font-size:18px;">₹0</div>
+            </div>
+            <button class="btn-add-cart" style="width:50%; font-size:14px; padding:12px; background:var(--secondary);" onclick="placeOrder()">Continue</button>
         </div>
     </div>
 
     <div class="auth-page" id="authPage">
-        <div class="auth-header"><i data-lucide="arrow-left" onclick="closeAuthPage()" style="cursor:pointer; margin-right: 15px;"></i><span>Login or Signup</span></div>
+        <div class="auth-header" style="flex-direction:row;"><i data-lucide="arrow-left" onclick="closeAuthPage()" style="cursor:pointer; margin-right: 15px;"></i><span>Login to Biju Mart</span></div>
         <div class="auth-tabs">
             <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
             <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Sign Up</div>
@@ -265,15 +299,15 @@
             <div id="authFormsSection">
                 <div id="registerForm" style="display:none;">
                     <label style="font-size:12px; font-weight:bold; color:var(--text-muted); margin-bottom:5px; display:block;">FIRST NAME</label>
-                    <input type="text" id="regFirstName" class="search-wrapper" style="width:100%; padding:15px; border:2px solid #e2e8f0; background:#f8fafc; margin-bottom:15px;" placeholder="e.g. Brahma">
+                    <input type="text" id="regFirstName" class="search-wrapper" style="width:100%; padding:15px; border:1px solid #e0e0e0; background:white; margin-bottom:15px;" placeholder="e.g. Brahma">
                     <label style="font-size:12px; font-weight:bold; color:var(--text-muted); margin-bottom:5px; display:block;">MOBILE NUMBER</label>
-                    <input type="tel" id="regPhone" class="search-wrapper" style="width:100%; padding:15px; border:2px solid #e2e8f0; background:#f8fafc; margin-bottom:25px;" placeholder="10-digit number" maxlength="10">
-                    <button class="btn-admin" style="background:var(--primary); padding:16px;" onclick="requestAuthOTP()">Send OTP</button>
+                    <input type="tel" id="regPhone" class="search-wrapper" style="width:100%; padding:15px; border:1px solid #e0e0e0; background:white; margin-bottom:25px;" placeholder="10-digit number" maxlength="10">
+                    <button class="btn-admin" style="background:var(--secondary); padding:16px;" onclick="requestAuthOTP()">Continue</button>
                 </div>
                 <div id="loginForm">
                     <label style="font-size:12px; font-weight:bold; color:var(--text-muted); margin-bottom:5px; display:block;">MOBILE NUMBER</label>
-                    <input type="tel" id="logPhone" class="search-wrapper" style="width:100%; padding:15px; border:2px solid #e2e8f0; background:#f8fafc; margin-bottom:25px;" placeholder="Enter registered number" maxlength="10">
-                    <button class="btn-admin" style="background:var(--primary); padding:16px;" onclick="requestAuthOTP()">Login with OTP</button>
+                    <input type="tel" id="logPhone" class="search-wrapper" style="width:100%; padding:15px; border:1px solid #e0e0e0; background:white; margin-bottom:25px;" placeholder="Enter registered number" maxlength="10">
+                    <button class="btn-admin" style="background:var(--secondary); padding:16px;" onclick="requestAuthOTP()">Continue</button>
                 </div>
             </div>
             <div id="authOtpSection" style="display:none; text-align: center;">
@@ -286,27 +320,27 @@
                     <input type="text" class="otp-box" id="otp4" maxlength="1" readonly>
                 </div>
                 <div class="otp-msg" id="autoDetectMsg">Waiting for SMS...</div>
-                <button class="btn-admin" id="verifyOtpBtn" style="background:var(--success); padding:16px; opacity:0.5; pointer-events:none;" onclick="verifyCustomerOTP()">Verify & Continue</button>
+                <button class="btn-admin" id="verifyOtpBtn" style="background:var(--success); padding:16px; opacity:0.5; pointer-events:none;" onclick="verifyCustomerOTP()">Verify</button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="adminLoginModal" style="background: var(--dark-bg);">
-        <div class="header" style="background:var(--dark-bg); border-bottom:1px solid #1e293b; color:white;">
-            <i data-lucide="arrow-left" onclick="closeModal('adminLoginModal')" style="cursor:pointer;"></i> <span>Admin Login</span> <div style="width:24px;"></div>
+        <div class="header" style="background:var(--dark-bg); border-bottom:1px solid #1e293b; color:white; flex-direction:row;">
+            <i data-lucide="arrow-left" onclick="closeModal('adminLoginModal')" style="cursor:pointer; width:24px;"></i> <span>Admin Access</span> <div style="width:24px;"></div>
         </div>
         <div style="padding: 30px; text-align:center; margin-top:30px;">
             <i data-lucide="lock" style="width:60px; height:60px; color:var(--primary); margin-bottom:20px;"></i>
-            <input type="text" id="adminUser" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:15px; background:#1e293b; color:white;" placeholder="Enter Admin Username">
+            <input type="text" id="adminUser" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:15px; background:#1e293b; color:white;" placeholder="Enter Username">
             <input type="password" id="adminPass" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:20px; background:#1e293b; color:white;" placeholder="Enter Password">
-            <button class="btn-admin" onclick="verifyAdmin()">Access Dashboard</button>
+            <button class="btn-admin" style="background:var(--primary);" onclick="verifyAdmin()">Login Dashboard</button>
         </div>
     </div>
   </div>
 
   <div class="app-view admin-bg" id="adminApp">
-    <div class="admin-header">
-        <div class="header-logo" id="dynamicLogoAdmin" style="color:white; -webkit-text-fill-color:white;">Admin Panel</div>
+    <div class="admin-header" style="flex-direction:row;">
+        <div class="header-logo" id="dynamicLogoAdmin" style="color:white; font-style:normal;">Admin Panel</div>
         <button class="icon-btn" onclick="logoutAdmin()" style="background:#1e293b; color:white; width:auto; padding:0 15px; font-size:12px; font-weight:bold;">Logout</button>
     </div>
 
@@ -323,15 +357,30 @@
         </div>
 
         <div class="admin-card">
-            <h3 style="margin-bottom: 15px; font-size:16px;">App Settings & Promo Banners</h3>
-            <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">APP LOGO (Image Link)</label>
+            <h3 style="margin-bottom: 15px; font-size:16px;">App Config (Support & Payments)</h3>
+            
+            <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">WHATSAPP NUMBER</label>
+            <input type="number" id="adminSupportWa" class="admin-input" placeholder="e.g. 919348954360">
+            
+            <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">SUPPORT EMAIL</label>
+            <input type="email" id="adminSupportEmail" class="admin-input" placeholder="e.g. help@bijumart.com">
+
+            <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px; margin-top:15px;">MERCHANT UPI ID (For Direct PhonePe/GPay)</label>
+            <input type="text" id="adminUpiId" class="admin-input" placeholder="e.g. 9348954360@ybl">
+            
+            <button class="btn-admin" style="margin-top:10px; background:var(--success);" onclick="updateAppConfig()">Save Configuration</button>
+        </div>
+
+        <div class="admin-card">
+            <h3 style="margin-bottom: 15px; font-size:16px;">App Settings & Banners</h3>
+            <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">APP LOGO (Image URL)</label>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <input type="text" id="adminLogoUrl" class="admin-input" placeholder="Paste Logo Image URL..." style="margin-bottom:0;">
+                <input type="text" id="adminLogoUrl" class="admin-input" placeholder="Paste URL..." style="margin-bottom:0;">
                 <button class="btn-small" onclick="updateAppLogo()">Update</button>
             </div>
-            <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">SLIDER BANNERS (Landscape Image Link)</label>
+            <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">PROMO BANNER (Image URL)</label>
             <div style="display:flex; gap:10px;">
-                <input type="text" id="adminBannerUrl" class="admin-input" placeholder="Paste Offer Poster URL..." style="margin-bottom:0;">
+                <input type="text" id="adminBannerUrl" class="admin-input" placeholder="Paste URL..." style="margin-bottom:0;">
                 <button class="btn-small" style="background:var(--success);" onclick="addPromoBanner()">Add</button>
             </div>
             <div style="margin-top: 15px;" id="adminBannerList"></div>
@@ -340,7 +389,7 @@
         <div class="admin-card">
             <h3 style="margin-bottom: 15px; font-size:16px;">Category Management</h3>
             <div style="display:flex; gap:10px;">
-                <input type="text" id="newCatName" class="admin-input" placeholder="New Category (e.g. Clothes)" style="margin-bottom:0;">
+                <input type="text" id="newCatName" class="admin-input" placeholder="New Category" style="margin-bottom:0;">
                 <button class="btn-small" style="background:var(--success);" onclick="addCategory()">Add</button>
             </div>
             <div style="margin-top: 15px;" id="adminCatList"></div>
@@ -349,16 +398,13 @@
         <div class="admin-card">
             <h3 style="margin-bottom: 15px; font-size:16px;">Product Management</h3>
             <input type="text" id="pName" class="admin-input" placeholder="Product Name">
-            <input type="text" id="pEmoji" class="admin-input" placeholder="Image Link (URL) OR Emoji (e.g. 🍚)">
+            <input type="text" id="pEmoji" class="admin-input" placeholder="Image URL OR Emoji">
             <div style="display:flex; gap:10px;">
                 <input type="number" id="pPrice" class="admin-input" placeholder="Price (₹)">
                 <input type="number" id="pStock" class="admin-input" placeholder="Stock Qty">
             </div>
-            
-            <select id="pCat" class="admin-input">
-                </select>
-            
-            <button class="btn-admin" id="adminAddBtn" onclick="saveProductEntry()">Add to Inventory</button>
+            <select id="pCat" class="admin-input"></select>
+            <button class="btn-admin" id="adminAddBtn" onclick="saveProductEntry()">Add Product</button>
             <div style="margin-top: 25px; border-top: 1px solid #334155; padding-top:15px;" id="adminStockList"></div>
         </div>
 
@@ -388,7 +434,12 @@
     let allOrders = [];
     let allUsers = [];
     let allCategories = []; 
-    let appSettings = { logo: '', banners: {} };
+    let appSettings = { 
+        logo: '', 
+        banners: {}, 
+        support: { whatsapp: "919348954360", email: "support@bijumart.com" },
+        payment: { upiId: "" }
+    };
     let cart = [];
     let currentCategory = 'All';
     let editingProductId = null;
@@ -396,20 +447,36 @@
     let currentAuthMode = 'login'; 
     let pendingAuthData = null;
     let selectedPaymentMethod = 'COD';
+    let customerLat = null;
+    let customerLng = null;
 
     const ADMIN_WHATSAPP_NUMBER = "919348954360";
 
     function isUrl(string) {
+        if(!string) return false;
         try { return Boolean(new URL(string)); }
         catch(e) { return false; }
+    }
+
+    // ✅ FIXED: Helper to safely parse Firebase arrays that might contain nulls
+    function safeParse(data) {
+        if (!data) return [];
+        if (Array.isArray(data)) {
+            return data.filter(item => item !== null && item !== undefined);
+        }
+        return Object.values(data).filter(item => item !== null && item !== undefined);
     }
 
     window.onload = () => {
         // Fetch Settings
         db.ref('settings').on('value', snap => {
             const data = snap.val();
-            if(data) appSettings = data;
-            if(!appSettings.banners) appSettings.banners = {};
+            if(data) {
+                appSettings.logo = data.logo || '';
+                appSettings.banners = data.banners || {};
+                if(data.support) appSettings.support = data.support;
+                if(data.payment) appSettings.payment = data.payment;
+            }
             applySettingsToUI();
             if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
         });
@@ -418,25 +485,30 @@
         db.ref('categories').on('value', snap => {
             const data = snap.val();
             if(data) {
-                allCategories = Object.values(data);
+                allCategories = safeParse(data);
             } else {
-                const defaultCats = ['Grocery', 'Camera', 'Computer', 'Audio', 'Accessories'];
+                const defaultCats = ['Fashion', 'Mobiles', 'Beauty', 'Electronics', 'Grocery'];
                 defaultCats.forEach(c => db.ref('categories/' + c.replace(/[^a-zA-Z0-9]/g, '')).set(c));
                 allCategories = defaultCats;
             }
             renderCategories();
         });
 
-        // Fetch Products
+        // ✅ FIXED: Product Fetching (Null handling to prevent crashes)
         db.ref('products').on('value', snap => {
             const data = snap.val();
-            if(data) {
-                allProducts = Object.values(data);
+            let parsedProducts = safeParse(data);
+            
+            if(parsedProducts.length > 0) {
+                allProducts = parsedProducts;
             } else {
+                // Auto-Recovery System: Add default products if DB is completely empty
                 const defaultProducts = [
-                    { id: 1, name: "Premium Basmati Rice", price: 450, emoji: "🍚", category: "Grocery", stock: 50 }
+                    { id: 1, name: "Premium Basmati Rice", price: 450, emoji: "🍚", category: "Grocery", stock: 50 },
+                    { id: 2, name: "Fresh Apples 1kg", price: 120, emoji: "🍎", category: "Grocery", stock: 20 }
                 ];
                 defaultProducts.forEach(p => db.ref('products/' + p.id).set(p));
+                allProducts = defaultProducts;
             }
             filterAndSortProducts();
             if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
@@ -445,7 +517,7 @@
         // Fetch Orders
         db.ref('orders').on('value', snap => {
             const data = snap.val();
-            allOrders = data ? Object.values(data).sort((a,b) => b.timestamp - a.timestamp) : [];
+            allOrders = safeParse(data).sort((a,b) => b.timestamp - a.timestamp);
             renderCustomerOrders();
             if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
         });
@@ -453,7 +525,7 @@
         // Fetch Users
         db.ref('users').on('value', snap => {
             const data = snap.val();
-            allUsers = data ? Object.values(data) : [];
+            allUsers = safeParse(data);
         });
 
         const savedSession = localStorage.getItem('shop_session_cloud');
@@ -464,21 +536,78 @@
         lucide.createIcons();
     };
 
+    // --- SUPPORT & PAYMENT LOGIC ---
+    function toggleSupportMenu() {
+        document.getElementById('supportMenu').classList.toggle('active');
+    }
+    
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('supportMenu');
+        const fab = document.querySelector('.support-fab');
+        if (menu && menu.classList.contains('active') && !menu.contains(event.target) && !fab.contains(event.target)) {
+            menu.classList.remove('active');
+        }
+    });
+
+    function contactSupport(type) {
+        document.getElementById('supportMenu').classList.remove('active');
+        if(type === 'wa') {
+            const waNumber = appSettings.support.whatsapp;
+            const text = encodeURIComponent("Hello Biju Mart Support, I need some help.");
+            window.open(`https://wa.me/${waNumber}?text=${text}`, '_blank');
+        } else {
+            const email = appSettings.support.email;
+            window.open(`mailto:${email}?subject=Customer Support Inquiry`, '_blank');
+        }
+    }
+
+    function updateAppConfig() {
+        const wa = document.getElementById('adminSupportWa').value;
+        const email = document.getElementById('adminSupportEmail').value;
+        const upi = document.getElementById('adminUpiId').value;
+        
+        if(wa) db.ref('settings/support/whatsapp').set(wa);
+        if(email) db.ref('settings/support/email').set(email);
+        if(upi !== undefined) db.ref('settings/payment/upiId').set(upi);
+        
+        showToast("Configuration Saved Successfully!");
+    }
+
+
     // --- CATEGORY MANAGEMENT ---
     function renderCategories() {
         const filterContainer = document.getElementById('categoryFilters');
-        let html = `<div class="cat-pill ${currentCategory === 'All' ? 'active' : ''}" onclick="setCategory('All', this)">All</div>`;
+        let html = `
+        <div class="cat-item ${currentCategory === 'All' ? 'active' : ''}" onclick="setCategory('All', this)">
+            <div class="cat-icon-circle"><i data-lucide="layout-grid"></i></div>
+            <span>For You</span>
+        </div>`;
+        
+        const iconMap = { 'Fashion':'shirt', 'Mobiles':'smartphone', 'Beauty':'sparkles', 'Electronics':'monitor', 'Grocery':'shopping-bag' };
+        
         allCategories.forEach(cat => {
-            html += `<div class="cat-pill ${currentCategory === cat ? 'active' : ''}" onclick="setCategory('${cat}', this)">${cat}</div>`;
+            if(!cat) return; // safety
+            const iconName = iconMap[cat] || 'box';
+            html += `
+            <div class="cat-item ${currentCategory === cat ? 'active' : ''}" onclick="setCategory('${cat}', this)">
+                <div class="cat-icon-circle"><i data-lucide="${iconName}"></i></div>
+                <span>${cat}</span>
+            </div>`;
         });
-        filterContainer.innerHTML = html;
+        if(filterContainer) {
+            filterContainer.innerHTML = html;
+            lucide.createIcons();
+        }
 
         const selectCat = document.getElementById('pCat');
-        selectCat.innerHTML = allCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        if(selectCat) {
+            selectCat.innerHTML = allCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        }
         
         const adminCatList = document.getElementById('adminCatList');
         if(adminCatList) {
             adminCatList.innerHTML = allCategories.map(cat => {
+                if(!cat) return '';
                 const catKey = cat.replace(/[^a-zA-Z0-9]/g, '');
                 return `
                 <div style="display:flex; align-items:center; justify-content:space-between; background:#1e293b; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #334155;">
@@ -493,20 +622,17 @@
     function addCategory() {
         const catName = document.getElementById('newCatName').value.trim();
         if(!catName) return showToast("Enter category name");
-        
         const catKey = catName.replace(/[^a-zA-Z0-9]/g, '');
         if(!catKey) return showToast("Invalid name");
-
         db.ref('categories/' + catKey).set(catName);
         document.getElementById('newCatName').value = '';
         showToast("Category Added!");
     }
 
     function deleteCategory(catKey, catName) {
-        if(confirm(`Are you sure you want to delete the "${catName}" category?`)) {
+        if(confirm(`Delete the "${catName}" category?`)) {
             db.ref('categories/' + catKey).remove();
             showToast("Category Deleted");
-            
             if(currentCategory === catName) {
                 currentCategory = 'All';
                 filterAndSortProducts();
@@ -520,25 +646,35 @@
             ? `<img src="${appSettings.logo}" alt="Biju Mart Logo">` 
             : "Biju Mart";
         
-        document.getElementById('dynamicLogoCustomer').innerHTML = logoHTML;
-        document.getElementById('dynamicLogoAdmin').innerHTML = logoHTML;
+        const dynCust = document.getElementById('dynamicLogoCustomer');
+        const dynAdmin = document.getElementById('dynamicLogoAdmin');
+        if(dynCust) dynCust.innerHTML = logoHTML;
+        if(dynAdmin) dynAdmin.innerHTML = logoHTML;
+
+        if(document.getElementById('adminSupportWa')) {
+            document.getElementById('adminSupportWa').value = appSettings.support.whatsapp || '';
+            document.getElementById('adminSupportEmail').value = appSettings.support.email || '';
+            document.getElementById('adminUpiId').value = (appSettings.payment && appSettings.payment.upiId) ? appSettings.payment.upiId : '';
+        }
 
         const bannerContainer = document.getElementById('promoBanners');
         const bannerKeys = Object.keys(appSettings.banners);
         
-        if(bannerKeys.length > 0) {
-            bannerContainer.style.display = 'flex';
-            bannerContainer.innerHTML = bannerKeys.map(key => `
-                <img src="${appSettings.banners[key]}" class="banner-slide" alt="Promo">
-            `).join('');
-        } else {
-            bannerContainer.style.display = 'none';
+        if(bannerContainer) {
+            if(bannerKeys.length > 0) {
+                bannerContainer.style.display = 'flex';
+                bannerContainer.innerHTML = bannerKeys.map(key => `
+                    <img src="${appSettings.banners[key]}" class="banner-slide" alt="Promo">
+                `).join('');
+            } else {
+                bannerContainer.style.display = 'none';
+            }
         }
     }
 
     function updateAppLogo() {
         const url = document.getElementById('adminLogoUrl').value;
-        if(url && !isUrl(url)) return showToast("Enter a valid image link (URL)");
+        if(url && !isUrl(url)) return showToast("Enter valid URL");
         db.ref('settings/logo').set(url);
         showToast("Logo Updated Live!");
         document.getElementById('adminLogoUrl').value = '';
@@ -546,11 +682,10 @@
 
     function addPromoBanner() {
         const url = document.getElementById('adminBannerUrl').value;
-        if(!url || !isUrl(url)) return showToast("Enter a valid image link (URL)");
-        
+        if(!url || !isUrl(url)) return showToast("Enter valid URL");
         const bannerId = 'BNR-' + Date.now();
         db.ref('settings/banners/' + bannerId).set(url);
-        showToast("Promo Banner Added Live!");
+        showToast("Banner Added Live!");
         document.getElementById('adminBannerUrl').value = '';
     }
 
@@ -561,8 +696,7 @@
         }
     }
 
-
-    // --- FULL SCREEN AUTH SYSTEM ---
+    // --- AUTHENTICATION ---
     function openAuthPage() {
         document.getElementById('authPage').classList.add('active');
         switchAuthTab('login');
@@ -581,8 +715,8 @@
         document.getElementById('regFirstName').value = '';
         document.getElementById('regPhone').value = '';
         ['otp1','otp2','otp3','otp4'].forEach(id => {
-            document.getElementById(id).value = '';
-            document.getElementById(id).style.borderColor = '#e2e8f0';
+            const el = document.getElementById(id);
+            if(el) { el.value = ''; el.style.borderColor = '#e0e0e0'; }
         });
         document.getElementById('autoDetectMsg').innerText = 'Waiting for SMS...';
         document.getElementById('autoDetectMsg').style.color = 'var(--text-muted)';
@@ -613,20 +747,17 @@
         if (currentAuthMode === 'login') {
             phone = document.getElementById('logPhone').value;
             if (phone.length !== 10) return showToast("Enter valid 10 digit mobile number");
-            
-            const existingUser = allUsers.find(u => u.phone === phone);
+            const existingUser = allUsers.find(u => u && u.phone === phone);
             if (!existingUser) {
                 showToast("Account not found. Please Sign Up.");
                 return switchAuthTab('register');
             }
             pendingAuthData = existingUser;
-
         } else if (currentAuthMode === 'register') {
             firstName = document.getElementById('regFirstName').value;
             phone = document.getElementById('regPhone').value;
             if (!firstName || phone.length !== 10) return showToast("Enter Name and 10 digit number");
-            
-            const existingUser = allUsers.find(u => u.phone === phone);
+            const existingUser = allUsers.find(u => u && u.phone === phone);
             if (existingUser) {
                 showToast("Number already registered. Please Login.");
                 return switchAuthTab('login');
@@ -643,18 +774,15 @@
     function simulateAutomaticOTP() {
         const msg = document.getElementById('autoDetectMsg');
         msg.innerText = "Reading SMS format...";
-        
         setTimeout(() => {
             msg.innerText = "OTP Detected! Auto-filling...";
-            msg.style.color = "var(--primary)";
+            msg.style.color = "var(--success)";
             setTimeout(() => { fillOtpBox('otp1', '4'); }, 300);
             setTimeout(() => { fillOtpBox('otp2', '2'); }, 600);
             setTimeout(() => { fillOtpBox('otp3', '8'); }, 900);
             setTimeout(() => { fillOtpBox('otp4', '9'); }, 1200);
-            
             setTimeout(() => {
                 msg.innerText = "✓ Verified securely.";
-                msg.style.color = "var(--success)";
                 const btn = document.getElementById('verifyOtpBtn');
                 btn.style.opacity = '1';
                 btn.style.pointerEvents = 'auto';
@@ -665,8 +793,10 @@
 
     function fillOtpBox(id, val) {
         const box = document.getElementById(id);
-        box.value = val;
-        box.style.borderColor = "var(--success)";
+        if(box) {
+            box.value = val;
+            box.style.borderColor = "var(--success)";
+        }
     }
 
     function verifyCustomerOTP() {
@@ -684,12 +814,10 @@
     function logoutCustomer() {
         loggedInUser = null;
         localStorage.removeItem('shop_session_cloud');
-        
         document.getElementById('loginBannerBtn').style.display = 'flex';
         document.getElementById('accountNavText').innerText = "Account";
         document.getElementById('cName').value = "";
         document.getElementById('cPhone').value = "";
-        
         switchCustomerTab('home', document.getElementById('navHome'));
         showToast("Logged out successfully");
     }
@@ -700,6 +828,7 @@
         document.getElementById('cPhone').value = loggedInUser.phone;
         document.getElementById('profileNameDisplay').innerText = loggedInUser.firstName;
         document.getElementById('profilePhoneDisplay').innerText = "+91 " + loggedInUser.phone;
+        document.getElementById('gridGreetingTitle').innerText = `${loggedInUser.firstName}, deals for you...`;
     }
 
     function handleAccountTabClick(element) {
@@ -716,95 +845,161 @@
 
     function filterAndSortProducts() {
         let products = allProducts;
-        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-        const sortMethod = document.getElementById('sortSelect').value;
+        const searchInput = document.getElementById('searchInput');
+        const searchQuery = searchInput ? searchInput.value.toLowerCase() : '';
+        const sortMethod = document.getElementById('sortSelect') ? document.getElementById('sortSelect').value : 'default';
 
-        if (currentCategory !== 'All') products = products.filter(p => p.category === currentCategory);
-        if (searchQuery) products = products.filter(p => p.name.toLowerCase().includes(searchQuery));
+        // ✅ FIXED: Safe filtering for older products without category
+        if (currentCategory !== 'All') {
+            products = products.filter(p => p && (p.category || 'Grocery') === currentCategory);
+        }
+        
+        if (searchQuery) {
+            products = products.filter(p => p && p.name && p.name.toLowerCase().includes(searchQuery));
+        }
 
-        if (sortMethod === 'low') products.sort((a, b) => a.price - b.price);
-        if (sortMethod === 'high') products.sort((a, b) => b.price - a.price);
+        if (sortMethod === 'low') products.sort((a, b) => (a.price||0) - (b.price||0));
+        if (sortMethod === 'high') products.sort((a, b) => (b.price||0) - (a.price||0));
 
         renderCustomerProducts(products);
     }
 
+    function updateQty(id, delta) {
+        const product = allProducts.find(p => p.id === id);
+        if(!product) return;
+        
+        let item = cart.find(i => i.id === id);
+
+        if(item) {
+            item.qty += delta;
+            if(item.qty <= 0) {
+                cart = cart.filter(i => i.id !== id);
+            } else if (item.qty > product.stock) {
+                item.qty = product.stock;
+                showToast("Stock limit reached!");
+            }
+        } else if (delta > 0) {
+            if(product.stock > 0) {
+                cart.push({...product, qty: 1});
+                showToast("Added to Cart");
+            } else {
+                showToast("Out of Stock");
+            }
+        }
+
+        const badge = document.getElementById('cartBadge');
+        const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+        if(totalQty > 0) {
+            badge.style.display = 'flex';
+            badge.innerText = totalQty;
+        } else {
+            badge.style.display = 'none';
+        }
+
+        filterAndSortProducts(); 
+        if(document.getElementById('cartModal').classList.contains('active')) openCart(); 
+    }
+
     function renderCustomerProducts(products) {
         const grid = document.getElementById('customerProductsGrid');
+        if(!grid) return;
+        
         if(products.length === 0) {
-            grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:#94a3b8;">No products found</div>`;
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:#878787;">No products found</div>`;
             return;
         }
 
         grid.innerHTML = products.map(p => {
             const isOutOfStock = p.stock <= 0;
             const stockBadge = isOutOfStock ? `<div class="stock-badge low">OUT OF STOCK</div>` : `<div class="stock-badge ok">${p.stock} LEFT</div>`;
-            const btnState = isOutOfStock ? 'disabled' : '';
-            const btnText = isOutOfStock ? 'Unavailable' : 'Add to Cart';
+            
+            const emojiVal = p.emoji || '📦';
+            const displayVisual = isUrl(emojiVal) ? `<img src="${emojiVal}" class="product-img-real" alt="product">` : emojiVal;
 
-            const displayVisual = isUrl(p.emoji) 
-                ? `<img src="${p.emoji}" class="product-img-real" alt="product">` 
-                : p.emoji;
+            let cartItem = cart.find(i => i.id === p.id);
+            let actionHTML = '';
+            
+            if(cartItem) {
+                actionHTML = `
+                <div class="qty-controls">
+                    <button class="btn-qty" onclick="updateQty(${p.id}, -1)">-</button>
+                    <span class="qty-val">${cartItem.qty}</span>
+                    <button class="btn-qty" onclick="updateQty(${p.id}, 1)">+</button>
+                </div>`;
+            } else if(isOutOfStock) {
+                actionHTML = `<button class="btn-add-cart" disabled>Unavailable</button>`;
+            } else {
+                actionHTML = `<button class="btn-add-cart" onclick="updateQty(${p.id}, 1)">Add to Cart</button>`;
+            }
 
             return `
             <div class="product-card">
                 ${stockBadge}
                 <div class="product-image">${displayVisual}</div>
                 <div class="product-info">
-                    <div class="product-cat">${p.category}</div>
                     <div class="product-name">${p.name}</div>
-                    <div class="product-price">₹${p.price.toLocaleString('en-IN')}</div>
-                    <button class="btn-add-cart" onclick="addToCart(${p.id})" ${btnState}>${btnText}</button>
+                    <div class="product-price">₹${(p.price||0).toLocaleString('en-IN')}</div>
+                    ${actionHTML}
                 </div>
             </div>
         `}).join('');
-    }
-
-    function addToCart(id) {
-        const product = allProducts.find(p => p.id === id);
-        const existing = cart.find(item => item.id === id);
-        const currentQtyInCart = existing ? existing.qty : 0;
-
-        if(currentQtyInCart >= product.stock) return showToast("Cannot add more! Stock limit reached.");
-
-        if(existing) existing.qty += 1;
-        else cart.push({...product, qty: 1});
-        
-        document.getElementById('cartBadge').style.display = 'flex';
-        document.getElementById('cartBadge').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
-        showToast("Added to Cart");
     }
 
     function openCart() {
         document.getElementById('cartModal').classList.add('active');
         const list = document.getElementById('cartItemsList');
         if(cart.length === 0) {
-            list.innerHTML = "<p style='text-align:center; margin-top:20px; color:#888;'>Cart is empty</p>";
+            list.innerHTML = "<p style='text-align:center; margin-top:20px; color:#878787;'>Cart is empty</p>";
             document.getElementById('cartTotal').innerText = '₹0';
             return;
         }
 
         let total = 0;
         list.innerHTML = cart.map(item => {
-            total += item.price * item.qty;
-            const displayVisual = isUrl(item.emoji) 
-                ? `<img src="${item.emoji}" class="cart-img-real">` 
-                : `<div style="font-size:30px;">${item.emoji}</div>`;
+            total += (item.price||0) * item.qty;
+            const emojiVal = item.emoji || '📦';
+            const displayVisual = isUrl(emojiVal) ? `<img src="${emojiVal}" class="cart-img-real">` : `<div style="font-size:30px; width:50px; text-align:center;">${emojiVal}</div>`;
 
             return `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:#f8fafc; border-radius:12px; margin-bottom:10px; border:1px solid #e2e8f0;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-radius:8px; margin-bottom:10px; border:1px solid #e0e0e0;">
                     <div style="display:flex; gap:15px; align-items:center;">
                         ${displayVisual}
                         <div>
-                            <div style="font-weight:700; font-size:14px; color:var(--text-main);">${item.name}</div>
-                            <div style="color:var(--primary); font-weight:800; font-size:15px; margin-top:4px;">₹${item.price.toLocaleString('en-IN')}</div>
+                            <div style="font-weight:600; font-size:13px; color:var(--text-main);">${item.name}</div>
+                            <div style="color:var(--text-main); font-weight:800; font-size:15px; margin-top:4px;">₹${(item.price||0).toLocaleString('en-IN')}</div>
                         </div>
                     </div>
-                    <div style="font-weight:bold; font-size:16px;">x${item.qty}</div>
+                    <div class="qty-controls" style="margin-top:0; width:80px;">
+                        <button class="btn-qty" style="width:22px; height:22px; font-size:12px;" onclick="updateQty(${item.id}, -1)">-</button>
+                        <span class="qty-val" style="font-size:12px;">${item.qty}</span>
+                        <button class="btn-qty" style="width:22px; height:22px; font-size:12px;" onclick="updateQty(${item.id}, 1)">+</button>
+                    </div>
                 </div>
             `;
         }).join('');
         document.getElementById('cartTotal').innerText = '₹' + total.toLocaleString('en-IN');
         document.getElementById('checkoutTotal').innerText = '₹' + total.toLocaleString('en-IN');
+    }
+
+    function captureLocation() {
+        if (navigator.geolocation) {
+            document.getElementById('locStatus').innerText = "Fetching location...";
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    customerLat = pos.coords.latitude;
+                    customerLng = pos.coords.longitude;
+                    document.getElementById('locStatus').innerText = "✅ Live Location Attached!";
+                    document.getElementById('locStatus').style.color = "var(--success)";
+                    document.getElementById('locStatus').style.fontWeight = "bold";
+                },
+                err => {
+                    document.getElementById('locStatus').innerText = "❌ Please enable GPS in browser.";
+                    document.getElementById('locStatus').style.color = "var(--danger)";
+                }
+            );
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
     }
 
     function proceedToCheckout() {
@@ -829,9 +1024,19 @@
     function placeOrder() {
         const name = document.getElementById('cName').value;
         const phone = document.getElementById('cPhone').value;
-        if(!name || !phone) return showToast("Name and Phone are required");
+        const address = document.getElementById('cAddress').value;
+        const pin = document.getElementById('cPin').value;
 
-        let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        if(!name || !phone || !address || !pin) return showToast("Please fill all Delivery Details.");
+
+        let total = cart.reduce((sum, item) => sum + ((item.price||0) * item.qty), 0);
+
+        if (selectedPaymentMethod === 'UPI') {
+            if (!appSettings.payment || !appSettings.payment.upiId) {
+                return showToast("Online payment is currently unavailable. Please choose Cash on Delivery.");
+            }
+        }
+
         const orderId = 'ORD-' + Date.now();
         const itemsStr = cart.map(i => `${i.name} (x${i.qty})`).join(', ');
 
@@ -840,7 +1045,10 @@
             timestamp: Date.now(),
             customer: name,
             phone: phone,
-            paymentMethod: selectedPaymentMethod,
+            address: address + " - " + pin,
+            lat: customerLat, 
+            lng: customerLng,
+            paymentMethod: selectedPaymentMethod === 'UPI' ? 'UPI (Pending)' : 'COD',
             items: itemsStr,
             total: total,
             status: 'Pending',
@@ -854,51 +1062,60 @@
             if(dbProduct) db.ref('products/' + dbProduct.id).update({ stock: dbProduct.stock - cartItem.qty });
         });
 
-        let waMessage = `*NEW ORDER ALERT - BIJU MART* 🚀\n`;
-        waMessage += `-------------------------\n`;
-        waMessage += `*Order ID:* ${orderId}\n`;
-        waMessage += `*Customer Name:* ${name}\n`;
-        waMessage += `*Customer Phone:* +91 ${phone}\n`;
-        waMessage += `-------------------------\n`;
-        waMessage += `*Items Ordered:*\n${itemsStr.replace(/, /g, '\n')}\n`;
-        waMessage += `-------------------------\n`;
-        waMessage += `*Payment Method:* ${selectedPaymentMethod}\n`;
-        waMessage += `*Total Amount:* ₹${total.toLocaleString('en-IN')}\n`;
-        waMessage += `-------------------------\n`;
-        waMessage += `Please confirm my order. Thank you!`;
-
-        const waUrl = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
-        window.open(waUrl, '_blank');
-
         cart = [];
+        customerLat = null;
+        customerLng = null;
         document.getElementById('cartBadge').style.display = 'none';
+        document.getElementById('locStatus').innerText = "Optional: Helps delivery boy find you";
+        document.getElementById('locStatus').style.color = "var(--text-muted)";
         closeModal('checkoutModal');
-        showToast("Order Placed! Redirecting to WhatsApp...");
+        
+        // ✅ FIXED: Send user directly to Orders tab
         switchCustomerTab('orders', document.getElementById('navOrders'));
+
+        setTimeout(() => {
+            if (selectedPaymentMethod === 'UPI') {
+                showToast("Opening Payment App...");
+                const upiUrl = `upi://pay?pa=${appSettings.payment.upiId}&pn=Biju%20Mart&am=${total}&cu=INR`;
+                window.location.href = upiUrl; 
+            } else {
+                showToast("Order Placed Successfully!");
+            }
+        }, 500);
     }
 
     function renderCustomerOrders() {
         const list = document.getElementById('customerOrdersList');
+        if(!list) return;
         let myOrders = loggedInUser ? allOrders.filter(o => o.phone === loggedInUser.phone) : [];
 
         if(myOrders.length === 0) {
-            list.innerHTML = "<p style='color:#888; text-align:center;'>No orders found.</p>";
+            list.innerHTML = "<p style='color:#878787; text-align:center;'>No orders found.</p>";
             return;
         }
 
         list.innerHTML = myOrders.map(o => {
-            let color = o.status === 'Delivered' ? 'var(--success)' : (o.status === 'Pending' ? '#f59e0b' : 'var(--primary)');
+            let color = o.status === 'Delivered' ? 'var(--success)' : (o.status === 'Pending' ? 'var(--secondary)' : 'var(--primary)');
+            
+            let deliveryInfo = "";
+            if(o.deliveryDate) {
+                deliveryInfo = `<div style="background:#f0f5ff; padding:8px; border-radius:6px; margin-top:10px; font-size:12px; color:var(--primary); font-weight:bold; border:1px dashed #c0d5ff;">
+                    🚚 Expected Delivery: ${o.deliveryDate} ${o.deliveryTime ? 'at '+o.deliveryTime : ''}
+                </div>`;
+            }
+
             return `
-            <div style="background:white; padding:15px; border-radius:12px; margin-bottom:15px; box-shadow:0 2px 10px rgba(0,0,0,0.02); border:1px solid #e2e8f0;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
-                    <b style="color:var(--text-main);">${o.id}</b>
-                    <span style="font-weight:bold; font-size:12px; color:${color}; background:${color}20; padding:4px 8px; border-radius:6px;">${o.status}</span>
+            <div style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #e0e0e0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #f1f3f6; padding-bottom:10px;">
+                    <b style="color:var(--text-main); font-size:12px;">${o.id}</b>
+                    <span style="font-weight:bold; font-size:11px; color:${color};">${o.status}</span>
                 </div>
                 <div style="font-size:13px; color:var(--text-muted); line-height:1.5;">
                     ${o.items}<br>
                     <div style="margin-top:8px; font-size:12px; color:var(--text-muted);">Payment: <b>${o.paymentMethod}</b></div>
-                    <div style="margin-top:4px; font-size:15px; font-weight:800; color:var(--text-main);">Total: ₹${o.total.toLocaleString('en-IN')}</div>
+                    <div style="margin-top:4px; font-size:15px; font-weight:800; color:var(--text-main);">Total: ₹${(o.total||0).toLocaleString('en-IN')}</div>
                 </div>
+                ${deliveryInfo}
             </div>
         `}).join('');
     }
@@ -911,6 +1128,7 @@
         document.getElementById('customerOrdersView').style.display = 'none';
         document.getElementById('customerProfileView').style.display = 'none';
 
+        // ✅ FIXED: Corrected logic so user sees orders tab properly
         if(tab === 'home') {
             document.getElementById('customerDashboard').style.display = 'block';
             filterAndSortProducts();
@@ -918,6 +1136,8 @@
             if(!loggedInUser) {
                 showToast("Please sign in to see your orders");
                 openAuthPage();
+                // Revert to Home tab active state
+                document.getElementById('navOrders').classList.remove('active');
                 document.getElementById('navHome').classList.add('active'); 
                 return;
             }
@@ -954,7 +1174,6 @@
         
         editingProductId = null;
         document.getElementById('adminAddBtn').innerText = "Add to Inventory";
-        document.getElementById('adminAddBtn').style.background = "var(--primary)";
         
         filterAndSortProducts(); 
         renderCustomerOrders();
@@ -962,11 +1181,10 @@
     }
 
     function loadAdminDashboard() {
-        let revenue = allOrders.reduce((sum, o) => sum + o.total, 0);
+        let revenue = allOrders.reduce((sum, o) => sum + (o.total||0), 0);
         document.getElementById('metricRevenue').innerText = '₹' + revenue.toLocaleString('en-IN');
         document.getElementById('metricOrders').innerText = allOrders.length;
 
-        // Render Banner List in Admin
         const bannerKeys = Object.keys(appSettings.banners || {});
         document.getElementById('adminBannerList').innerHTML = bannerKeys.length === 0 
             ? `<p style="color:#64748b; font-size:12px;">No active banners</p>` 
@@ -978,10 +1196,8 @@
             `).join('');
 
         document.getElementById('adminStockList').innerHTML = allProducts.map(p => {
-            const displayVisual = isUrl(p.emoji) 
-                ? `<img src="${p.emoji}" class="admin-img-real">` 
-                : `<span style="font-size:18px;">${p.emoji}</span>`;
-
+            const emojiVal = p.emoji || '📦';
+            const displayVisual = isUrl(emojiVal) ? `<img src="${emojiVal}" class="admin-img-real">` : `<span style="font-size:18px;">${emojiVal}</span>`;
             return `
             <div class="inventory-item">
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:8px;">
@@ -992,7 +1208,7 @@
                     <div style="font-size:12px; font-weight:bold; padding:3px 6px; border-radius:4px; background:${p.stock <= 2 ? '#ef444430' : '#10b98130'}; color:${p.stock <= 2 ? 'var(--danger)' : 'var(--success)'}">Stock: ${p.stock}</div>
                 </div>
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <span style="color:var(--primary); font-weight:bold; font-size:15px;">₹${p.price.toLocaleString('en-IN')}</span>
+                    <span style="color:var(--primary); font-weight:bold; font-size:15px;">₹${(p.price||0).toLocaleString('en-IN')}</span>
                     <div style="display:flex; gap:8px;">
                         <button onclick="editProduct(${p.id})" style="background:#3b82f6; border:none; padding:6px 12px; border-radius:6px; color:white; font-size:12px; cursor:pointer; font-weight:bold;">Edit</button>
                         <button onclick="deleteProduct(${p.id})" style="background:var(--danger); border:none; padding:6px 12px; border-radius:6px; color:white; font-size:12px; cursor:pointer; font-weight:bold;">Delete</button>
@@ -1002,31 +1218,64 @@
             `;
         }).join('');
 
-        document.getElementById('adminOrdersList').innerHTML = allOrders.map(o => `
-            <div style="background:#0f172a; padding:15px; border-radius:10px; margin-bottom:12px; border:1px solid #334155;">
+        document.getElementById('adminOrdersList').innerHTML = allOrders.map(o => {
+            let mapBtn = '';
+            if(o.lat && o.lng) {
+                mapBtn = `<a href="https://www.google.com/maps?q=${o.lat},${o.lng}" target="_blank" style="background:#f0f5ff; color:var(--primary); font-weight:bold; padding:6px 10px; border-radius:6px; font-size:11px; text-decoration:none; display:inline-block; margin-bottom:10px;">📍 View Map Location</a><br>`;
+            }
+
+            return `
+            <div style="background:#0f172a; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #334155;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                     <b style="color:var(--primary);">${o.id}</b>
                     <span style="font-size:12px; color:#94a3b8;">${o.date}</span>
                 </div>
-                <div style="font-size:13px; color:#cbd5e1; margin-bottom:12px;">
-                    Customer: ${o.customer} (+91 ${o.phone})<br>
-                    Items: ${o.items}<br>
-                    Payment: <b>${o.paymentMethod || 'COD'}</b><br>
-                    Total: ₹${o.total.toLocaleString('en-IN')}
+                <div style="font-size:13px; color:#cbd5e1; margin-bottom:12px; line-height:1.5;">
+                    <b style="color:white;">${o.customer}</b> (+91 ${o.phone})<br>
+                    Address: ${o.address || 'N/A'}<br>
+                    ${mapBtn}
+                    Items: <span style="color:#94a3b8;">${o.items}</span><br>
+                    Payment: <b style="color:${o.paymentMethod.includes('UPI') ? '#388e3c' : '#cbd5e1'};">${o.paymentMethod}</b><br>
+                    Total: <b style="color:white; font-size:15px;">₹${(o.total||0).toLocaleString('en-IN')}</b>
                 </div>
-                <select style="background:#1e293b; color:white; border:1px solid #475569; padding:8px; border-radius:6px; width:100%; outline:none;" onchange="updateOrderStatus('${o.id}', this.value)">
-                    <option value="Pending" ${o.status==='Pending'?'selected':''}>⏳ Pending</option>
-                    <option value="Packed" ${o.status==='Packed'?'selected':''}>📦 Packed</option>
-                    <option value="Shipped" ${o.status==='Shipped'?'selected':''}>🚚 Shipped</option>
-                    <option value="Delivered" ${o.status==='Delivered'?'selected':''}>✅ Delivered</option>
-                </select>
+                
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <select style="background:#1e293b; color:white; border:1px solid #475569; padding:8px; border-radius:6px; flex:1; outline:none;" onchange="updateOrderStatus('${o.id}', this.value)">
+                        <option value="Pending" ${o.status==='Pending'?'selected':''}>⏳ Pending</option>
+                        <option value="Packed" ${o.status==='Packed'?'selected':''}>📦 Packed</option>
+                        <option value="Shipped" ${o.status==='Shipped'?'selected':''}>🚚 Shipped</option>
+                        <option value="Delivered" ${o.status==='Delivered'?'selected':''}>✅ Delivered</option>
+                    </select>
+                </div>
+
+                <div style="background:#1e293b; padding:10px; border-radius:6px; border:1px solid #334155;">
+                    <div style="font-size:11px; color:#94a3b8; font-weight:bold; margin-bottom:5px;">SET DELIVERY DATE & TIME</div>
+                    <div style="display:flex; gap:5px;">
+                        <input type="date" id="delDate_${o.id}" class="admin-input" style="padding:6px; margin:0;" value="${o.deliveryDate || ''}">
+                        <input type="time" id="delTime_${o.id}" class="admin-input" style="padding:6px; margin:0; width:100px;" value="${o.deliveryTime || ''}">
+                        <button class="btn-small" style="padding:6px 12px;" onclick="saveDeliverySchedule('${o.id}')">Save</button>
+                    </div>
+                </div>
+
                 <button onclick="shareBillWhatsApp('${o.id}')" style="background:var(--whatsapp); color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px; font-weight:bold; justify-content:center; width:100%; margin-top:12px;">
-                    <i data-lucide="message-circle" style="width:18px;"></i> Send Receipt to Customer
+                    <i data-lucide="message-circle" style="width:18px;"></i> Send Receipt
                 </button>
             </div>
-        `).join('') || "<p style='color:#64748b;'>No orders yet.</p>";
+            `;
+        }).join('') || "<p style='color:#64748b;'>No orders yet.</p>";
         
         lucide.createIcons();
+    }
+
+    function saveDeliverySchedule(orderId) {
+        const dDate = document.getElementById(`delDate_${orderId}`).value;
+        const dTime = document.getElementById(`delTime_${orderId}`).value;
+        
+        db.ref('orders/' + orderId).update({ 
+            deliveryDate: dDate,
+            deliveryTime: dTime
+        });
+        showToast("Delivery Schedule Sent to Customer!");
     }
 
     function shareBillWhatsApp(orderId) {
@@ -1041,9 +1290,10 @@
         message += `-------------------------\n`;
         message += `*Items Ordered:*\n${o.items.replace(/, /g, '\n')}\n`; 
         message += `-------------------------\n`;
-        message += `*Payment Method:* ${o.paymentMethod || 'COD'}\n`;
-        message += `*Total Amount:* ₹${o.total.toLocaleString('en-IN')}\n`;
+        message += `*Payment Method:* ${o.paymentMethod}\n`;
+        message += `*Total Amount:* ₹${(o.total||0).toLocaleString('en-IN')}\n`;
         message += `*Status:* ${o.status}\n`;
+        if(o.deliveryDate) message += `*Expected Delivery:* ${o.deliveryDate} ${o.deliveryTime}\n`;
         message += `-------------------------\n`;
         message += `Thank you for shopping with Biju Mart! 🛍️`;
 
@@ -1072,8 +1322,7 @@
         if (editingProductId) {
             showToast("Product Updated in Cloud!");
             editingProductId = null;
-            document.getElementById('adminAddBtn').innerText = "Add to Inventory";
-            document.getElementById('adminAddBtn').style.background = "var(--primary)";
+            document.getElementById('adminAddBtn').innerText = "Add Product";
         } else {
             showToast("Product Added to Cloud Successfully");
         }
@@ -1097,7 +1346,6 @@
         editingProductId = id;
         const btn = document.getElementById('adminAddBtn');
         btn.innerText = "Update Product";
-        btn.style.background = "var(--success)";
         
         document.querySelector('#adminApp .main-content').scrollTo({top: 0, behavior: 'smooth'});
     }
@@ -1110,7 +1358,7 @@
 
     function updateOrderStatus(orderId, newStatus) {
         db.ref('orders/' + orderId).update({ status: newStatus });
-        showToast("Order Updated live on all devices!");
+        showToast("Status Updated live!");
     }
 
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
@@ -1118,7 +1366,7 @@
         const t = document.createElement('div');
         t.className = 'toast'; t.innerText = msg;
         document.body.appendChild(t);
-        setTimeout(() => t.remove(), 2500);
+        setTimeout(() => t.remove(), 3500);
     }
   </script>
 </body>
