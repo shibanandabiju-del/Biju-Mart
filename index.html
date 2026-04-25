@@ -83,9 +83,8 @@
         .btn-email { color: var(--danger); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
-
-        /* --- PROFESSIONAL ADMIN PANEL TABS --- */
+        
+        /* --- ADMIN & RIDER THEMES --- */
         .admin-bg { background: var(--dark-bg); color: white; }
         .admin-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items:center; flex-shrink:0; }
         .admin-tab-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 0 20px 15px; border-bottom: 1px solid #1e293b; scrollbar-width: none; flex-shrink:0; }
@@ -107,7 +106,6 @@
         .btn-small { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
         .btn-danger-small { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
 
-        /* --- Shared Modals & Nav --- */
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .nav-item.active { color: var(--primary); }
         
@@ -138,14 +136,13 @@
         
         .cart-img-real { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; border: 1px solid #eee; padding:2px; }
 
-        /* 🚀 PRINT STYLES FOR BILL GENERATION */
+        /* PRINT STYLES */
         .print-only { display: none; }
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; position: absolute; top:0; left:0; width: 100%; background: white; z-index: 99999; padding: 20px; color: black; font-family: sans-serif; }
             body { background: white; }
         }
-        
         .bill-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 12px; }
         .bill-table th, .bill-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         .bill-table th { background-color: #f8fafc; font-weight: bold; }
@@ -160,6 +157,7 @@
         <div class="header-top-row">
             <div class="header-logo" id="dynamicLogoCustomer">Biju Mart</div>
             <div style="display:flex; gap:10px; align-items:center;">
+                <button class="icon-btn" onclick="openRiderLogin()" style="color:var(--primary);"><i data-lucide="bike" style="width:20px;"></i></button>
                 <button class="icon-btn" onclick="openAdminLogin()"><i data-lucide="shield" style="width:20px;"></i></button>
             </div>
         </div>
@@ -206,34 +204,18 @@
         </div>
     </div>
 
-    <div class="support-fab" onclick="toggleSupportMenu()">
-        <i data-lucide="headphones"></i>
-    </div>
+    <div class="support-fab" onclick="toggleSupportMenu()"><i data-lucide="headphones"></i></div>
     <div class="support-menu" id="supportMenu">
-        <button class="support-btn btn-wa" onclick="contactSupport('wa')">
-            <i data-lucide="message-circle"></i> WhatsApp
-        </button>
-        <button class="support-btn btn-email" onclick="contactSupport('email')">
-            <i data-lucide="mail"></i> Email Us
-        </button>
+        <button class="support-btn btn-wa" onclick="contactSupport('wa')"><i data-lucide="message-circle"></i> WhatsApp</button>
+        <button class="support-btn btn-email" onclick="contactSupport('email')"><i data-lucide="mail"></i> Email Us</button>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" id="navHome" onclick="switchCustomerTab('home', this)">
-            <i data-lucide="home"></i> <span>Home</span>
-        </div>
-        <div class="nav-item" id="navOrders" onclick="switchCustomerTab('orders', this)">
-            <i data-lucide="package"></i> <span>My Orders</span>
-        </div>
-        <div class="nav-item" id="navAccount" onclick="handleAccountTabClick(this)">
-            <i data-lucide="user"></i> <span id="accountNavText">Account</span>
-        </div>
+        <div class="nav-item active" id="navHome" onclick="switchCustomerTab('home', this)"><i data-lucide="home"></i> <span>Home</span></div>
+        <div class="nav-item" id="navOrders" onclick="switchCustomerTab('orders', this)"><i data-lucide="package"></i> <span>My Orders</span></div>
+        <div class="nav-item" id="navAccount" onclick="handleAccountTabClick(this)"><i data-lucide="user"></i> <span>Account</span></div>
         <div class="nav-item" onclick="openCart()">
-            <div style="position:relative;">
-                <i data-lucide="shopping-cart"></i>
-                <div class="badge" id="cartBadge" style="display: none;">0</div>
-            </div>
-            <span>Cart</span>
+            <div style="position:relative;"><i data-lucide="shopping-cart"></i><div class="badge" id="cartBadge" style="display: none;">0</div></div><span>Cart</span>
         </div>
     </div>
 
@@ -300,7 +282,7 @@
     </div>
 
     <div class="auth-page" id="authPage">
-        <div class="auth-header" style="flex-direction:row; flex-shrink:0;"><i data-lucide="arrow-left" onclick="closeAuthPage()" style="cursor:pointer; margin-right: 15px;"></i><span>Login to Biju Mart</span></div>
+        <div class="auth-header" style="flex-direction:row; flex-shrink:0;"><i data-lucide="arrow-left" onclick="closeAuthPage()" style="cursor:pointer; margin-right: 15px;"></i><span>Login</span></div>
         <div class="auth-tabs">
             <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
             <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Sign Up</div>
@@ -346,7 +328,54 @@
             <button class="btn-admin" style="background:var(--primary);" onclick="verifyAdmin()">Login Dashboard</button>
         </div>
     </div>
+
+    <div class="modal" id="riderLoginModal" style="background: #1e293b; color:white;">
+        <div class="header" style="background:#1e293b; border-bottom:1px solid #334155; color:white; flex-direction:row; flex-shrink:0;">
+            <i data-lucide="arrow-left" onclick="closeModal('riderLoginModal')" style="cursor:pointer; width:24px;"></i> <span>Rider Partner Login</span> <div style="width:24px;"></div>
+        </div>
+        <div style="padding: 30px; text-align:center; margin-top:30px;">
+            <i data-lucide="bike" style="width:60px; height:60px; color:var(--secondary); margin-bottom:20px;"></i>
+            <input type="tel" id="riderPhoneLogin" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:15px; background:#0f172a; color:white;" placeholder="Registered Mobile Number">
+            <input type="password" id="riderPassLogin" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:20px; background:#0f172a; color:white;" placeholder="Password">
+            <button class="btn-admin" style="background:var(--secondary);" onclick="verifyRider()">Start Duty</button>
+        </div>
+    </div>
+
   </div>
+
+  <div class="app-view admin-bg" id="riderApp" style="background:#f1f5f9; color:var(--text-main);">
+      <div class="header" style="background:var(--secondary); color:white; border-bottom:none; flex-direction:row;">
+          <div style="font-weight:900; font-size:18px;"><i data-lucide="bike" style="vertical-align:middle; margin-right:5px;"></i> Rider App</div>
+          <button class="icon-btn" onclick="logoutRider()" style="background:white; color:var(--secondary); width:auto; padding:0 15px; font-size:12px; font-weight:bold;">Logout</button>
+      </div>
+
+      <div class="main-content" style="padding:15px;">
+          <div style="background:white; border-radius:12px; padding:20px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-bottom:15px;">
+              <h2 id="riderGreeting" style="font-size:18px; margin-bottom:10px;">Welcome</h2>
+              <div style="font-size:12px; color:var(--text-muted);">TODAY'S DELIVERIES</div>
+              <div id="riderDeliveredCount" style="font-size:30px; font-weight:900; color:var(--success);">0</div>
+          </div>
+
+          <h3 style="font-size:15px; margin-bottom:10px; color:var(--text-muted); font-weight:bold;">ASSIGNED ORDERS</h3>
+          <div id="riderOrdersList"></div>
+      </div>
+
+      <div class="modal" id="riderQrModal" style="background:rgba(0,0,0,0.8); justify-content:center; padding:20px;">
+          <div style="background:white; border-radius:16px; padding:20px; text-align:center; position:relative; width:100%; max-width:350px; margin:0 auto;">
+              <i data-lucide="x" onclick="closeModal('riderQrModal')" style="position:absolute; top:15px; right:15px; cursor:pointer; color:var(--text-muted);"></i>
+              <h3 style="margin-bottom:5px; font-size:18px;">Scan to Pay</h3>
+              <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Ask customer to scan with PhonePe/GPay</p>
+              
+              <div style="background:#f0f5ff; padding:15px; border-radius:12px; display:inline-block; border:1px solid #c0d5ff; margin-bottom:15px;">
+                  <img id="dynamicQrImage" src="" style="width:200px; height:200px; mix-blend-mode:multiply;">
+              </div>
+              
+              <div style="font-size:24px; font-weight:900; color:var(--primary); margin-bottom:5px;" id="qrAmountDisplay">₹0</div>
+              <div style="font-size:12px; color:var(--success); font-weight:bold;">UPI: <span id="qrUpiDisplay"></span></div>
+          </div>
+      </div>
+  </div>
+
 
   <div class="app-view admin-bg" id="adminApp">
     
@@ -366,6 +395,7 @@
         <button class="admin-tab-btn" id="btn-tab-orders" onclick="switchAdminTab('orders')">Live Orders</button>
         <button class="admin-tab-btn" id="btn-tab-products" onclick="switchAdminTab('products')">Products</button>
         <button class="admin-tab-btn" id="btn-tab-categories" onclick="switchAdminTab('categories')">Categories</button>
+        <button class="admin-tab-btn" id="btn-tab-riders" onclick="switchAdminTab('riders')">Riders</button>
         <button class="admin-tab-btn" id="btn-tab-settings" onclick="switchAdminTab('settings')">Settings</button>
     </div>
 
@@ -423,6 +453,21 @@
                     <button class="btn-small" style="background:var(--success);" onclick="addCategory()">Add</button>
                 </div>
                 <div style="margin-top: 15px;" id="adminCatList"></div>
+            </div>
+        </div>
+
+        <div class="admin-section" id="sec-riders">
+            <div class="admin-card" style="border-color:var(--secondary);">
+                <h3 style="margin-bottom: 15px; font-size:16px; color:var(--secondary);">Add Delivery Rider</h3>
+                <input type="text" id="rName" class="admin-input" placeholder="Rider Name">
+                <input type="tel" id="rPhone" class="admin-input" placeholder="Mobile Number (Login ID)" maxlength="10">
+                <input type="password" id="rPass" class="admin-input" placeholder="Create Password">
+                <button class="btn-admin" style="background:var(--secondary);" onclick="saveRider()">Register Rider</button>
+            </div>
+            
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; font-size:16px;">Active Riders</h3>
+                <div id="adminRidersList"></div>
             </div>
         </div>
 
@@ -489,8 +534,7 @@
                 <th style="width:20%; text-align:right;">Amount</th>
             </tr>
         </thead>
-        <tbody id="billTableBody">
-            </tbody>
+        <tbody id="billTableBody"></tbody>
     </table>
 
     <div style="text-align:right; font-size:16px; margin-top:15px;">
@@ -518,7 +562,7 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let allProducts = [], allOrders = [], allUsers = [], allCategories = []; 
+    let allProducts = [], allOrders = [], allUsers = [], allCategories = [], allRiders = []; 
     let appSettings = { 
         logo: '', banners: {}, 
         support: { whatsapp: "919348954360", email: "support@bijumart.com" },
@@ -526,6 +570,7 @@
     };
     let cart = [], currentCategory = 'All', editingProductId = null;
     let loggedInUser = null, currentAuthMode = 'login', pendingAuthData = null;
+    let loggedInRider = null; // 🚀 RIDER STATE
     let selectedPaymentMethod = 'UPI', customerLat = null, customerLng = null;
     let autoSlideInterval = null, isInitialOrderLoad = true;
 
@@ -597,14 +642,16 @@
                     document.getElementById('newOrderAlertDetails').innerText = `${latest.customer} ne ₹${(latest.total||0).toLocaleString('en-IN')} ka naya order diya hai!`;
                     document.getElementById('newOrderAlert').style.display = 'block';
                     let audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-                    audio.play().catch(e => console.log("Audio blocked by browser"));
+                    audio.play().catch(e => console.log("Audio play blocked"));
                 }
             }
             
             allOrders = newOrdersList;
             isInitialOrderLoad = false;
             renderCustomerOrders();
+            
             if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
+            if(document.getElementById('riderApp').classList.contains('active')) renderRiderDashboard(); // Refresh Rider
         });
 
         db.ref('users').on('value', snap => {
@@ -612,11 +659,24 @@
             allUsers = safeParse(data);
         });
 
+        // 🚀 FETCH RIDERS
+        db.ref('riders').on('value', snap => {
+            const data = snap.val();
+            allRiders = safeParse(data);
+            if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
+        });
+
         const savedSession = localStorage.getItem('shop_session_cloud');
         if(savedSession) {
             loggedInUser = JSON.parse(savedSession);
             updateAppForLoggedInUser();
         }
+
+        const savedRider = localStorage.getItem('rider_session_cloud');
+        if(savedRider) {
+            loggedInRider = JSON.parse(savedRider);
+        }
+
         lucide.createIcons();
     };
 
@@ -1231,6 +1291,128 @@
         }
     }
 
+    // --- RIDER LOGIN LOGIC ---
+    function openRiderLogin() {
+        if(loggedInRider) {
+            document.getElementById('customerApp').classList.remove('active');
+            document.getElementById('riderApp').classList.add('active');
+            renderRiderDashboard();
+        } else {
+            document.getElementById('riderLoginModal').classList.add('active');
+        }
+    }
+
+    function verifyRider() {
+        const phone = document.getElementById('riderPhoneLogin').value;
+        const pass = document.getElementById('riderPassLogin').value;
+        
+        const rider = allRiders.find(r => r.phone === phone && r.password === pass);
+        if(rider) {
+            loggedInRider = rider;
+            localStorage.setItem('rider_session_cloud', JSON.stringify(rider));
+            closeModal('riderLoginModal');
+            document.getElementById('customerApp').classList.remove('active');
+            document.getElementById('riderApp').classList.add('active');
+            renderRiderDashboard();
+            showToast("Welcome Partner!");
+            
+            document.getElementById('riderPhoneLogin').value = '';
+            document.getElementById('riderPassLogin').value = '';
+        } else {
+            showToast("Invalid Rider Credentials");
+        }
+    }
+
+    function logoutRider() {
+        loggedInRider = null;
+        localStorage.removeItem('rider_session_cloud');
+        document.getElementById('riderApp').classList.remove('active');
+        document.getElementById('customerApp').classList.add('active');
+        showToast("Rider Logged Out");
+    }
+
+    function renderRiderDashboard() {
+        if(!loggedInRider) return;
+        
+        document.getElementById('riderGreeting').innerText = `Welcome, ${loggedInRider.name}`;
+        
+        // Filter orders assigned to this rider
+        let assignedOrders = allOrders.filter(o => o.assignedRider === loggedInRider.phone);
+        
+        // Count total delivered by this rider
+        let deliveredCount = assignedOrders.filter(o => o.status === 'Delivered').length;
+        document.getElementById('riderDeliveredCount').innerText = deliveredCount;
+
+        // Show pending deliveries
+        let activeDeliveries = assignedOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
+        
+        const list = document.getElementById('riderOrdersList');
+        if(activeDeliveries.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">No active deliveries assigned to you. Relax!</div>`;
+            return;
+        }
+
+        list.innerHTML = activeDeliveries.map(o => {
+            let mapBtn = '';
+            if(o.lat && o.lng) {
+                mapBtn = `<button onclick="window.open('http://googleusercontent.com/maps.google.com/2{o.lat},${o.lng}', '_blank')" style="background:#f0f5ff; color:var(--primary); border:1px solid #c0d5ff; padding:8px; border-radius:6px; width:100%; font-weight:bold; margin-bottom:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;"><i data-lucide="navigation" style="width:16px;"></i> Navigate to Customer</button>`;
+            }
+
+            return `
+            <div style="background:white; padding:15px; border-radius:12px; margin-bottom:15px; box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid #e2e8f0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #f1f3f6; padding-bottom:10px;">
+                    <b style="color:var(--text-main); font-size:13px;">${o.id}</b>
+                    <span style="font-weight:bold; font-size:11px; color:var(--primary); background:#f0f5ff; padding:3px 6px; border-radius:4px;">${o.status}</span>
+                </div>
+                
+                <div style="font-size:13px; color:var(--text-muted); line-height:1.5; margin-bottom:10px;">
+                    <b style="color:var(--text-main); font-size:15px;">${o.customer}</b><br>
+                    ${o.address || 'Address N/A'}<br>
+                    <div style="margin-top:5px; padding:5px; background:#f8fafc; border-radius:4px; font-size:12px;">Items: ${o.items}</div>
+                </div>
+
+                ${mapBtn}
+
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <button onclick="window.location.href='tel:${o.phone}'" style="flex:1; background:white; color:var(--text-main); border:1px solid #cbd5e1; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+                        <i data-lucide="phone" style="width:16px;"></i> Call
+                    </button>
+                    <button onclick="showRiderQR('${o.total}')" style="flex:1; background:var(--primary); color:white; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+                        <i data-lucide="qr-code" style="width:16px;"></i> ₹${(o.total||0).toLocaleString('en-IN')}
+                    </button>
+                </div>
+
+                <button onclick="markOrderDelivered('${o.id}')" style="width:100%; background:var(--success); color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; font-size:14px; cursor:pointer;">
+                    ✅ Mark as Delivered
+                </button>
+            </div>
+            `;
+        }).join('');
+        lucide.createIcons();
+    }
+
+    function showRiderQR(amount) {
+        document.getElementById('riderQrModal').classList.add('active');
+        document.getElementById('qrAmountDisplay').innerText = "₹" + Number(amount).toLocaleString('en-IN');
+        
+        let upiId = appSettings.payment.upiId || "9348954360@ybl";
+        document.getElementById('qrUpiDisplay').innerText = upiId;
+        
+        // Generate QR code URL using a free reliable API
+        const upiString = `upi://pay?pa=${upiId}&pn=Biju%20Mart&am=${amount}&cu=INR`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
+        
+        document.getElementById('dynamicQrImage').src = qrUrl;
+    }
+
+    function markOrderDelivered(orderId) {
+        if(confirm("Are you sure you have delivered this order and collected the payment?")) {
+            db.ref('orders/' + orderId).update({ status: 'Delivered', paymentMethod: 'Paid on Delivery' });
+            showToast("Great Job! Order Delivered.");
+        }
+    }
+
+    // --- Admin Functions ---
     function openAdminLogin() { document.getElementById('adminLoginModal').classList.add('active'); }
     
     function verifyAdmin() {
@@ -1270,6 +1452,34 @@
         if(tabId === 'dashboard') loadAdminDashboard();
     }
 
+    // 🚀 NEW: RIDER REGISTRATION ADMIN LOGIC
+    function saveRider() {
+        const name = document.getElementById('rName').value;
+        const phone = document.getElementById('rPhone').value;
+        const pass = document.getElementById('rPass').value;
+
+        if(!name || phone.length !== 10 || !pass) return showToast("Enter Name, valid 10-digit Phone, and Password");
+
+        db.ref('riders/' + phone).set({ name, phone, password: pass });
+        showToast("Rider Registered Successfully!");
+        document.getElementById('rName').value = '';
+        document.getElementById('rPhone').value = '';
+        document.getElementById('rPass').value = '';
+    }
+
+    function removeRider(phone) {
+        if(confirm("Remove this rider permanently?")) {
+            db.ref('riders/' + phone).remove();
+            showToast("Rider Removed");
+        }
+    }
+
+    function assignRiderToOrder(orderId, riderPhone) {
+        db.ref('orders/' + orderId).update({ assignedRider: riderPhone, status: 'Out for Delivery' });
+        showToast("Rider Assigned & Status Updated!");
+    }
+
+
     function loadAdminDashboard() {
         let totalRev = 0, upiRev = 0, codRev = 0;
 
@@ -1285,6 +1495,20 @@
         document.getElementById('metricOrders').innerText = allOrders.length;
         document.getElementById('metricUPI').innerText = '₹' + upiRev.toLocaleString('en-IN');
         document.getElementById('metricCOD').innerText = '₹' + codRev.toLocaleString('en-IN');
+
+        // Render Riders List in Admin
+        const rList = document.getElementById('adminRidersList');
+        if(rList) {
+            rList.innerHTML = allRiders.map(r => `
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:12px; border-radius:8px; margin-bottom:8px; border:1px solid #334155;">
+                    <div>
+                        <div style="color:white; font-weight:bold; font-size:14px;">${r.name}</div>
+                        <div style="color:var(--text-muted); font-size:12px;">+91 ${r.phone}</div>
+                    </div>
+                    <button class="btn-danger-small" onclick="removeRider('${r.phone}')">Remove</button>
+                </div>
+            `).join('') || "<p style='color:#64748b; font-size:12px;'>No riders registered yet.</p>";
+        }
 
         const bannerKeys = Object.keys(appSettings.banners || {});
         document.getElementById('adminBannerList').innerHTML = bannerKeys.length === 0 
@@ -1322,10 +1546,16 @@
         document.getElementById('adminOrdersList').innerHTML = allOrders.map(o => {
             let mapBtn = '';
             if(o.lat && o.lng) {
-                mapBtn = `<a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank" style="background:#f0f5ff; color:var(--primary); font-weight:bold; padding:6px 10px; border-radius:6px; font-size:11px; text-decoration:none; display:inline-block; margin-bottom:10px;">📍 View Map Location</a><br>`;
+                mapBtn = `<a href="http://googleusercontent.com/maps.google.com/3{o.lat},${o.lng}" target="_blank" style="background:#f0f5ff; color:var(--primary); font-weight:bold; padding:6px 10px; border-radius:6px; font-size:11px; text-decoration:none; display:inline-block; margin-bottom:10px;">📍 View Map Location</a><br>`;
             }
             
             let highlight = o.status === 'Cancel Requested' ? 'border: 2px solid #ef4444;' : 'border: 1px solid #334155;';
+
+            // 🚀 RIDER DROPDOWN
+            let riderOptions = `<option value="">-- Assign Rider --</option>`;
+            allRiders.forEach(r => {
+                riderOptions += `<option value="${r.phone}" ${o.assignedRider === r.phone ? 'selected' : ''}>🏍️ ${r.name}</option>`;
+            });
 
             return `
             <div style="background:#0f172a; padding:15px; border-radius:10px; margin-bottom:15px; ${highlight}">
@@ -1346,10 +1576,16 @@
                     <select style="background:#1e293b; color:white; border:1px solid #475569; padding:8px; border-radius:6px; flex:1; outline:none;" onchange="updateOrderStatus('${o.id}', this.value)">
                         <option value="Pending" ${o.status==='Pending'?'selected':''}>⏳ Pending</option>
                         <option value="Packed" ${o.status==='Packed'?'selected':''}>📦 Packed</option>
-                        <option value="Shipped" ${o.status==='Shipped'?'selected':''}>🚚 Shipped</option>
+                        <option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>🏍️ Out for Delivery</option>
                         <option value="Delivered" ${o.status==='Delivered'?'selected':''}>✅ Delivered</option>
                         <option value="Cancel Requested" ${o.status==='Cancel Requested'?'selected':''} disabled>⚠️ Cancel Requested</option>
                         <option value="Cancelled" ${o.status==='Cancelled'?'selected':''}>❌ Cancelled</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <select style="background:#1e293b; color:var(--secondary); border:1px solid var(--secondary); padding:8px; border-radius:6px; width:100%; outline:none; font-weight:bold;" onchange="assignRiderToOrder('${o.id}', this.value)">
+                        ${riderOptions}
                     </select>
                 </div>
 
@@ -1386,7 +1622,6 @@
         lucide.createIcons();
     }
 
-    // 🚀 PDF & PRINT BILLING LOGIC
     function populateBillTemplate(orderId) {
         const o = allOrders.find(x => x.id === orderId);
         if(!o) return false;
@@ -1426,7 +1661,7 @@
         if(!populateBillTemplate(orderId)) return;
         showToast("Generating PDF...");
         const element = document.getElementById('printBillArea');
-        element.style.display = 'block'; // Make visible for html2pdf
+        element.style.display = 'block'; 
         
         html2pdf().set({
             margin: 10,
@@ -1435,7 +1670,7 @@
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
         }).from(element).save().then(() => {
-            element.style.display = 'none'; // Hide again
+            element.style.display = 'none'; 
             showToast("PDF Downloaded!");
         });
     }
