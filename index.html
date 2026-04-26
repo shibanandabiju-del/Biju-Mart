@@ -83,8 +83,9 @@
         .btn-email { color: var(--danger); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* --- ADMIN & RIDER THEMES --- */
+        @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        /* --- ADMIN PANEL TABS --- */
         .admin-bg { background: var(--dark-bg); color: white; }
         .admin-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items:center; flex-shrink:0; }
         .admin-tab-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 0 20px 15px; border-bottom: 1px solid #1e293b; scrollbar-width: none; flex-shrink:0; }
@@ -102,6 +103,11 @@
         .admin-card { background: #1e293b; padding: 20px; border-radius: 12px; margin: 0 20px 20px; border: 1px solid #334155; }
         .admin-input { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px; margin-bottom: 12px; font-size: 14px; outline: none; }
         .admin-input:focus { border-color: var(--primary); }
+        
+        /* File Input Styling */
+        input[type="file"].admin-input { background: white; color: black; padding: 10px; cursor: pointer; }
+        input[type="file"].admin-input::-webkit-file-upload-button { background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 10px; }
+
         .btn-admin { background: var(--primary); color: white; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s;}
         .btn-small { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
         .btn-danger-small { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
@@ -340,7 +346,6 @@
             <button class="btn-admin" style="background:var(--secondary);" onclick="verifyRider()">Start Duty</button>
         </div>
     </div>
-
   </div>
 
   <div class="app-view admin-bg" id="riderApp" style="background:#f1f5f9; color:var(--text-main);">
@@ -365,11 +370,9 @@
               <i data-lucide="x" onclick="closeModal('riderQrModal')" style="position:absolute; top:15px; right:15px; cursor:pointer; color:var(--text-muted);"></i>
               <h3 style="margin-bottom:5px; font-size:18px;">Scan to Pay</h3>
               <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Ask customer to scan with PhonePe/GPay</p>
-              
               <div style="background:#f0f5ff; padding:15px; border-radius:12px; display:inline-block; border:1px solid #c0d5ff; margin-bottom:15px;">
                   <img id="dynamicQrImage" src="" style="width:200px; height:200px; mix-blend-mode:multiply;">
               </div>
-              
               <div style="font-size:24px; font-weight:900; color:var(--primary); margin-bottom:5px;" id="qrAmountDisplay">₹0</div>
               <div style="font-size:12px; color:var(--success); font-weight:bold;">UPI: <span id="qrUpiDisplay"></span></div>
           </div>
@@ -434,12 +437,14 @@
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px;">Add / Edit Products</h3>
                 <input type="text" id="pName" class="admin-input" placeholder="Product Name">
-                <input type="text" id="pEmoji" class="admin-input" placeholder="Image URL OR Emoji">
+                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">PRODUCT IMAGE (Choose from Gallery)</label>
+                <input type="file" id="pImageFile" class="admin-input" accept="image/*">
                 <div style="display:flex; gap:10px;">
                     <input type="number" id="pPrice" class="admin-input" placeholder="Price (₹)">
                     <input type="number" id="pStock" class="admin-input" placeholder="Stock Qty">
                 </div>
                 <select id="pCat" class="admin-input"></select>
+                <input type="hidden" id="pExistingImage">
                 <button class="btn-admin" id="adminAddBtn" onclick="saveProductEntry()">Add Product</button>
                 <div style="margin-top: 25px; border-top: 1px solid #334155; padding-top:15px;" id="adminStockList"></div>
             </div>
@@ -488,17 +493,20 @@
                 <input type="text" id="adminUpiId" class="admin-input" placeholder="e.g. 9348954360@ybl">
                 <button class="btn-admin" style="margin-top:10px; background:var(--success);" onclick="updateAppConfig()">Save Configuration</button>
             </div>
+            
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px;">App Branding & Banners</h3>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">APP LOGO (Image URL)</label>
+                
+                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">APP LOGO (Choose from Gallery)</label>
                 <div style="display:flex; gap:10px; margin-bottom:20px;">
-                    <input type="text" id="adminLogoUrl" class="admin-input" placeholder="Paste URL..." style="margin-bottom:0;">
-                    <button class="btn-small" onclick="updateAppLogo()">Update</button>
+                    <input type="file" id="adminLogoFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
+                    <button class="btn-small" onclick="updateAppLogo()">Upload</button>
                 </div>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">PROMO BANNER (Image URL)</label>
+                
+                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">PROMO BANNER (Choose from Gallery)</label>
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="adminBannerUrl" class="admin-input" placeholder="Paste URL..." style="margin-bottom:0;">
-                    <button class="btn-small" style="background:var(--success);" onclick="addPromoBanner()">Add</button>
+                    <input type="file" id="adminBannerFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
+                    <button class="btn-small" style="background:var(--success);" onclick="addPromoBanner()">Add Banner</button>
                 </div>
                 <div style="margin-top: 15px;" id="adminBannerList"></div>
             </div>
@@ -510,7 +518,6 @@
         <h1 style="font-size:28px; margin:0; font-weight:900;" id="billStoreName">BIJU MART</h1>
         <p style="font-size:12px; color:#555; margin:5px 0 0;">Premium E-Commerce & Home Delivery</p>
     </div>
-    
     <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:12px;">
         <div>
             <strong>BILLED TO:</strong><br>
@@ -524,7 +531,6 @@
             <strong>Payment:</strong> <span id="billPayment"></span>
         </div>
     </div>
-
     <table class="bill-table" id="billTable">
         <thead>
             <tr>
@@ -536,11 +542,9 @@
         </thead>
         <tbody id="billTableBody"></tbody>
     </table>
-
     <div style="text-align:right; font-size:16px; margin-top:15px;">
         <strong>Total Amount: ₹<span id="billTotalAmount"></span></strong>
     </div>
-
     <div style="text-align:center; margin-top:40px; font-size:12px; color:#555; border-top:1px dashed #ccc; padding-top:10px;">
         Thank you for shopping with us!<br>
         <span id="billSupportContact"></span>
@@ -570,21 +574,48 @@
     };
     let cart = [], currentCategory = 'All', editingProductId = null;
     let loggedInUser = null, currentAuthMode = 'login', pendingAuthData = null;
-    let loggedInRider = null; // 🚀 RIDER STATE
+    let loggedInRider = null; 
     let selectedPaymentMethod = 'UPI', customerLat = null, customerLng = null;
     let autoSlideInterval = null, isInitialOrderLoad = true;
 
-    const ADMIN_WHATSAPP_NUMBER = "919348954360";
-
-    function isUrl(string) {
+    // 🚀 NEW: Function to check if string is Image (URL or Base64)
+    function isImage(string) {
         if(!string) return false;
-        try { return Boolean(new URL(string)); } catch(e) { return false; }
+        return string.startsWith('http') || string.startsWith('data:image');
     }
 
     function safeParse(data) {
         if (!data) return [];
         if (Array.isArray(data)) return data.filter(item => item !== null && item !== undefined);
         return Object.values(data).filter(item => item !== null && item !== undefined);
+    }
+
+    // 🚀 NEW: Image Compressor & Base64 Converter
+    function processImageFile(file, callback) {
+        showToast("Processing Image...");
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 500; // Compress image to keep DB fast
+                let width = img.width;
+                let height = img.height;
+
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7); // 70% quality
+                callback(dataUrl);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
     }
 
     window.onload = () => {
@@ -651,7 +682,7 @@
             renderCustomerOrders();
             
             if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
-            if(document.getElementById('riderApp').classList.contains('active')) renderRiderDashboard(); // Refresh Rider
+            if(document.getElementById('riderApp').classList.contains('active')) renderRiderDashboard();
         });
 
         db.ref('users').on('value', snap => {
@@ -659,7 +690,6 @@
             allUsers = safeParse(data);
         });
 
-        // 🚀 FETCH RIDERS
         db.ref('riders').on('value', snap => {
             const data = snap.val();
             allRiders = safeParse(data);
@@ -774,7 +804,7 @@
     }
 
     function applySettingsToUI() {
-        const logoHTML = (appSettings.logo && isUrl(appSettings.logo)) 
+        const logoHTML = (appSettings.logo && isImage(appSettings.logo)) 
             ? `<img src="${appSettings.logo}" alt="Biju Mart Logo">` 
             : "Biju Mart";
         
@@ -814,21 +844,29 @@
         }
     }
 
+    // 🚀 NEW: File Upload for Logo
     function updateAppLogo() {
-        const url = document.getElementById('adminLogoUrl').value;
-        if(url && !isUrl(url)) return showToast("Enter valid URL");
-        db.ref('settings/logo').set(url);
-        showToast("Logo Updated Live!");
-        document.getElementById('adminLogoUrl').value = '';
+        const fileInput = document.getElementById('adminLogoFile');
+        if(!fileInput.files[0]) return showToast("Please select a Logo Image");
+        
+        processImageFile(fileInput.files[0], (base64String) => {
+            db.ref('settings/logo').set(base64String);
+            showToast("Logo Uploaded & Saved!");
+            fileInput.value = '';
+        });
     }
 
+    // 🚀 NEW: File Upload for Promo Banner
     function addPromoBanner() {
-        const url = document.getElementById('adminBannerUrl').value;
-        if(!url || !isUrl(url)) return showToast("Enter valid URL");
-        const bannerId = 'BNR-' + Date.now();
-        db.ref('settings/banners/' + bannerId).set(url);
-        showToast("Banner Added Live!");
-        document.getElementById('adminBannerUrl').value = '';
+        const fileInput = document.getElementById('adminBannerFile');
+        if(!fileInput.files[0]) return showToast("Please select a Banner Image");
+        
+        processImageFile(fileInput.files[0], (base64String) => {
+            const bannerId = 'BNR-' + Date.now();
+            db.ref('settings/banners/' + bannerId).set(base64String);
+            showToast("Banner Uploaded Live!");
+            fileInput.value = '';
+        });
     }
 
     function deletePromoBanner(bannerId) {
@@ -1033,8 +1071,10 @@
         grid.innerHTML = products.map(p => {
             const isOutOfStock = p.stock <= 0;
             const stockBadge = isOutOfStock ? `<div class="stock-badge low">OUT OF STOCK</div>` : `<div class="stock-badge ok">${p.stock} LEFT</div>`;
+            
+            // 🚀 RENDER IMAGE (Now supports Base64)
             const emojiVal = p.emoji || '📦';
-            const displayVisual = isUrl(emojiVal) ? `<img src="${emojiVal}" class="product-img-real" alt="product">` : emojiVal;
+            const displayVisual = isImage(emojiVal) ? `<img src="${emojiVal}" class="product-img-real" alt="product">` : `<div style="font-size:50px;">${emojiVal}</div>`;
 
             let cartItem = cart.find(i => i.id === p.id);
             let actionHTML = '';
@@ -1078,7 +1118,7 @@
         list.innerHTML = cart.map(item => {
             total += (item.price||0) * item.qty;
             const emojiVal = item.emoji || '📦';
-            const displayVisual = isUrl(emojiVal) ? `<img src="${emojiVal}" class="cart-img-real">` : `<div style="font-size:30px; width:50px; text-align:center;">${emojiVal}</div>`;
+            const displayVisual = isImage(emojiVal) ? `<img src="${emojiVal}" class="cart-img-real">` : `<div style="font-size:30px; width:50px; text-align:center;">${emojiVal}</div>`;
 
             return `
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-radius:8px; margin-bottom:10px; border:1px solid #e0e0e0;">
@@ -1336,14 +1376,10 @@
         
         document.getElementById('riderGreeting').innerText = `Welcome, ${loggedInRider.name}`;
         
-        // Filter orders assigned to this rider
         let assignedOrders = allOrders.filter(o => o.assignedRider === loggedInRider.phone);
-        
-        // Count total delivered by this rider
         let deliveredCount = assignedOrders.filter(o => o.status === 'Delivered').length;
         document.getElementById('riderDeliveredCount').innerText = deliveredCount;
 
-        // Show pending deliveries
         let activeDeliveries = assignedOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
         
         const list = document.getElementById('riderOrdersList');
@@ -1355,7 +1391,7 @@
         list.innerHTML = activeDeliveries.map(o => {
             let mapBtn = '';
             if(o.lat && o.lng) {
-                mapBtn = `<button onclick="window.open('http://googleusercontent.com/maps.google.com/2{o.lat},${o.lng}', '_blank')" style="background:#f0f5ff; color:var(--primary); border:1px solid #c0d5ff; padding:8px; border-radius:6px; width:100%; font-weight:bold; margin-bottom:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;"><i data-lucide="navigation" style="width:16px;"></i> Navigate to Customer</button>`;
+                mapBtn = `<button onclick="window.open('http://googleusercontent.com/maps.google.com/maps?q=${o.lat},${o.lng}', '_blank')" style="background:#f0f5ff; color:var(--primary); border:1px solid #c0d5ff; padding:8px; border-radius:6px; width:100%; font-weight:bold; margin-bottom:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;"><i data-lucide="navigation" style="width:16px;"></i> Navigate to Customer</button>`;
             }
 
             return `
@@ -1398,7 +1434,6 @@
         let upiId = appSettings.payment.upiId || "9348954360@ybl";
         document.getElementById('qrUpiDisplay').innerText = upiId;
         
-        // Generate QR code URL using a free reliable API
         const upiString = `upi://pay?pa=${upiId}&pn=Biju%20Mart&am=${amount}&cu=INR`;
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
         
@@ -1452,7 +1487,6 @@
         if(tabId === 'dashboard') loadAdminDashboard();
     }
 
-    // 🚀 NEW: RIDER REGISTRATION ADMIN LOGIC
     function saveRider() {
         const name = document.getElementById('rName').value;
         const phone = document.getElementById('rPhone').value;
@@ -1496,7 +1530,6 @@
         document.getElementById('metricUPI').innerText = '₹' + upiRev.toLocaleString('en-IN');
         document.getElementById('metricCOD').innerText = '₹' + codRev.toLocaleString('en-IN');
 
-        // Render Riders List in Admin
         const rList = document.getElementById('adminRidersList');
         if(rList) {
             rList.innerHTML = allRiders.map(r => `
@@ -1522,7 +1555,7 @@
 
         document.getElementById('adminStockList').innerHTML = allProducts.map(p => {
             const emojiVal = p.emoji || '📦';
-            const displayVisual = isUrl(emojiVal) ? `<img src="${emojiVal}" class="admin-img-real">` : `<span style="font-size:18px;">${emojiVal}</span>`;
+            const displayVisual = isImage(emojiVal) ? `<img src="${emojiVal}" class="admin-img-real">` : `<span style="font-size:18px;">${emojiVal}</span>`;
             return `
             <div class="inventory-item">
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:8px;">
@@ -1546,12 +1579,11 @@
         document.getElementById('adminOrdersList').innerHTML = allOrders.map(o => {
             let mapBtn = '';
             if(o.lat && o.lng) {
-                mapBtn = `<a href="http://googleusercontent.com/maps.google.com/3{o.lat},${o.lng}" target="_blank" style="background:#f0f5ff; color:var(--primary); font-weight:bold; padding:6px 10px; border-radius:6px; font-size:11px; text-decoration:none; display:inline-block; margin-bottom:10px;">📍 View Map Location</a><br>`;
+                mapBtn = `<a href="http://googleusercontent.com/maps.google.com/maps?q=${o.lat},${o.lng}" target="_blank" style="background:#f0f5ff; color:var(--primary); font-weight:bold; padding:6px 10px; border-radius:6px; font-size:11px; text-decoration:none; display:inline-block; margin-bottom:10px;">📍 View Map Location</a><br>`;
             }
             
             let highlight = o.status === 'Cancel Requested' ? 'border: 2px solid #ef4444;' : 'border: 1px solid #334155;';
 
-            // 🚀 RIDER DROPDOWN
             let riderOptions = `<option value="">-- Assign Rider --</option>`;
             allRiders.forEach(r => {
                 riderOptions += `<option value="${r.phone}" ${o.assignedRider === r.phone ? 'selected' : ''}>🏍️ ${r.name}</option>`;
@@ -1713,18 +1745,32 @@
         showToast("Opening WhatsApp...");
     }
 
+    // 🚀 NEW: Save Product with Base64 Image
     function saveProductEntry() {
         const name = document.getElementById('pName').value;
         const price = parseInt(document.getElementById('pPrice').value);
         const stock = parseInt(document.getElementById('pStock').value);
-        const emoji = document.getElementById('pEmoji').value || '📦';
         const cat = document.getElementById('pCat').value;
-
+        
         if(!name || isNaN(price) || isNaN(stock)) return showToast("Enter Valid Name, Price & Stock");
 
-        const productData = { id: editingProductId || Date.now(), name, price, stock, emoji, category: cat };
-        db.ref('products/' + productData.id).set(productData);
+        const id = editingProductId || Date.now();
+        const existingImage = document.getElementById('pExistingImage').value;
+        const fileInput = document.getElementById('pImageFile');
 
+        if(fileInput.files[0]) {
+            processImageFile(fileInput.files[0], (base64) => {
+                db.ref('products/' + id).set({ id, name, price, stock, emoji: base64, category: cat });
+                finalizeProductSave();
+            });
+        } else {
+            const finalImage = existingImage || '📦';
+            db.ref('products/' + id).set({ id, name, price, stock, emoji: finalImage, category: cat });
+            finalizeProductSave();
+        }
+    }
+
+    function finalizeProductSave() {
         if (editingProductId) {
             showToast("Product Updated in Cloud!");
             editingProductId = null;
@@ -1732,11 +1778,11 @@
         } else {
             showToast("Product Added to Cloud Successfully");
         }
-
         document.getElementById('pName').value = '';
         document.getElementById('pPrice').value = '';
         document.getElementById('pStock').value = '';
-        document.getElementById('pEmoji').value = '';
+        document.getElementById('pImageFile').value = '';
+        document.getElementById('pExistingImage').value = '';
     }
 
     function editProduct(id) {
@@ -1746,8 +1792,8 @@
         document.getElementById('pName').value = p.name;
         document.getElementById('pPrice').value = p.price;
         document.getElementById('pStock').value = p.stock;
-        document.getElementById('pEmoji').value = p.emoji;
         document.getElementById('pCat').value = p.category;
+        document.getElementById('pExistingImage').value = p.emoji; // Save existing image
 
         editingProductId = id;
         document.getElementById('adminAddBtn').innerText = "Update Product";
