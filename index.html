@@ -1,124 +1,172 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Biju Mart</title>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<style>
-:root{--primary:#2874f0;--secondary:#ff9f00;--dark-bg:#0f172a;--light-bg:#f1f3f6;--text-main:#212121;--text-muted:#878787;--success:#388e3c;--danger:#ff6161;--whatsapp:#25D366}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100dvh;font-family:Roboto,sans-serif;background:var(--light-bg);overflow:hidden}
-body{max-width:480px;margin:0 auto;position:relative;color:var(--text-main);box-shadow:0 0 40px rgba(0,0,0,.05)}
-.app-view{display:none;width:100%;height:100dvh;flex-direction:column;overflow:hidden;position:absolute;top:0;left:0;background:var(--light-bg)}
-.app-view.active{display:flex}
-.header{flex-shrink:0;background:white;padding:10px 15px;z-index:40;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
-.main-content{flex-grow:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:90px}
-.main-content::-webkit-scrollbar{display:none}
-.bottom-nav{flex-shrink:0;position:absolute;bottom:0;width:100%;max-width:480px;background:white;border-top:1px solid #e0e0e0;display:flex;justify-content:space-around;padding:10px 0;z-index:50}
-.header-top-row{display:flex;justify-content:space-between;align-items:center}
-.header-logo{font-size:20px;font-weight:900;color:var(--primary);display:flex;align-items:center;font-style:italic;letter-spacing:-.5px}
-.header-logo img{height:28px;max-width:130px;object-fit:contain}
-.icon-btn{background:transparent;border:none;color:var(--text-main);width:35px;height:35px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;transition:.2s}
-.badge{position:absolute;top:-2px;right:-2px;background:var(--danger);color:white;font-size:10px;font-weight:bold;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid white}
-.search-wrapper{display:flex;background:#f0f5ff;border-radius:8px;padding:10px 12px;align-items:center;border:1px solid #e0e0e0;margin-bottom:10px}
-.search-wrapper input{border:none;outline:none;width:100%;margin-left:10px;font-size:14px;color:var(--text-main);background:transparent}
-.banner-slider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:15px 15px 0;gap:10px;scroll-behavior:smooth}
-.banner-slider::-webkit-scrollbar{display:none}
-.banner-slide{min-width:100%;height:150px;border-radius:8px;scroll-snap-align:center;object-fit:cover;background:#e2e8f0}
-.cat-scroll{display:flex;gap:15px;overflow-x:auto;scrollbar-width:none;padding:15px;background:white;margin-bottom:10px}
-.cat-scroll::-webkit-scrollbar{display:none}
-.cat-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;opacity:.8;transition:.3s;min-width:60px}
-.cat-item.active{opacity:1}
-.cat-icon-circle{width:45px;height:45px;background:#f0f5ff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary);transition:.3s; overflow:hidden;}
-.cat-icon-circle img{width:100%; height:100%; object-fit:cover;}
-.cat-item.active .cat-icon-circle{background:var(--primary);color:white;box-shadow:0 4px 8px rgba(40,116,240,.3)}
-.cat-item span{font-size:11px;font-weight:600;color:var(--text-main);white-space:nowrap}
-.products-grid-container{background:white;padding-top:15px;padding-bottom:20px;border-radius:12px 12px 0 0;min-height:50vh}
-.grid-greeting{padding:0 15px 15px;font-size:16px;font-weight:800;color:var(--text-main)}
-.products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 15px}
-.product-card{background:white;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:.3s;position:relative;border:1px solid #f1f3f6; cursor:pointer;}
-.share-badge{position:absolute;top:8px;left:8px;width:28px;height:28px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:10;border:1px solid #eee;cursor:pointer;color:var(--primary);box-shadow:0 2px 5px rgba(0,0,0,.1)}
-.product-image{background:#f8fafc;height:150px;display:flex;align-items:center;justify-content:center;font-size:50px;overflow:hidden;position:relative;padding:10px}
-.product-img-real{width:100%;height:100%;object-fit:contain}
-.stock-badge{position:absolute;top:8px;right:8px;font-size:9px;font-weight:800;padding:3px 6px;border-radius:4px;background:rgba(255,255,255,.95);z-index:10;border:1px solid #eee}
-.stock-badge.low{color:var(--danger)}.stock-badge.ok{color:var(--success)}
-.product-info{padding:10px;flex:1;display:flex;flex-direction:column}
-.product-name{font-size:13px;font-weight:600;margin-bottom:4px;line-height:1.4;color:var(--text-main);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.product-price{font-size:16px;font-weight:800;color:var(--text-main);margin-bottom:10px;margin-top:4px}
-.btn-add-cart{background:var(--primary);color:white;border:none;padding:8px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;margin-top:auto;transition:.2s;text-transform:uppercase;width:100%}
-.btn-add-cart:disabled{background:#e0e0e0;color:#9e9e9e;cursor:not-allowed}
-.qty-controls{display:flex;justify-content:space-between;align-items:center;background:#f0f5ff;border-radius:4px;padding:4px;margin-top:auto}
-.btn-qty{border:1px solid var(--primary);background:white;color:var(--primary);width:28px;height:28px;border-radius:4px;cursor:pointer;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center}
-.qty-val{font-weight:bold;font-size:14px;color:var(--text-main)}
-.support-fab{position:absolute;bottom:80px;right:20px;background:var(--secondary);color:white;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(0,0,0,.2);z-index:90;cursor:pointer}
-.support-menu{position:absolute;bottom:140px;right:20px;background:white;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:10px;display:none;flex-direction:column;gap:10px;z-index:91;border:1px solid #eee}
-.support-menu.active{display:flex;animation:fadeIn .2s}
-.support-btn{display:flex;align-items:center;gap:10px;padding:10px 15px;border:none;background:#f8fafc;border-radius:8px;font-weight:bold;font-size:13px;cursor:pointer;width:150px}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideDown{from{opacity:0;transform:translate(-50%,-20px)}to{opacity:1;transform:translate(-50%,0)}}
-.admin-bg{background:var(--dark-bg);color:white}
-.admin-header{padding:20px 20px 10px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.admin-tab-scroll{display:flex;overflow-x:auto;gap:10px;padding:0 20px 15px;border-bottom:1px solid #1e293b;scrollbar-width:none;flex-shrink:0}
-.admin-tab-scroll::-webkit-scrollbar{display:none}
-.admin-tab-btn{background:transparent;color:#94a3b8;border:none;font-weight:bold;font-size:13px;white-space:nowrap;padding:8px 16px;cursor:pointer;border-radius:20px;transition:.3s;border:1px solid #334155}
-.admin-tab-btn.active{background:var(--primary);color:white;border-color:var(--primary)}
-.admin-section{display:none;padding-top:15px}
-.admin-section.active{display:block;animation:fadeIn .3s}
-.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:0 20px 15px}
-.metric-card{background:#1e293b;padding:20px;border-radius:12px;border:1px solid #334155;display:flex;flex-direction:column;justify-content:center}
-.metric-title{font-size:11px;color:#94a3b8;margin-bottom:5px;font-weight:bold;letter-spacing:.5px}
-.metric-value{font-size:22px;font-weight:900;color:white}
-.admin-card{background:#1e293b;padding:20px;border-radius:12px;margin:0 20px 20px;border:1px solid #334155}
-.admin-input{width:100%;padding:12px;background:#0f172a;border:1px solid #334155;color:white;border-radius:8px;margin-bottom:12px;font-size:14px;outline:none}
-.admin-input:focus{border-color:var(--primary)}
-input[type="file"].admin-input{background:white;color:black;padding:10px;cursor:pointer}
-input[type="file"].admin-input::-webkit-file-upload-button{background:var(--primary);color:white;border:none;padding:8px 12px;border-radius:4px;font-weight:bold;cursor:pointer;margin-right:10px}
-.btn-admin{background:var(--primary);color:white;padding:14px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;width:100%;transition:.2s}
-.btn-small{background:var(--primary);color:white;border:none;padding:10px 15px;border-radius:8px;font-weight:bold;cursor:pointer;white-space:nowrap}
-.btn-danger-small{background:var(--danger);color:white;border:none;padding:8px 12px;border-radius:6px;font-size:11px;font-weight:bold;cursor:pointer}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text-muted);font-size:11px;font-weight:600;cursor:pointer;transition:.2s}
-.nav-item.active{color:var(--primary)}
-.modal{display:none;position:absolute;top:0;left:0;width:100%;height:100dvh;background:var(--light-bg);z-index:100;flex-direction:column}
-.modal.active{display:flex;animation:fadeIn .2s}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:12px 24px;border-radius:30px;font-size:13px;font-weight:bold;z-index:9999;box-shadow:0 10px 20px rgba(0,0,0,.1);text-align:center;width:max-content;max-width:90%}
-.payment-option{display:flex;align-items:center;gap:15px;padding:15px;background:white;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:12px;cursor:pointer;transition:.3s}
-.payment-option.active{border-color:var(--primary);background:#f0f5ff}
-.radio-custom{width:20px;height:20px;border:2px solid #ccc;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.3s}
-.payment-option.active .radio-custom{border-color:var(--primary)}
-.payment-option.active .radio-custom::after{content:'';width:10px;height:10px;background:var(--primary);border-radius:50%}
-.auth-page{display:none;position:absolute;top:0;left:0;width:100%;height:100dvh;background:white;z-index:200;flex-direction:column;overflow-y:auto}
-.auth-page.active{display:flex;animation:slideInRight .3s forwards}
-@keyframes slideInRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
-.auth-header{padding:20px;display:flex;align-items:center;font-size:18px;font-weight:bold;border-bottom:1px solid #f1f5f9;flex-shrink:0}
-.auth-tabs{display:flex;margin:20px 20px 0;background:#f8fafc;border-radius:12px;padding:5px;flex-shrink:0}
-.auth-tab{flex:1;text-align:center;padding:12px;font-weight:bold;color:var(--text-muted);cursor:pointer;border-radius:8px;transition:.3s;font-size:14px}
-.auth-tab.active{background:white;color:var(--primary);box-shadow:0 2px 5px rgba(0,0,0,.05)}
-.auth-body{padding:30px 20px;flex:1;overflow-y:auto}
-.otp-box{width:50px;height:55px;border:1px solid #e0e0e0;border-radius:8px;font-size:24px;text-align:center;font-weight:800;outline:none;transition:.3s;color:var(--primary);background:#f8fafc}
-.otp-box:focus{border-color:var(--primary);background:white;box-shadow:0 0 0 3px rgba(40,116,240,.1)}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Biju Mart</title>
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <style>
+        :root {
+            --primary: #2874f0; 
+            --secondary: #ff9f00; 
+            --dark-bg: #0f172a;
+            --light-bg: #f1f3f6; 
+            --text-main: #212121;
+            --text-muted: #878787;
+            --success: #388e3c;
+            --danger: #ff6161;
+            --whatsapp: #25D366; 
+        }
 
-/* 🚀 PRODUCT MODAL STYLES */
-.prod-img-slider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;background:white;padding:15px;gap:10px;scrollbar-width:none}
-.prod-img-slider::-webkit-scrollbar{display:none}
-.prod-img-box{min-width:100%;height:300px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;background:#f8fafc;border-radius:12px}
-.prod-img-box img{width:100%;height:100%;object-fit:contain}
-.size-btn{border:1px solid #e0e0e0;background:white;padding:10px 15px;border-radius:6px;font-weight:bold;color:var(--text-main);cursor:pointer;}
-.size-btn.active{background:var(--primary);color:white;border-color:var(--primary);}
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100dvh; font-family: Roboto, 'Segoe UI', sans-serif; background: var(--light-bg); overflow: hidden; }
+        body { max-width: 480px; margin: 0 auto; position: relative; color: var(--text-main); background: var(--light-bg); box-shadow: 0 0 40px rgba(0,0,0,0.05); }
+        
+        .app-view { display: none; width: 100%; height: 100dvh; flex-direction: column; overflow: hidden; position: absolute; top:0; left:0; background: var(--light-bg); }
+        .app-view.active { display: flex; }
+        
+        .header { flex-shrink: 0; background: white; padding: 10px 15px; z-index: 40; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .main-content { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 90px; }
+        .main-content::-webkit-scrollbar { display: none; }
+        .bottom-nav { flex-shrink: 0; position: absolute; bottom: 0; width: 100%; max-width: 480px; background: white; border-top: 1px solid #e0e0e0; display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
 
-.print-only{display:none}
-@media print{.no-print{display:none!important}.print-only{display:block!important;position:absolute;top:0;left:0;width:100%;background:white;z-index:99999;padding:20px;color:black;font-family:sans-serif}body{background:white}}
-.bill-table{width:100%;border-collapse:collapse;margin-top:15px;margin-bottom:15px;font-size:12px}
-.bill-table th,.bill-table td{border:1px solid #ddd;padding:8px;text-align:left}
-.bill-table th{background-color:#f8fafc;font-weight:bold}
-</style>
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 20px; font-weight: 900; color: var(--primary); display: flex; align-items: center; font-style: italic; letter-spacing: -0.5px; }
+        .header-logo img { height: 28px; max-width: 130px; object-fit: contain; }
+        .icon-btn { background: transparent; border: none; color: var(--text-main); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: 0.2s; }
+        .badge { position: absolute; top: -2px; right: -2px; background: var(--danger); color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid white; }
+
+        .search-wrapper { display: flex; background: #f0f5ff; border-radius: 8px; padding: 10px 12px; align-items: center; border: 1px solid #e0e0e0; margin-bottom: 10px; }
+        .search-wrapper input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 14px; color: var(--text-main); background: transparent; }
+        
+        .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 15px 15px 0; gap: 10px; scroll-behavior: smooth; }
+        .banner-slider::-webkit-scrollbar { display: none; }
+        .banner-slide { min-width: 100%; height: 150px; border-radius: 8px; scroll-snap-align: center; object-fit: cover; background: #e2e8f0; }
+        
+        .cat-scroll { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding: 15px; background: white; margin-bottom: 10px; }
+        .cat-scroll::-webkit-scrollbar { display: none; }
+        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; opacity: 0.8; transition: 0.3s; min-width: 60px; }
+        .cat-item.active { opacity: 1; }
+        .cat-icon-circle { width: 45px; height: 45px; background: #f0f5ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.3s; overflow:hidden;}
+        .cat-icon-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .cat-item.active .cat-icon-circle { background: var(--primary); color: white; box-shadow: 0 4px 8px rgba(40, 116, 240, 0.3); }
+        .cat-item span { font-size: 11px; font-weight: 600; color: var(--text-main); white-space: nowrap; }
+
+        .products-grid-container { background: white; padding-top: 15px; padding-bottom: 20px; border-radius: 12px 12px 0 0; min-height: 50vh; }
+        .grid-greeting { padding: 0 15px 15px; font-size: 16px; font-weight: 800; color: var(--text-main); }
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 15px; }
+        
+        .product-card { background: white; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; border: 1px solid #f1f3f6; cursor:pointer;}
+        .share-badge { position: absolute; top: 8px; left: 8px; width: 28px; height: 28px; background: rgba(255,255,255,0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid #eee; cursor: pointer; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .product-image { background: #f8fafc; height: 150px; display: flex; align-items: center; justify-content: center; font-size: 50px; overflow: hidden; position: relative; padding: 10px; }
+        .product-img-real { width: 100%; height: 100%; object-fit: contain; }
+        .stock-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 4px; background: rgba(255,255,255,0.95); z-index: 10; border: 1px solid #eee; }
+        .stock-badge.low { color: var(--danger); }
+        .stock-badge.ok { color: var(--success); }
+        .product-info { padding: 10px; flex: 1; display: flex; flex-direction: column; }
+        .product-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; line-height: 1.4; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-price { font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; margin-top: 4px; }
+        
+        .btn-add-cart { background: var(--primary); color: white; border: none; padding: 8px; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: auto; transition: 0.2s; text-transform: uppercase; width: 100%; }
+        .btn-add-cart:disabled { background: #e0e0e0; color: #9e9e9e; cursor: not-allowed; }
+        .qty-controls { display:flex; justify-content:space-between; align-items:center; background:#f0f5ff; border-radius:4px; padding:4px; margin-top:auto; }
+        .btn-qty { border:1px solid var(--primary); background:white; color:var(--primary); width:28px; height:28px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:16px; display:flex; align-items:center; justify-content:center;}
+        .qty-val { font-weight:bold; font-size:14px; color:var(--text-main); }
+
+        /* PRODUCT MODAL (3 IMAGES & SIZE) */
+        .prod-img-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: white; padding: 15px; gap: 10px; scrollbar-width: none; }
+        .prod-img-slider::-webkit-scrollbar { display: none; }
+        .prod-img-box { min-width: 100%; height: 300px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; background: #f8fafc; border-radius: 12px; font-size: 80px;}
+        .prod-img-box img { width: 100%; height: 100%; object-fit: contain; }
+        .size-btn { border: 1px solid #e0e0e0; background: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; color: var(--text-main); cursor: pointer; }
+        .size-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .support-fab { position: absolute; bottom: 80px; right: 20px; background: var(--secondary); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 90; cursor: pointer; }
+        .support-menu { position: absolute; bottom: 140px; right: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 10px; display: none; flex-direction: column; gap: 10px; z-index: 91; border: 1px solid #eee; }
+        .support-menu.active { display: flex; animation: fadeIn 0.2s; }
+        .support-btn { display: flex; align-items: center; gap: 10px; padding: 10px 15px; border: none; background: #f8fafc; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 150px; }
+        .btn-wa { color: var(--whatsapp); }
+        .btn-email { color: var(--danger); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        /* --- ADMIN PANEL TABS --- */
+        .admin-bg { background: var(--dark-bg); color: white; }
+        .admin-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items:center; flex-shrink:0; }
+        .admin-tab-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 0 20px 15px; border-bottom: 1px solid #1e293b; scrollbar-width: none; flex-shrink:0; }
+        .admin-tab-scroll::-webkit-scrollbar { display: none; }
+        .admin-tab-btn { background: transparent; color: #94a3b8; border: none; font-weight: bold; font-size: 13px; white-space: nowrap; padding: 8px 16px; cursor: pointer; border-radius: 20px; transition: 0.3s; border: 1px solid #334155; }
+        .admin-tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .admin-section { display: none; padding-top:15px; }
+        .admin-section.active { display: block; animation: fadeIn 0.3s; }
+
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px 15px; }
+        .metric-card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; display:flex; flex-direction:column; justify-content:center; }
+        .metric-title { font-size: 11px; color: #94a3b8; margin-bottom: 5px; font-weight:bold; letter-spacing:0.5px; }
+        .metric-value { font-size: 22px; font-weight: 900; color: white; }
+        
+        .admin-card { background: #1e293b; padding: 20px; border-radius: 12px; margin: 0 20px 20px; border: 1px solid #334155; }
+        .admin-input { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px; margin-bottom: 12px; font-size: 14px; outline: none; }
+        .admin-input:focus { border-color: var(--primary); }
+        
+        input[type="file"].admin-input { background: white; color: black; padding: 10px; cursor: pointer; }
+        input[type="file"].admin-input::-webkit-file-upload-button { background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 10px; }
+
+        .btn-admin { background: var(--primary); color: white; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s;}
+        .btn-small { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .btn-danger-small { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--primary); }
+        
+        .modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--light-bg); z-index: 100; flex-direction: column; }
+        .modal.active { display: flex; animation: fadeIn 0.2s; }
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align:center; width:max-content; max-width:90%; }
+
+        .payment-option { display: flex; align-items: center; gap: 15px; padding: 15px; background: white; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; }
+        .payment-option.active { border-color: var(--primary); background: #f0f5ff; }
+        .radio-custom { width: 20px; height: 20px; border: 2px solid #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .payment-option.active .radio-custom { border-color: var(--primary); }
+        .payment-option.active .radio-custom::after { content: ''; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; }
+
+        .auth-page { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: white; z-index: 200; flex-direction: column; overflow-y: auto; }
+        .auth-page.active { display: flex; animation: slideInRight 0.3s forwards; }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        
+        .auth-header { padding: 20px; display: flex; align-items: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid #f1f5f9; flex-shrink:0; }
+        .auth-tabs { display: flex; margin: 20px 20px 0; background: #f8fafc; border-radius: 12px; padding: 5px; flex-shrink:0; }
+        .auth-tab { flex: 1; text-align: center; padding: 12px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.3s; font-size: 14px; }
+        .auth-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .auth-body { padding: 30px 20px; flex: 1; overflow-y:auto; }
+        
+        .otp-container { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
+        .otp-box { width: 50px; height: 55px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 24px; text-align: center; font-weight: 800; outline: none; transition: 0.3s; color: var(--primary); background: #f8fafc; }
+        .otp-box:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(40, 116, 240, 0.1); }
+        .otp-msg { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px; color: var(--text-muted); height: 20px; }
+        
+        .cart-img-real { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; border: 1px solid #eee; padding:2px; }
+
+        /* PRINT STYLES */
+        .print-only { display: none; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; position: absolute; top:0; left:0; width: 100%; background: white; z-index: 99999; padding: 20px; color: black; font-family: sans-serif; }
+            body { background: white; }
+        }
+        .bill-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 12px; }
+        .bill-table th, .bill-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .bill-table th { background-color: #f8fafc; font-weight: bold; }
+  </style>
 </head>
 <body>
 
-<div id="appContainer" class="no-print">
+ <div id="appContainer" class="no-print">
   
   <div class="app-view active" id="customerApp">
     <div class="header">
@@ -131,7 +179,7 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
         </div>
         <div class="search-wrapper">
             <i data-lucide="search" style="color:#878787; width:20px;"></i>
-            <input type="text" id="searchInput" placeholder="Search for products, clothing, shoes..." onkeyup="filterAndSortProducts()">
+            <input type="text" id="searchInput" placeholder="Search for products..." onkeyup="filterAndSortProducts()">
         </div>
     </div>
 
@@ -161,6 +209,7 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
             </div>
             <h2 id="profileNameDisplay" style="font-size: 22px; font-weight: 800; margin-bottom: 5px;">User</h2>
             <p id="profilePhoneDisplay" style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">+91 XXXXXXXXXX</p>
+            
             <div style="display: flex; gap: 10px; flex-direction: column;">
                 <button class="search-wrapper" style="width: 100%; justify-content: space-between; font-weight: bold; cursor: pointer; padding: 15px;" onclick="switchCustomerTab('orders', document.getElementById('navOrders'))">
                     <span style="display: flex; gap: 10px;"><i data-lucide="package"></i> My Orders</span>
@@ -194,7 +243,7 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
         </div>
         <div style="flex:1; overflow-y:auto; background:white; padding-bottom:20px;">
             <div class="prod-img-slider" id="modalImgSlider"></div>
-            <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-bottom:15px;">Swipe to see more images</div>
+            <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-bottom:15px;">Swipe left/right to see more images</div>
             
             <div style="padding:0 20px;">
                 <h2 id="modalProdName" style="font-size:18px; margin-bottom:5px; color:var(--text-main);"></h2>
@@ -207,7 +256,7 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
             </div>
         </div>
         <div style="padding: 15px; background: white; border-top: 1px solid #e0e0e0; flex-shrink:0;">
-            <button class="btn-add-cart" id="modalAddToCartBtn" style="padding:14px; font-size:14px;">Add to Cart</button>
+            <button class="btn-add-cart" id="modalAddToCartBtn" onclick="addToCartFromModal()" style="padding:14px; font-size:14px;">Add to Cart</button>
         </div>
     </div>
 
@@ -233,7 +282,7 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
             <span style="font-weight:bold; font-size:16px;">Order Details</span> 
             <div style="width:24px;"></div>
         </div>
-        <div style="padding: 15px; flex:1; overflow-y:auto; background:#f1f3f6;">
+        <div style="padding: 15px; flex:1; overflow-y:auto; background:#f1f3f6; -webkit-overflow-scrolling:touch;">
             <div style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #e0e0e0;">
                 <h3 style="font-size: 13px; margin-bottom: 15px; color: var(--text-muted); font-weight:bold;">DELIVERY ADDRESS</h3>
                 <input type="text" id="cName" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main);" placeholder="Full Name">
@@ -245,6 +294,7 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
                 </button>
                 <div id="locStatus" style="font-size:11px; text-align:center; margin-top:5px; color:var(--text-muted);">Helps delivery boy find you easily</div>
             </div>
+            
             <div style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #e0e0e0;">
                 <h3 style="font-size: 13px; margin-bottom: 15px; color: var(--text-muted); font-weight:bold;">PAYMENT OPTIONS</h3>
                 <div class="payment-option active" id="payUPI" onclick="selectPaymentMethod('UPI')">
@@ -319,7 +369,50 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
             <button class="btn-admin" style="background:var(--primary);" onclick="verifyAdmin()">Login Dashboard</button>
         </div>
     </div>
+
+    <div class="modal" id="riderLoginModal" style="background: #1e293b; color:white;">
+        <div class="header" style="background:#1e293b; border-bottom:1px solid #334155; color:white; flex-direction:row; flex-shrink:0;">
+            <i data-lucide="arrow-left" onclick="closeModal('riderLoginModal')" style="cursor:pointer; width:24px;"></i> <span>Rider Partner Login</span> <div style="width:24px;"></div>
+        </div>
+        <div style="padding: 30px; text-align:center; margin-top:30px;">
+            <i data-lucide="bike" style="width:60px; height:60px; color:var(--secondary); margin-bottom:20px;"></i>
+            <input type="tel" id="riderPhoneLogin" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:15px; background:#0f172a; color:white;" placeholder="Registered Mobile Number">
+            <input type="password" id="riderPassLogin" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:20px; background:#0f172a; color:white;" placeholder="Password">
+            <button class="btn-admin" style="background:var(--secondary);" onclick="verifyRider()">Start Duty</button>
+        </div>
+    </div>
   </div>
+
+  <div class="app-view admin-bg" id="riderApp" style="background:#f1f5f9; color:var(--text-main);">
+      <div class="header" style="background:var(--secondary); color:white; border-bottom:none; flex-direction:row;">
+          <div style="font-weight:900; font-size:18px;"><i data-lucide="bike" style="vertical-align:middle; margin-right:5px;"></i> Rider App</div>
+          <button class="icon-btn" onclick="logoutRider()" style="background:white; color:var(--secondary); width:auto; padding:0 15px; font-size:12px; font-weight:bold;">Logout</button>
+      </div>
+
+      <div class="main-content" style="padding:15px;">
+          <div style="background:white; border-radius:12px; padding:20px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-bottom:15px;">
+              <h2 id="riderGreeting" style="font-size:18px; margin-bottom:10px;">Welcome</h2>
+              <div style="font-size:12px; color:var(--text-muted);">TODAY'S DELIVERIES</div>
+              <div id="riderDeliveredCount" style="font-size:30px; font-weight:900; color:var(--success);">0</div>
+          </div>
+          <h3 style="font-size:15px; margin-bottom:10px; color:var(--text-muted); font-weight:bold;">ASSIGNED ORDERS</h3>
+          <div id="riderOrdersList"></div>
+      </div>
+
+      <div class="modal" id="riderQrModal" style="background:rgba(0,0,0,0.8); justify-content:center; padding:20px;">
+          <div style="background:white; border-radius:16px; padding:20px; text-align:center; position:relative; width:100%; max-width:350px; margin:0 auto;">
+              <i data-lucide="x" onclick="closeModal('riderQrModal')" style="position:absolute; top:15px; right:15px; cursor:pointer; color:var(--text-muted);"></i>
+              <h3 style="margin-bottom:5px; font-size:18px;">Scan to Pay</h3>
+              <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Ask customer to scan with PhonePe/GPay</p>
+              <div style="background:#f0f5ff; padding:15px; border-radius:12px; display:inline-block; border:1px solid #c0d5ff; margin-bottom:15px;">
+                  <img id="dynamicQrImage" src="" style="width:200px; height:200px; mix-blend-mode:multiply;">
+              </div>
+              <div style="font-size:24px; font-weight:900; color:var(--primary); margin-bottom:5px;" id="qrAmountDisplay">₹0</div>
+              <div style="font-size:12px; color:var(--success); font-weight:bold;">UPI: <span id="qrUpiDisplay"></span></div>
+          </div>
+      </div>
+  </div>
+
 
   <div class="app-view admin-bg" id="adminApp">
     
@@ -339,6 +432,7 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
         <button class="admin-tab-btn" id="btn-tab-orders" onclick="switchAdminTab('orders')">Live Orders</button>
         <button class="admin-tab-btn" id="btn-tab-products" onclick="switchAdminTab('products')">Products</button>
         <button class="admin-tab-btn" id="btn-tab-categories" onclick="switchAdminTab('categories')">Categories</button>
+        <button class="admin-tab-btn" id="btn-tab-riders" onclick="switchAdminTab('riders')">Riders</button>
         <button class="admin-tab-btn" id="btn-tab-settings" onclick="switchAdminTab('settings')">Settings</button>
     </div>
 
@@ -423,6 +517,21 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
             </div>
         </div>
 
+        <div class="admin-section" id="sec-riders">
+            <div class="admin-card" style="border-color:var(--secondary);">
+                <h3 style="margin-bottom: 15px; font-size:16px; color:var(--secondary);">Add Delivery Rider</h3>
+                <input type="text" id="rName" class="admin-input" placeholder="Rider Name">
+                <input type="tel" id="rPhone" class="admin-input" placeholder="Mobile Number (Login ID)" maxlength="10">
+                <input type="password" id="rPass" class="admin-input" placeholder="Create Password">
+                <button class="btn-admin" style="background:var(--secondary);" onclick="saveRider()">Register Rider</button>
+            </div>
+            
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; font-size:16px;">Active Riders</h3>
+                <div id="adminRidersList"></div>
+            </div>
+        </div>
+
         <div class="admin-section" id="sec-settings">
             <div class="admin-card" style="border-color:var(--secondary);">
                 <h3 style="margin-bottom: 15px; font-size:16px; color:var(--secondary);">Delivery Settings</h3>
@@ -489,18 +598,17 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let allProducts = [], allOrders = [], allUsers = [], allCategories = []; 
+    let allProducts = [], allOrders = [], allUsers = [], allCategories = [], allRiders = []; 
     let appSettings = { logo: '', banners: {}, support: { whatsapp: "919348954360", email: "support@bijumart.com" }, payment: { upiId: "9348954360@ybl", minOrderAmount: 0 } };
     let cart = [], currentCategory = 'All', editingProductId = null;
     let loggedInUser = null, currentAuthMode = 'login', pendingAuthData = null;
     let selectedPaymentMethod = 'UPI', customerLat = null, customerLng = null;
     let autoSlideInterval = null, isInitialOrderLoad = true;
-    let activeModalProduct = null, selectedModalSize = null; // 🚀 New variables for details modal
+    let activeModalProduct = null, selectedModalSize = null;
 
     function isImage(string) { if(!string) return false; return string.startsWith('http') || string.startsWith('data:image'); }
     function safeParse(data) { if (!data) return []; if (Array.isArray(data)) return data.filter(item => item !== null && item !== undefined); return Object.values(data).filter(item => item !== null && item !== undefined); }
 
-    // Fast image compression logic
     function processImageFileAsync(file) {
         return new Promise((resolve) => {
             if(!file) return resolve(null);
@@ -509,7 +617,7 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 400; // More compressed for 3 images
+                    const MAX_WIDTH = 400; 
                     let width = img.width, height = img.height;
                     if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                     canvas.width = width; canvas.height = height;
@@ -538,7 +646,6 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
         db.ref('categories').on('value', snap => {
             const data = snap.val();
             if(data) {
-                // Safely handle old string categories vs new object categories
                 allCategories = safeParse(data).map(c => typeof c === 'string' ? {id: c.replace(/[^a-zA-Z0-9]/g, ''), name: c, image: null} : c);
             } else {
                 const defaultCats = ['Fashion', 'Mobiles', 'Beauty', 'Electronics', 'Grocery'];
@@ -570,7 +677,11 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
             if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
         });
 
-        db.ref('users').on('value', snap => { allUsers = safeParse(data); });
+        // 🚀 FIXED THIS LINE WHICH CAUSED THE CRASH
+        db.ref('users').on('value', snap => { 
+            const data = snap.val(); 
+            allUsers = safeParse(data); 
+        });
 
         const savedSession = localStorage.getItem('shop_session_cloud');
         if(savedSession) { loggedInUser = JSON.parse(savedSession); updateAppForLoggedInUser(); }
@@ -589,7 +700,6 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
         showToast("Configuration Saved Successfully!");
     }
 
-    // 🚀 NEW: Categories rendering logic (Image support)
     function renderCategories() {
         const filterContainer = document.getElementById('categoryFilters');
         let html = `
@@ -768,7 +878,6 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
         renderCustomerProducts(products);
     }
 
-    // 🚀 NEW: Custom Cart Key handling size variations
     function updateQty(id, delta, size = null) {
         const product = allProducts.find(p => p.id === id);
         if(!product) return;
@@ -794,7 +903,7 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
         if(document.getElementById('cartModal').classList.contains('active')) openCart(); 
     }
 
-    // 🚀 NEW: Product Details Modal Logic
+    // 🚀 RESTORED 3 IMAGES & PRODUCT MODAL
     function openProductDetails(id) {
         activeModalProduct = allProducts.find(p => p.id === id);
         selectedModalSize = null;
@@ -802,19 +911,17 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
         document.getElementById('modalProdName').innerText = activeModalProduct.name;
         document.getElementById('modalProdPrice').innerText = `₹${activeModalProduct.price.toLocaleString('en-IN')}`;
         
-        // Setup Images
         let imgsHTML = '';
         if(activeModalProduct.emoji) imgsHTML += `<div class="prod-img-box"><img src="${activeModalProduct.emoji}"></div>`;
         if(activeModalProduct.image2) imgsHTML += `<div class="prod-img-box"><img src="${activeModalProduct.image2}"></div>`;
         if(activeModalProduct.image3) imgsHTML += `<div class="prod-img-box"><img src="${activeModalProduct.image3}"></div>`;
         document.getElementById('modalImgSlider').innerHTML = imgsHTML;
 
-        // Setup Sizes
         const sizeBox = document.getElementById('sizeSelectionBox');
         const sContainer = document.getElementById('sizeButtonsContainer');
         if(activeModalProduct.sizeType && activeModalProduct.sizeType !== 'None') {
             sizeBox.style.display = 'block';
-            let sizes = activeModalProduct.sizeType === 'Clothing' ? ['S', 'M', 'L', 'XL', 'XXL'] : ['6', '7', '8', '9', '10'];
+            let sizes = activeModalProduct.sizeType === 'Clothing' ? ['S', 'M', 'L', 'XL', 'XXL'] : ['6', '7', '8', '9', '10', '11'];
             sContainer.innerHTML = sizes.map(s => `<div class="size-btn" onclick="selectModalSize('${s}', this)">${s}</div>`).join('');
         } else {
             sizeBox.style.display = 'none';
@@ -851,7 +958,6 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
 
             let actionHTML = '';
             
-            // If product has sizes, force them to open details
             if(p.sizeType && p.sizeType !== 'None') {
                 actionHTML = `<button class="btn-add-cart" onclick="openProductDetails('${p.id}')">Select Size</button>`;
             } else {
@@ -960,6 +1066,14 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
             </div>`}).join('');
     }
 
+    function switchCustomerTab(tab, element) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); if(element) element.classList.add('active');
+        document.getElementById('customerDashboard').style.display = 'none'; document.getElementById('customerOrdersView').style.display = 'none'; document.getElementById('customerProfileView').style.display = 'none';
+        if(tab === 'home') { document.getElementById('customerDashboard').style.display = 'block'; filterAndSortProducts(); } 
+        else if (tab === 'orders') { if(!loggedInUser) { showToast("Sign in required"); openAuthPage(); document.getElementById('navOrders').classList.remove('active'); document.getElementById('navHome').classList.add('active'); return; } document.getElementById('customerOrdersView').style.display = 'block'; renderCustomerOrders(); } 
+        else if (tab === 'profile') { document.getElementById('customerProfileView').style.display = 'block'; }
+    }
+
     // --- Admin Logic ---
     function openAdminLogin() { document.getElementById('adminLoginModal').classList.add('active'); }
     function verifyAdmin() {
@@ -1010,7 +1124,6 @@ input[type="file"].admin-input::-webkit-file-upload-button{background:var(--prim
     function deleteOrder(orderId) { if(confirm("Permanently delete?")) { db.ref('orders/' + orderId).remove(); showToast("Deleted!"); } }
     function updateOrderStatus(orderId, newStatus) { db.ref('orders/' + orderId).update({ status: newStatus }); showToast("Status Updated!"); }
 
-    // 🚀 NEW: Save 3 Images + Size Data
     async function saveProductEntry() {
         const name = document.getElementById('pName').value, price = parseInt(document.getElementById('pPrice').value), stock = parseInt(document.getElementById('pStock').value), cat = document.getElementById('pCat').value, sizeType = document.getElementById('pSizeType').value;
         if(!name || isNaN(price) || isNaN(stock)) return showToast("Enter Valid Name, Price & Stock");
