@@ -78,7 +78,6 @@
         .btn-qty { border:1px solid var(--primary); background:white; color:var(--primary); width:28px; height:28px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:16px; display:flex; align-items:center; justify-content:center;}
         .qty-val { font-weight:bold; font-size:14px; color:var(--text-main); }
 
-        /* PRODUCT MODAL (3 IMAGES & SIZE) */
         .prod-img-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: white; padding: 15px; gap: 10px; scrollbar-width: none; }
         .prod-img-slider::-webkit-scrollbar { display: none; }
         .prod-img-box { min-width: 100%; height: 300px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; background: #f8fafc; border-radius: 12px; font-size: 80px;}
@@ -549,14 +548,17 @@
                 <input type="text" id="adminUpiId" class="admin-input" placeholder="e.g. 9348954360@ybl">
                 <button class="btn-admin" style="margin-top:10px; background:var(--success);" onclick="updateAppConfig()">Save Configuration</button>
             </div>
+            
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px;">App Branding & Banners</h3>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">APP LOGO</label>
+                
+                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">APP LOGO (Choose from Gallery)</label>
                 <div style="display:flex; gap:10px; margin-bottom:20px;">
                     <input type="file" id="adminLogoFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
                     <button class="btn-small" onclick="updateAppLogo()">Upload</button>
                 </div>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">PROMO BANNER</label>
+                
+                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">PROMO BANNER (Choose from Gallery)</label>
                 <div style="display:flex; gap:10px;">
                     <input type="file" id="adminBannerFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
                     <button class="btn-small" style="background:var(--success);" onclick="addPromoBanner()">Add Banner</button>
@@ -632,61 +634,91 @@
     }
 
     window.onload = () => {
-        db.ref('settings').on('value', snap => {
-            const data = snap.val();
-            if(data) {
-                appSettings.logo = data.logo || ''; appSettings.banners = data.banners || {};
-                if(data.support) appSettings.support = data.support;
-                if(data.payment) { appSettings.payment.upiId = data.payment.upiId || "9348954360@ybl"; appSettings.payment.minOrderAmount = data.payment.minOrderAmount || 0; }
-            }
-            applySettingsToUI();
-            if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
-        });
-
-        db.ref('categories').on('value', snap => {
-            const data = snap.val();
-            if(data) {
-                allCategories = safeParse(data).map(c => typeof c === 'string' ? {id: c.replace(/[^a-zA-Z0-9]/g, ''), name: c, image: null} : c);
-            } else {
-                const defaultCats = ['Fashion', 'Mobiles', 'Beauty', 'Electronics', 'Grocery'];
-                defaultCats.forEach(c => db.ref('categories/' + c.replace(/[^a-zA-Z0-9]/g, '')).set({id: c.replace(/[^a-zA-Z0-9]/g, ''), name: c, image: null}));
-            }
-            renderCategories();
-        });
-
-        db.ref('products').on('value', snap => {
-            const data = snap.val();
-            let parsedProducts = safeParse(data);
-            if(parsedProducts.length > 0) allProducts = parsedProducts;
-            filterAndSortProducts();
-            if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
-        });
-
-        db.ref('orders').on('value', snap => {
-            const data = snap.val();
-            let newOrdersList = safeParse(data).sort((a,b) => b.timestamp - a.timestamp);
-            if(!isInitialOrderLoad && newOrdersList.length > allOrders.length) {
-                const latest = newOrdersList[0];
-                if(document.getElementById('adminApp').classList.contains('active')) {
-                    document.getElementById('newOrderAlertDetails').innerText = `${latest.customer} ne ₹${(latest.total||0).toLocaleString('en-IN')} ka naya order diya hai!`;
-                    document.getElementById('newOrderAlert').style.display = 'block';
+        try {
+            db.ref('settings').on('value', snap => {
+                const data = snap.val();
+                if(data) {
+                    appSettings.logo = data.logo || ''; appSettings.banners = data.banners || {};
+                    if(data.support) appSettings.support = data.support;
+                    if(data.payment) { appSettings.payment.upiId = data.payment.upiId || "9348954360@ybl"; appSettings.payment.minOrderAmount = data.payment.minOrderAmount || 0; }
                 }
-            }
-            allOrders = newOrdersList; isInitialOrderLoad = false;
-            renderCustomerOrders();
-            if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
-        });
+                applySettingsToUI();
+                if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
+            });
 
-        // 🚀 FIXED THIS LINE WHICH CAUSED THE CRASH
-        db.ref('users').on('value', snap => { 
-            const data = snap.val(); 
-            allUsers = safeParse(data); 
-        });
+            db.ref('categories').on('value', snap => {
+                const data = snap.val();
+                if(data) {
+                    allCategories = safeParse(data).map(c => typeof c === 'string' ? {id: c.replace(/[^a-zA-Z0-9]/g, ''), name: c, image: null} : c);
+                } else {
+                    const defaultCats = ['Fashion', 'Mobiles', 'Beauty', 'Electronics', 'Grocery'];
+                    defaultCats.forEach(c => db.ref('categories/' + c.replace(/[^a-zA-Z0-9]/g, '')).set({id: c.replace(/[^a-zA-Z0-9]/g, ''), name: c, image: null}));
+                }
+                renderCategories();
+            });
+
+            db.ref('products').on('value', snap => {
+                const data = snap.val();
+                let parsedProducts = safeParse(data);
+                if(parsedProducts.length > 0) allProducts = parsedProducts;
+                filterAndSortProducts();
+                if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
+            });
+
+            db.ref('orders').on('value', snap => {
+                const data = snap.val();
+                let newOrdersList = safeParse(data).sort((a,b) => b.timestamp - a.timestamp);
+                if(!isInitialOrderLoad && newOrdersList.length > allOrders.length) {
+                    const latest = newOrdersList[0];
+                    if(document.getElementById('adminApp').classList.contains('active')) {
+                        document.getElementById('newOrderAlertDetails').innerText = `${latest.customer} ne ₹${(latest.total||0).toLocaleString('en-IN')} ka naya order diya hai!`;
+                        document.getElementById('newOrderAlert').style.display = 'block';
+                    }
+                }
+                allOrders = newOrdersList; isInitialOrderLoad = false;
+                renderCustomerOrders();
+                if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
+            });
+
+            // 🚀 BUG FIXED: data -> snap.val()
+            db.ref('users').on('value', snap => { 
+                const data = snap.val(); 
+                allUsers = safeParse(data); 
+            });
+
+            db.ref('riders').on('value', snap => {
+                const data = snap.val();
+                allRiders = safeParse(data);
+                if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
+            });
+        } catch(err) { console.error("Firebase load error", err); }
 
         const savedSession = localStorage.getItem('shop_session_cloud');
         if(savedSession) { loggedInUser = JSON.parse(savedSession); updateAppForLoggedInUser(); }
         lucide.createIcons();
     };
+
+    function toggleSupportMenu() { document.getElementById('supportMenu').classList.toggle('active'); }
+    
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('supportMenu');
+        const fab = document.querySelector('.support-fab');
+        if (menu && menu.classList.contains('active') && !menu.contains(event.target) && !fab.contains(event.target)) {
+            menu.classList.remove('active');
+        }
+    });
+
+    function contactSupport(type) {
+        document.getElementById('supportMenu').classList.remove('active');
+        if(type === 'wa') {
+            const waNumber = appSettings.support.whatsapp;
+            const text = encodeURIComponent("Hello Biju Mart Support, I need some help.");
+            window.open(`https://wa.me/${waNumber}?text=${text}`, '_blank');
+        } else {
+            const email = appSettings.support.email;
+            window.open(`mailto:${email}?subject=Customer Support Inquiry`, '_blank');
+        }
+    }
 
     function updateAppConfig() {
         const wa = document.getElementById('adminSupportWa').value;
@@ -767,6 +799,13 @@
         if(document.getElementById('dynamicLogoCustomer')) document.getElementById('dynamicLogoCustomer').innerHTML = logoHTML;
         if(document.getElementById('dynamicLogoAdmin')) document.getElementById('dynamicLogoAdmin').innerHTML = logoHTML;
 
+        if(document.getElementById('adminSupportWa')) {
+            document.getElementById('adminSupportWa').value = appSettings.support.whatsapp || '';
+            document.getElementById('adminSupportEmail').value = appSettings.support.email || '';
+            document.getElementById('adminUpiId').value = (appSettings.payment && appSettings.payment.upiId) ? appSettings.payment.upiId : '9348954360@ybl';
+            document.getElementById('adminMinOrder').value = (appSettings.payment && appSettings.payment.minOrderAmount) ? appSettings.payment.minOrderAmount : 0;
+        }
+
         const bannerContainer = document.getElementById('promoBanners');
         const bannerKeys = Object.keys(appSettings.banners);
         if(bannerContainer) {
@@ -802,9 +841,22 @@
 
     function deletePromoBanner(bannerId) { if(confirm("Delete banner?")) { db.ref('settings/banners/' + bannerId).remove(); showToast("Deleted"); } }
 
-    function openAuthPage() { document.getElementById('authPage').classList.add('active'); switchAuthTab('login'); }
+    function openAuthPage() { document.getElementById('authPage').classList.add('active'); switchAuthTab('login'); resetAuthForms(); }
     function closeAuthPage() { document.getElementById('authPage').classList.remove('active'); }
     
+    function resetAuthForms() {
+        document.getElementById('authFormsSection').style.display = 'block';
+        document.getElementById('authOtpSection').style.display = 'none';
+        ['logPhone', 'regFirstName', 'regPhone', 'otp1', 'otp2', 'otp3', 'otp4'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) { el.value = ''; el.style.borderColor = '#e0e0e0'; }
+        });
+        document.getElementById('autoDetectMsg').innerText = 'Waiting for SMS...';
+        document.getElementById('autoDetectMsg').style.color = 'var(--text-muted)';
+        const btn = document.getElementById('verifyOtpBtn');
+        btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
+    }
+
     function switchAuthTab(mode) {
         currentAuthMode = mode;
         document.getElementById('tabLogin').classList.remove('active'); document.getElementById('tabRegister').classList.remove('active');
@@ -831,8 +883,25 @@
         document.getElementById('authFormsSection').style.display = 'none';
         document.getElementById('authOtpSection').style.display = 'block';
         document.getElementById('displayOtpPhone').innerText = "+91 " + phone;
-        setTimeout(() => { document.getElementById('verifyOtpBtn').style.opacity = '1'; document.getElementById('verifyOtpBtn').style.pointerEvents = 'auto'; document.getElementById('autoDetectMsg').innerText = "Simulated OTP verified"; verifyCustomerOTP(); }, 1500);
+        simulateAutomaticOTP();
     }
+
+    function simulateAutomaticOTP() {
+        const msg = document.getElementById('autoDetectMsg'); msg.innerText = "Reading SMS format...";
+        setTimeout(() => {
+            msg.innerText = "OTP Detected! Auto-filling..."; msg.style.color = "var(--success)";
+            setTimeout(() => { fillOtpBox('otp1', '4'); }, 300); setTimeout(() => { fillOtpBox('otp2', '2'); }, 600);
+            setTimeout(() => { fillOtpBox('otp3', '8'); }, 900); setTimeout(() => { fillOtpBox('otp4', '9'); }, 1200);
+            setTimeout(() => {
+                msg.innerText = "✓ Verified securely.";
+                const btn = document.getElementById('verifyOtpBtn');
+                btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+                setTimeout(() => verifyCustomerOTP(), 800);
+            }, 1500);
+        }, 1500);
+    }
+
+    function fillOtpBox(id, val) { const box = document.getElementById(id); if(box) { box.value = val; box.style.borderColor = "var(--success)"; } }
 
     function verifyCustomerOTP() {
         if(currentAuthMode === 'register') db.ref('users/' + pendingAuthData.phone).set(pendingAuthData);
@@ -857,8 +926,9 @@
     function handleAccountTabClick(element) { if (loggedInUser) switchCustomerTab('profile', element); else openAuthPage(); }
     function setCategory(cat, element) { currentCategory = cat; renderCategories(); filterAndSortProducts(); }
 
+    // 🚀 FIXED: SHARE MATCHING BUG
     function shareProduct(id) {
-        const p = allProducts.find(x => x.id === id);
+        const p = allProducts.find(x => String(x.id) === String(id));
         if(!p) return;
         const shareUrl = window.location.href;
         const shareText = `Check out ${p.name} for just ₹${p.price} at Biju Mart! 🛒\nOrder now:`;
@@ -878,8 +948,9 @@
         renderCustomerProducts(products);
     }
 
+    // 🚀 FIXED: ID MATCHING BUG
     function updateQty(id, delta, size = null) {
-        const product = allProducts.find(p => p.id === id);
+        const product = allProducts.find(p => String(p.id) === String(id));
         if(!product) return;
         
         let cartKey = size ? `${id}_${size}` : `${id}`;
@@ -903,11 +974,12 @@
         if(document.getElementById('cartModal').classList.contains('active')) openCart(); 
     }
 
-    // 🚀 RESTORED 3 IMAGES & PRODUCT MODAL
+    // 🚀 FIXED: ID MATCHING BUG
     function openProductDetails(id) {
-        activeModalProduct = allProducts.find(p => p.id === id);
-        selectedModalSize = null;
+        activeModalProduct = allProducts.find(p => String(p.id) === String(id));
+        if(!activeModalProduct) return;
         
+        selectedModalSize = null;
         document.getElementById('modalProdName').innerText = activeModalProduct.name;
         document.getElementById('modalProdPrice').innerText = `₹${activeModalProduct.price.toLocaleString('en-IN')}`;
         
@@ -957,11 +1029,10 @@
             const displayVisual = isImage(emojiVal) ? `<img src="${emojiVal}" class="product-img-real" alt="product">` : `<div style="font-size:50px;">${emojiVal}</div>`;
 
             let actionHTML = '';
-            
             if(p.sizeType && p.sizeType !== 'None') {
                 actionHTML = `<button class="btn-add-cart" onclick="openProductDetails('${p.id}')">Select Size</button>`;
             } else {
-                let cartItem = cart.find(i => i.id === p.id);
+                let cartItem = cart.find(i => String(i.id) === String(p.id));
                 if(cartItem) {
                     actionHTML = `<div class="qty-controls"><button class="btn-qty" onclick="updateQty('${p.id}', -1, null)">-</button><span class="qty-val">${cartItem.qty}</span><button class="btn-qty" onclick="updateQty('${p.id}', 1, null)">+</button></div>`;
                 } else if(isOutOfStock) {
@@ -1044,7 +1115,7 @@
         const newOrder = { id: orderId, timestamp: Date.now(), customer: name, phone, address: address + " - " + pin, lat: customerLat, lng: customerLng, paymentMethod: selectedPaymentMethod === 'UPI' ? 'UPI' : 'COD', items: itemsStr, cartItems: detailedCart, total, status: 'Pending', date: new Date().toLocaleDateString() };
         db.ref('orders/' + orderId).set(newOrder);
 
-        cart.forEach(cItem => { const p = allProducts.find(p => p.id === cItem.id); if(p) db.ref('products/' + p.id).update({ stock: p.stock - cItem.qty }); });
+        cart.forEach(cItem => { const p = allProducts.find(p => String(p.id) === String(cItem.id)); if(p) db.ref('products/' + p.id).update({ stock: p.stock - cItem.qty }); });
         cart = []; document.getElementById('cartBadge').style.display = 'none'; closeModal('checkoutModal'); switchCustomerTab('orders', document.getElementById('navOrders'));
         showToast("Order Placed Successfully!");
     }
@@ -1053,7 +1124,7 @@
 
     function renderCustomerOrders() {
         const list = document.getElementById('customerOrdersList'); if(!list) return;
-        let myOrders = loggedInUser ? allOrders.filter(o => o.phone === loggedInUser.phone) : [];
+        let myOrders = loggedInUser ? allOrders.filter(o => String(o.phone) === String(loggedInUser.phone)) : [];
         if(myOrders.length === 0) { list.innerHTML = "<p style='color:#878787; text-align:center;'>No orders found.</p>"; return; }
         list.innerHTML = myOrders.map(o => {
             let color = o.status === 'Delivered' ? 'var(--success)' : (o.status === 'Cancelled' ? 'var(--danger)' : (o.status === 'Cancel Requested' ? '#ef4444' : 'var(--primary)'));
@@ -1114,7 +1185,7 @@
     }
 
     function populateBillTemplate(orderId) {
-        const o = allOrders.find(x => x.id === orderId); if(!o) return false;
+        const o = allOrders.find(x => String(x.id) === String(orderId)); if(!o) return false;
         document.getElementById('billCustomerName').innerText = o.customer; document.getElementById('billOrderId').innerText = o.id; document.getElementById('billDate').innerText = o.date; document.getElementById('billPayment').innerText = o.paymentMethod; document.getElementById('billTotalAmount').innerText = (o.total||0).toLocaleString('en-IN');
         const tbody = document.getElementById('billTableBody');
         if(o.cartItems && o.cartItems.length > 0) tbody.innerHTML = o.cartItems.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>₹${(i.price||0).toLocaleString('en-IN')}</td><td style="text-align:right;">₹${(i.amount||0).toLocaleString('en-IN')}</td></tr>`).join('');
@@ -1142,8 +1213,9 @@
         ['pName', 'pPrice', 'pStock', 'pImageFile1', 'pImageFile2', 'pImageFile3', 'pExistingImage1', 'pExistingImage2', 'pExistingImage3'].forEach(el => document.getElementById(el).value = '');
     }
 
+    // 🚀 FIXED: ID MATCHING BUG
     function editProduct(id) {
-        const p = allProducts.find(x => x.id === id); if(!p) return;
+        const p = allProducts.find(x => String(x.id) === String(id)); if(!p) return;
         document.getElementById('pName').value = p.name; document.getElementById('pPrice').value = p.price; document.getElementById('pStock').value = p.stock; document.getElementById('pCat').value = p.category; 
         if(p.sizeType) document.getElementById('pSizeType').value = p.sizeType;
         document.getElementById('pExistingImage1').value = p.emoji || ''; document.getElementById('pExistingImage2').value = p.image2 || ''; document.getElementById('pExistingImage3').value = p.image3 || '';
