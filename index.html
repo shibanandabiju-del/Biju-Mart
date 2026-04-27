@@ -859,6 +859,7 @@
 
     function selectPaymentMethod(method) { selectedPaymentMethod = method; document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('active')); document.getElementById('pay' + method.toUpperCase()).classList.add('active'); }
 
+    // 🚀 FIXED: UPI REDIRECT CODE ADDED BACK HERE
     function placeOrder() {
         const name = document.getElementById('cName').value.trim(), phone = document.getElementById('cPhone').value.trim(), address = document.getElementById('cAddress').value.trim(), pin = document.getElementById('cPin').value.trim();
         if(!name || !phone || !address || !pin) return showToast("Fill all Delivery Details");
@@ -867,11 +868,26 @@
         const itemsStr = cart.map(i => `${i.name} ${i.size ? `[Size:${i.size}]` : ''} (x${i.qty})`).join(', ');
         const detailedCart = cart.map(i => ({ name: `${i.name} ${i.size ? `[${i.size}]` : ''}`, qty: i.qty, price: i.price, amount: i.price*i.qty }));
 
-        db.ref('orders/' + orderId).set({ id: orderId, timestamp: Date.now(), customer: name, phone, address: address + " - " + pin, lat: customerLat, lng: customerLng, paymentMethod: selectedPaymentMethod === 'UPI' ? 'UPI' : 'COD', items: itemsStr, cartItems: detailedCart, total, status: 'Pending', date: new Date().toLocaleDateString() });
+        db.ref('orders/' + orderId).set({ id: orderId, timestamp: Date.now(), customer: name, phone, address: address + " - " + pin, lat: customerLat, lng: customerLng, paymentMethod: selectedPaymentMethod === 'UPI' ? 'UPI (Pending)' : 'COD', items: itemsStr, cartItems: detailedCart, total, status: 'Pending', date: new Date().toLocaleDateString() });
 
         cart.forEach(cItem => { const p = allProducts.find(p => String(p.id) === String(cItem.id)); if(p) db.ref('products/' + p.id).update({ stock: p.stock - cItem.qty }); });
         cart = []; document.getElementById('cartBadge').style.display = 'none'; closeModal('checkoutModal'); switchCustomerTab('orders', document.getElementById('navOrders'));
-        showToast("Order Placed Successfully!");
+        
+        // 🌟 UPI App Opening Logic
+        setTimeout(() => {
+            if (selectedPaymentMethod === 'UPI') {
+                if(/Android|iPhone|iPad/i.test(navigator.userAgent)){
+                    showToast("Opening Payment App...");
+                    let upiId = appSettings.payment.upiId || "9348954360@ybl";
+                    const upiUrl = `upi://pay?pa=${upiId}&pn=Biju%20Mart&am=${total}&cu=INR`;
+                    window.location.href = upiUrl; 
+                } else {
+                    showToast("UPI Direct link only works on Mobile Phones.");
+                }
+            } else {
+                showToast("Order Placed Successfully!");
+            }
+        }, 500);
     }
 
     function requestCancelOrder(orderId) { if(confirm("Request cancellation?")) { db.ref('orders/' + orderId).update({ status: 'Cancel Requested' }); showToast("Request Sent"); } }
@@ -895,7 +911,7 @@
         else if (tab === 'profile') { document.getElementById('customerProfileView').style.display = 'block'; }
     }
 
-    // --- RIDER LOGIC (🔥 COMPLETELY FIXED) ---
+    // --- RIDER LOGIC ---
     function openRiderLogin() {
         if(loggedInRider) {
             document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active'); renderRiderDashboard();
@@ -903,42 +919,21 @@
     }
 
     function saveRider() {
-        const name = document.getElementById('rName').value.trim();
-        const phone = document.getElementById('rPhone').value.trim();
-        const pass = document.getElementById('rPass').value.trim();
-
-        if(!name || phone.length !== 10 || !pass) {
-            showToast("Enter Name, 10-digit Phone, and Password");
-            return;
-        }
+        const name = document.getElementById('rName').value.trim(), phone = document.getElementById('rPhone').value.trim(), pass = document.getElementById('rPass').value.trim();
+        if(!name || phone.length !== 10 || !pass) { showToast("Enter Name, 10-digit Phone, and Password"); return; }
         db.ref('riders/' + phone).set({ name: name, phone: phone, password: pass });
-        showToast("Rider Registered!");
-        document.getElementById('rName').value = '';
-        document.getElementById('rPhone').value = '';
-        document.getElementById('rPass').value = '';
+        showToast("Rider Registered!"); document.getElementById('rName').value = ''; document.getElementById('rPhone').value = ''; document.getElementById('rPass').value = '';
     }
 
     function verifyRider() {
-        const phone = document.getElementById('riderPhoneLogin').value.trim();
-        const pass = document.getElementById('riderPassLogin').value.trim();
-        
+        const phone = document.getElementById('riderPhoneLogin').value.trim(), pass = document.getElementById('riderPassLogin').value.trim();
         if(!phone || !pass) return showToast("Enter credentials");
-
         const rider = allRiders.find(r => String(r.phone) === String(phone) && String(r.password) === String(pass));
-        
         if(rider) {
-            loggedInRider = rider; 
-            localStorage.setItem('rider_session_cloud', JSON.stringify(rider));
-            closeModal('riderLoginModal'); 
-            document.getElementById('customerApp').classList.remove('active'); 
-            document.getElementById('riderApp').classList.add('active');
-            renderRiderDashboard(); 
-            showToast("Welcome Partner!"); 
-            document.getElementById('riderPhoneLogin').value = ''; 
-            document.getElementById('riderPassLogin').value = '';
-        } else { 
-            showToast("Invalid Rider Credentials"); 
-        }
+            loggedInRider = rider; localStorage.setItem('rider_session_cloud', JSON.stringify(rider));
+            closeModal('riderLoginModal'); document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active');
+            renderRiderDashboard(); showToast("Welcome Partner!"); document.getElementById('riderPhoneLogin').value = ''; document.getElementById('riderPassLogin').value = '';
+        } else { showToast("Invalid Rider Credentials"); }
     }
 
     function logoutRider() { loggedInRider = null; localStorage.removeItem('rider_session_cloud'); document.getElementById('riderApp').classList.remove('active'); document.getElementById('customerApp').classList.add('active'); showToast("Rider Logged Out"); }
