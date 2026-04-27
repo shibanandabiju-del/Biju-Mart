@@ -3,120 +3,177 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Biju Mart</title>
+  <title>Biju Mart Premium</title>
+  
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
   <style>
-    :root { --primary: #2874f0; --secondary: #ff9f00; --dark-bg: #0f172a; --light-bg: #f1f3f6; --text-main: #212121; --text-muted: #878787; --success: #388e3c; --danger: #ff6161; --whatsapp: #25D366; }
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100dvh; font-family: Roboto, 'Segoe UI', sans-serif; background: var(--light-bg); overflow: hidden; }
-    body { max-width: 480px; margin: 0 auto; position: relative; color: var(--text-main); background: var(--light-bg); box-shadow: 0 0 40px rgba(0,0,0,0.05); }
-    .app-view { display: none; width: 100%; height: 100dvh; flex-direction: column; overflow: hidden; position: absolute; top:0; left:0; background: var(--light-bg); }
-    .app-view.active { display: flex; }
-    .header { flex-shrink: 0; background: white; padding: 10px 15px; z-index: 40; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .main-content { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 90px; }
-    .main-content::-webkit-scrollbar { display: none; }
-    .bottom-nav { flex-shrink: 0; position: absolute; bottom: 0; width: 100%; max-width: 480px; background: white; border-top: 1px solid #e0e0e0; display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
-    .header-top-row { display: flex; justify-content: space-between; align-items: center; }
-    .header-logo { font-size: 20px; font-weight: 900; color: var(--primary); display: flex; align-items: center; font-style: italic; letter-spacing: -0.5px; }
-    .header-logo img { height: 28px; max-width: 130px; object-fit: contain; }
-    .icon-btn { background: transparent; border: none; color: var(--text-main); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: 0.2s; }
-    .badge { position: absolute; top: -2px; right: -2px; background: var(--danger); color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid white; }
-    .search-wrapper { display: flex; background: #f0f5ff; border-radius: 8px; padding: 10px 12px; align-items: center; border: 1px solid #e0e0e0; margin-bottom: 10px; }
-    .search-wrapper input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 14px; color: var(--text-main); background: transparent; }
-    .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 15px 15px 0; gap: 10px; scroll-behavior: smooth; }
-    .banner-slider::-webkit-scrollbar { display: none; }
-    .banner-slide { min-width: 100%; height: 150px; border-radius: 8px; scroll-snap-align: center; object-fit: cover; background: #e2e8f0; }
-    .cat-scroll { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding: 15px; background: white; margin-bottom: 10px; }
-    .cat-scroll::-webkit-scrollbar { display: none; }
-    .cat-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; opacity: 0.8; transition: 0.3s; min-width: 60px; }
-    .cat-item.active { opacity: 1; }
-    .cat-icon-circle { width: 45px; height: 45px; background: #f0f5ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.3s; overflow:hidden;}
-    .cat-icon-circle img { width: 100%; height: 100%; object-fit: cover; }
-    .cat-item.active .cat-icon-circle { background: var(--primary); color: white; box-shadow: 0 4px 8px rgba(40, 116, 240, 0.3); }
-    .cat-item span { font-size: 11px; font-weight: 600; color: var(--text-main); white-space: nowrap; }
-    .products-grid-container { background: white; padding-top: 15px; padding-bottom: 20px; border-radius: 12px 12px 0 0; min-height: 50vh; }
-    .grid-greeting { padding: 0 15px 15px; font-size: 16px; font-weight: 800; color: var(--text-main); }
-    .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 15px; }
-    .product-card { background: white; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; border: 1px solid #f1f3f6; cursor:pointer;}
-    .share-badge { position: absolute; top: 8px; left: 8px; width: 28px; height: 28px; background: rgba(255,255,255,0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid #eee; cursor: pointer; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .product-image { background: #f8fafc; height: 150px; display: flex; align-items: center; justify-content: center; font-size: 50px; overflow: hidden; position: relative; padding: 10px; }
-    .product-img-real { width: 100%; height: 100%; object-fit: contain; }
-    .stock-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 4px; background: rgba(255,255,255,0.95); z-index: 10; border: 1px solid #eee; }
-    .stock-badge.low { color: var(--danger); }
-    .stock-badge.ok { color: var(--success); }
-    .product-info { padding: 10px; flex: 1; display: flex; flex-direction: column; }
-    .product-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; line-height: 1.4; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .product-price { font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; margin-top: 4px; }
-    .btn-add-cart { background: var(--primary); color: white; border: none; padding: 8px; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: auto; transition: 0.2s; text-transform: uppercase; width: 100%; }
-    .btn-add-cart:disabled { background: #e0e0e0; color: #9e9e9e; cursor: not-allowed; }
-    .qty-controls { display:flex; justify-content:space-between; align-items:center; background:#f0f5ff; border-radius:4px; padding:4px; margin-top:auto; }
-    .btn-qty { border:1px solid var(--primary); background:white; color:var(--primary); width:28px; height:28px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:16px; display:flex; align-items:center; justify-content:center;}
-    .qty-val { font-weight:bold; font-size:14px; color:var(--text-main); }
-    .prod-img-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: white; padding: 15px; gap: 10px; scrollbar-width: none; }
-    .prod-img-slider::-webkit-scrollbar { display: none; }
-    .prod-img-box { min-width: 100%; height: 300px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; background: #f8fafc; border-radius: 12px; font-size: 80px;}
-    .prod-img-box img { width: 100%; height: 100%; object-fit: contain; }
-    .size-btn { border: 1px solid #e0e0e0; background: white; padding: 10px 15px; border-radius: 6px; font-weight: bold; color: var(--text-main); cursor: pointer; }
-    .size-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-    .support-fab { position: absolute; bottom: 80px; right: 20px; background: var(--secondary); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 90; cursor: pointer; }
-    .support-menu { position: absolute; bottom: 140px; right: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 10px; display: none; flex-direction: column; gap: 10px; z-index: 91; border: 1px solid #eee; }
-    .support-menu.active { display: flex; animation: fadeIn 0.2s; }
-    .support-btn { display: flex; align-items: center; gap: 10px; padding: 10px 15px; border: none; background: #f8fafc; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 150px; }
-    .btn-wa { color: var(--whatsapp); }
-    .btn-email { color: var(--danger); }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
-    .admin-bg { background: var(--dark-bg); color: white; }
-    .admin-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items:center; flex-shrink:0; }
-    .admin-tab-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 0 20px 15px; border-bottom: 1px solid #1e293b; scrollbar-width: none; flex-shrink:0; }
-    .admin-tab-scroll::-webkit-scrollbar { display: none; }
-    .admin-tab-btn { background: transparent; color: #94a3b8; border: none; font-weight: bold; font-size: 13px; white-space: nowrap; padding: 8px 16px; cursor: pointer; border-radius: 20px; transition: 0.3s; border: 1px solid #334155; }
-    .admin-tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-    .admin-section { display: none; padding-top:15px; }
-    .admin-section.active { display: block; animation: fadeIn 0.3s; }
-    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px 15px; }
-    .metric-card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; display:flex; flex-direction:column; justify-content:center; }
-    .metric-title { font-size: 11px; color: #94a3b8; margin-bottom: 5px; font-weight:bold; letter-spacing:0.5px; }
-    .metric-value { font-size: 22px; font-weight: 900; color: white; }
-    .admin-card { background: #1e293b; padding: 20px; border-radius: 12px; margin: 0 20px 20px; border: 1px solid #334155; }
-    .admin-input { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px; margin-bottom: 12px; font-size: 14px; outline: none; }
-    .admin-input:focus { border-color: var(--primary); }
-    input[type="file"].admin-input { background: white; color: black; padding: 10px; cursor: pointer; }
-    input[type="file"].admin-input::-webkit-file-upload-button { background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 10px; }
-    .btn-admin { background: var(--primary); color: white; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s;}
-    .btn-small { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-    .btn-danger-small { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .nav-item.active { color: var(--primary); }
-    .modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--light-bg); z-index: 100; flex-direction: column; }
-    .modal.active { display: flex; animation: fadeIn 0.2s; }
-    .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align:center; width:max-content; max-width:90%; }
-    .payment-option { display: flex; align-items: center; gap: 15px; padding: 15px; background: white; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; }
-    .payment-option.active { border-color: var(--primary); background: #f0f5ff; }
-    .radio-custom { width: 20px; height: 20px; border: 2px solid #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-    .payment-option.active .radio-custom { border-color: var(--primary); }
-    .payment-option.active .radio-custom::after { content: ''; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; }
-    .auth-page { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: white; z-index: 200; flex-direction: column; overflow-y: auto; }
-    .auth-page.active { display: flex; animation: slideInRight 0.3s forwards; }
-    @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
-    .auth-header { padding: 20px; display: flex; align-items: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid #f1f5f9; flex-shrink:0; }
-    .auth-tabs { display: flex; margin: 20px 20px 0; background: #f8fafc; border-radius: 12px; padding: 5px; flex-shrink:0; }
-    .auth-tab { flex: 1; text-align: center; padding: 12px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.3s; font-size: 14px; }
-    .auth-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .auth-body { padding: 30px 20px; flex: 1; overflow-y:auto; }
-    .otp-container { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
-    .otp-box { width: 50px; height: 55px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 24px; text-align: center; font-weight: 800; outline: none; transition: 0.3s; color: var(--primary); background: #f8fafc; }
-    .otp-box:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(40, 116, 240, 0.1); }
-    .otp-msg { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px; color: var(--text-muted); height: 20px; }
-    .cart-img-real { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; border: 1px solid #eee; padding:2px; }
-    .print-only { display: none; }
-    @media print { .no-print { display: none !important; } .print-only { display: block !important; position: absolute; top:0; left:0; width: 100%; background: white; z-index: 99999; padding: 20px; color: black; font-family: sans-serif; } body { background: white; } }
-    .bill-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 12px; }
-    .bill-table th, .bill-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    .bill-table th { background-color: #f8fafc; font-weight: bold; }
+        :root { 
+            /* PREMIUM GOLD & BLACK THEME */
+            --primary: #D4AF37; /* Metallic Gold */
+            --primary-light: #F3E5AB; 
+            --gold-gradient: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            --secondary: #E5C158; 
+            --dark-bg: #000000; /* Pure Black */
+            --light-bg: #121212; /* Deep Grey Background */
+            --card-bg: #1a1a1a; /* Card Surface */
+            --border-color: #333333;
+            --text-main: #f1f1f1; /* White Text */
+            --text-muted: #888888; /* Grey Text */
+            --text-dark: #000000; /* Black text for gold backgrounds */
+            --success: #4caf50; 
+            --danger: #ef5350; 
+            --whatsapp: #25D366; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100dvh; font-family: Roboto, 'Segoe UI', sans-serif; background: var(--light-bg); overflow: hidden; color: var(--text-main); }
+        body { max-width: 480px; margin: 0 auto; position: relative; background: var(--light-bg); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        
+        .app-view { display: none; width: 100%; height: 100dvh; flex-direction: column; overflow: hidden; position: absolute; top:0; left:0; background: var(--light-bg); }
+        .app-view.active { display: flex; }
+        
+        .header { flex-shrink: 0; background: var(--card-bg); padding: 10px 15px; z-index: 40; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border-color); }
+        .main-content { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 90px; }
+        .main-content::-webkit-scrollbar { display: none; }
+        .bottom-nav { flex-shrink: 0; position: absolute; bottom: 0; width: 100%; max-width: 480px; background: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
+
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 22px; font-weight: 900; color: var(--primary); display: flex; align-items: center; font-style: italic; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(212,175,55,0.2); }
+        .header-logo img { height: 32px; max-width: 140px; object-fit: contain; }
+        .icon-btn { background: transparent; border: none; color: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: 0.2s; }
+        .badge { position: absolute; top: -2px; right: -2px; background: var(--primary); color: var(--text-dark); font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg); box-shadow: 0 0 5px rgba(212,175,55,0.5); }
+
+        .search-wrapper { display: flex; background: #222222; border-radius: 8px; padding: 12px 15px; align-items: center; border: 1px solid var(--border-color); margin-bottom: 10px; }
+        .search-wrapper input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 14px; color: var(--text-main); background: transparent; }
+        .search-wrapper input::placeholder { color: var(--text-muted); }
+        
+        .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 15px 15px 0; gap: 10px; scroll-behavior: smooth; }
+        .banner-slider::-webkit-scrollbar { display: none; }
+        .banner-slide { min-width: 100%; height: 160px; border-radius: 12px; scroll-snap-align: center; object-fit: cover; background: #2a2a2a; border: 1px solid var(--border-color); }
+        
+        .cat-scroll { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding: 15px; background: var(--card-bg); margin-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .cat-scroll::-webkit-scrollbar { display: none; }
+        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; opacity: 0.7; transition: 0.3s; min-width: 65px; }
+        .cat-item.active { opacity: 1; }
+        .cat-icon-circle { width: 50px; height: 50px; background: #222222; border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.3s; overflow:hidden; }
+        .cat-icon-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .cat-item.active .cat-icon-circle { background: var(--gold-gradient); color: var(--text-dark); box-shadow: 0 4px 15px rgba(212,175,55,0.4); border: none; }
+        .cat-item span { font-size: 11px; font-weight: 600; color: var(--text-main); white-space: nowrap; }
+
+        .products-grid-container { background: transparent; padding-top: 10px; padding-bottom: 20px; min-height: 50vh; }
+        .grid-greeting { padding: 0 15px 15px; font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
+        
+        .product-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; border: 1px solid var(--border-color); cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .share-badge { position: absolute; top: 8px; left: 8px; width: 30px; height: 30px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid var(--primary); cursor: pointer; color: var(--primary); backdrop-filter: blur(4px); }
+        
+        /* Product Image Background kept white so products pop out */
+        .product-image { background: #ffffff; height: 160px; display: flex; align-items: center; justify-content: center; font-size: 50px; overflow: hidden; position: relative; padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .product-img-real { width: 100%; height: 100%; object-fit: contain; }
+        
+        .stock-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.8); z-index: 10; border: 1px solid var(--border-color); color: var(--text-main); backdrop-filter: blur(4px); }
+        .stock-badge.low { color: var(--danger); border-color: var(--danger); }
+        .stock-badge.ok { color: var(--primary); border-color: var(--primary); }
+        
+        .product-info { padding: 12px; flex: 1; display: flex; flex-direction: column; }
+        .product-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-price { font-size: 18px; font-weight: 900; color: var(--primary); margin-bottom: 12px; margin-top: 4px; }
+        
+        .btn-add-cart { background: var(--gold-gradient); color: var(--text-dark); border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: auto; transition: 0.2s; text-transform: uppercase; width: 100%; box-shadow: 0 4px 10px rgba(212,175,55,0.2); }
+        .btn-add-cart:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
+        
+        .qty-controls { display:flex; justify-content:space-between; align-items:center; background:#222; border-radius:6px; padding:4px; margin-top:auto; border: 1px solid var(--border-color); }
+        .btn-qty { border: none; background: transparent; color: var(--primary); width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .qty-val { font-weight: bold; font-size: 15px; color: var(--text-main); }
+
+        /* PRODUCT MODAL (3 IMAGES & SIZE) */
+        .prod-img-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #ffffff; padding: 15px; gap: 10px; scrollbar-width: none; border-bottom: 1px solid var(--border-color); }
+        .prod-img-slider::-webkit-scrollbar { display: none; }
+        .prod-img-box { min-width: 100%; height: 320px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; background: transparent; border-radius: 12px; font-size: 80px; }
+        .prod-img-box img { width: 100%; height: 100%; object-fit: contain; }
+        .size-btn { border: 1px solid var(--border-color); background: #222; padding: 10px 18px; border-radius: 6px; font-weight: bold; color: var(--text-main); cursor: pointer; transition: 0.2s; }
+        .size-btn.active { background: var(--gold-gradient); color: var(--text-dark); border: none; box-shadow: 0 4px 10px rgba(212,175,55,0.3); }
+
+        .support-fab { position: absolute; bottom: 80px; right: 20px; background: var(--gold-gradient); color: var(--text-dark); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(212,175,55,0.4); z-index: 90; cursor: pointer; border: 2px solid #000; }
+        .support-menu { position: absolute; bottom: 145px; right: 20px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); padding: 10px; display: none; flex-direction: column; gap: 10px; z-index: 91; border: 1px solid var(--border-color); }
+        .support-menu.active { display: flex; animation: fadeIn 0.2s; }
+        .support-btn { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border: none; background: #222; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 160px; color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-wa { color: var(--whatsapp); }
+        .btn-email { color: var(--primary); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        /* --- ADMIN PANEL TABS --- */
+        .admin-bg { background: var(--dark-bg); color: var(--text-main); }
+        .admin-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items:center; flex-shrink:0; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
+        .admin-tab-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 15px 20px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); scrollbar-width: none; flex-shrink:0; }
+        .admin-tab-scroll::-webkit-scrollbar { display: none; }
+        .admin-tab-btn { background: #222; color: var(--text-muted); border: 1px solid var(--border-color); font-weight: bold; font-size: 13px; white-space: nowrap; padding: 10px 18px; cursor: pointer; border-radius: 30px; transition: 0.3s; }
+        .admin-tab-btn.active { background: var(--gold-gradient); color: var(--text-dark); border: none; box-shadow: 0 4px 10px rgba(212,175,55,0.2); }
+        .admin-section { display: none; padding-top:20px; }
+        .admin-section.active { display: block; animation: fadeIn 0.3s; }
+
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px 15px; }
+        .metric-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); display:flex; flex-direction:column; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .metric-title { font-size: 11px; color: var(--primary); margin-bottom: 8px; font-weight:bold; letter-spacing:1px; text-transform: uppercase; }
+        .metric-value { font-size: 24px; font-weight: 900; color: white; }
+        
+        .admin-card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin: 0 20px 20px; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .admin-input { width: 100%; padding: 14px; background: #222; border: 1px solid var(--border-color); color: white; border-radius: 8px; margin-bottom: 15px; font-size: 14px; outline: none; transition: 0.3s; }
+        .admin-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(212,175,55,0.2); }
+        
+        input[type="file"].admin-input { background: #222; color: var(--text-muted); padding: 10px; cursor: pointer; }
+        input[type="file"].admin-input::-webkit-file-upload-button { background: var(--gold-gradient); color: var(--text-dark); border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 15px; }
+
+        .btn-admin { background: var(--gold-gradient); color: var(--text-dark); padding: 15px; border: none; border-radius: 8px; font-weight: 900; font-size: 14px; cursor: pointer; width: 100%; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(212,175,55,0.3); }
+        .btn-small { background: #333; color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .btn-danger-small { background: rgba(239, 83, 80, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--primary); text-shadow: 0 0 10px rgba(212,175,55,0.5); }
+        
+        .modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--dark-bg); z-index: 100; flex-direction: column; }
+        .modal.active { display: flex; animation: fadeIn 0.2s; }
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--primary); color: var(--text-dark); padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.5); text-align:center; width:max-content; max-width:90%; border: 2px solid #000; }
+
+        .payment-option { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; }
+        .payment-option.active { border-color: var(--primary); background: rgba(212,175,55,0.05); }
+        .radio-custom { width: 22px; height: 22px; border: 2px solid #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .payment-option.active .radio-custom { border-color: var(--primary); }
+        .payment-option.active .radio-custom::after { content: ''; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 5px var(--primary); }
+
+        .auth-page { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--dark-bg); z-index: 200; flex-direction: column; overflow-y: auto; }
+        .auth-page.active { display: flex; animation: slideInRight 0.3s forwards; }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        
+        .auth-header { padding: 20px; display: flex; align-items: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid var(--border-color); flex-shrink:0; background: var(--card-bg); }
+        .auth-tabs { display: flex; margin: 20px 20px 0; background: #222; border-radius: 12px; padding: 5px; flex-shrink:0; border: 1px solid var(--border-color); }
+        .auth-tab { flex: 1; text-align: center; padding: 12px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.3s; font-size: 14px; }
+        .auth-tab.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.5); border: 1px solid var(--border-color); }
+        .auth-body { padding: 30px 20px; flex: 1; overflow-y:auto; }
+        
+        .otp-container { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
+        .otp-box { width: 55px; height: 60px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 26px; text-align: center; font-weight: 900; outline: none; transition: 0.3s; color: var(--primary); background: #222; }
+        .otp-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(212,175,55, 0.2); }
+        .otp-msg { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px; color: var(--text-muted); height: 20px; }
+        
+        .cart-img-real { width: 60px; height: 60px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border-color); padding: 4px; background: white; }
+
+        /* PRINT STYLES */
+        .print-only { display: none; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; position: absolute; top:0; left:0; width: 100%; background: white; z-index: 99999; padding: 20px; color: black; font-family: sans-serif; }
+            body { background: white; }
+        }
+        .bill-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 12px; }
+        .bill-table th, .bill-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .bill-table th { background-color: #f8fafc; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -128,160 +185,169 @@
         <div class="header-top-row">
             <div class="header-logo" id="dynamicLogoCustomer">Biju Mart</div>
             <div style="display:flex; gap:10px; align-items:center;">
-                <button class="icon-btn" onclick="openRiderLogin()" style="color:var(--primary);"><i data-lucide="bike" style="width:20px;"></i></button>
-                <button class="icon-btn" onclick="openAdminLogin()"><i data-lucide="shield" style="width:20px;"></i></button>
+                <button class="icon-btn" onclick="openRiderLogin()"><i data-lucide="bike" style="width:22px;"></i></button>
+                <button class="icon-btn" onclick="openAdminLogin()"><i data-lucide="shield" style="width:22px;"></i></button>
             </div>
         </div>
         <div class="search-wrapper">
-            <i data-lucide="search" style="color:#878787; width:20px;"></i>
-            <input type="text" id="searchInput" placeholder="Search for products..." onkeyup="filterAndSortProducts()">
+            <i data-lucide="search" style="color:var(--primary); width:20px;"></i>
+            <input type="text" id="searchInput" placeholder="Search premium products..." onkeyup="filterAndSortProducts()">
         </div>
     </div>
-    <div class="login-banner" id="loginBannerBtn" onclick="openAuthPage()" style="background: linear-gradient(135deg, var(--primary), #818cf8); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-        <div style="font-size: 14px; font-weight: 600;">Sign in for personalized experience</div>
-        <i data-lucide="chevron-right"></i>
+    
+    <div class="login-banner" id="loginBannerBtn" onclick="openAuthPage()" style="background: var(--gold-gradient); color: var(--text-dark); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid #000;">
+        <div style="font-size: 14px; font-weight: 800; letter-spacing: 0.5px;">SIGN IN FOR VIP EXPERIENCE</div>
+        <i data-lucide="chevron-right" style="width: 20px; font-weight:bold;"></i>
     </div>
+
     <div class="main-content" id="customerDashboard">
         <div class="cat-scroll" id="categoryFilters"></div>
         <div class="banner-slider" id="promoBanners" style="display:none;"></div>
-        <div class="products-grid-container" id="productGridContainer">
-            <div class="grid-greeting" id="gridGreetingTitle">Best items for you</div>
+        <div class="products-grid-container">
+            <div class="grid-greeting" id="gridGreetingTitle">Exclusive Collection</div>
             <div class="products-grid" id="customerProductsGrid"></div>
         </div>
     </div>
+
     <div class="main-content" id="customerOrdersView" style="display:none; padding: 20px;">
-        <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">My Orders</h2>
+        <h2 style="font-size: 22px; font-weight: 900; margin-bottom: 20px; color: var(--primary);">My Orders</h2>
         <div id="customerOrdersList"></div>
     </div>
+
     <div class="main-content" id="customerProfileView" style="display:none; padding: 20px;">
-        <div style="background: white; padding: 30px 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #f1f3f6;">
-            <div style="width: 80px; height: 80px; background: #f0f5ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
-                <i data-lucide="user" style="width: 40px; height: 40px; color: var(--primary);"></i>
+        <div style="background: var(--card-bg); padding: 30px 20px; border-radius: 12px; text-align: center; border: 1px solid var(--primary); box-shadow: 0 10px 30px rgba(212,175,55,0.1);">
+            <div style="width: 90px; height: 90px; background: #222; border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 0 15px rgba(212,175,55,0.3);">
+                <i data-lucide="user" style="width: 45px; height: 45px; color: var(--primary);"></i>
             </div>
-            <h2 id="profileNameDisplay" style="font-size: 22px; font-weight: 800; margin-bottom: 5px;">User</h2>
-            <p id="profilePhoneDisplay" style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">+91 XXXXXXXXXX</p>
-            <div style="display: flex; gap: 10px; flex-direction: column;">
-                <button class="search-wrapper" style="width: 100%; justify-content: space-between; font-weight: bold; cursor: pointer; padding: 15px;" onclick="switchCustomerTab('orders', document.getElementById('navOrders'))">
-                    <span style="display: flex; gap: 10px;"><i data-lucide="package"></i> My Orders</span>
-                    <i data-lucide="chevron-right"></i>
+            <h2 id="profileNameDisplay" style="font-size: 24px; font-weight: 900; margin-bottom: 5px; color: var(--text-main);">User</h2>
+            <p id="profilePhoneDisplay" style="color: var(--primary); font-size: 15px; font-weight: bold; margin-bottom: 25px; letter-spacing: 1px;">+91 XXXXXXXXXX</p>
+            
+            <div style="display: flex; gap: 15px; flex-direction: column;">
+                <button class="search-wrapper" style="width: 100%; justify-content: space-between; font-weight: bold; cursor: pointer; padding: 15px; background: #222; border-color: var(--border-color);" onclick="switchCustomerTab('orders', document.getElementById('navOrders'))">
+                    <span style="display: flex; gap: 12px; color: var(--text-main);"><i data-lucide="package" style="color: var(--primary);"></i> My Orders</span>
+                    <i data-lucide="chevron-right" style="color: var(--primary);"></i>
                 </button>
-                <button class="btn-admin" style="background: white; color:var(--danger); border: 1px solid var(--danger); margin-top: 15px;" onclick="logoutCustomer()">Logout Securely</button>
+                <button class="btn-admin" style="background: transparent; color:var(--danger); border: 1px solid var(--danger); margin-top: 10px; box-shadow: none;" onclick="logoutCustomer()">Logout Securely</button>
             </div>
         </div>
     </div>
+
     <div class="support-fab" onclick="toggleSupportMenu()"><i data-lucide="headphones"></i></div>
     <div class="support-menu" id="supportMenu">
-        <button class="support-btn btn-wa" onclick="contactSupport('wa')"><i data-lucide="message-circle"></i> WhatsApp</button>
-        <button class="support-btn btn-email" onclick="contactSupport('email')"><i data-lucide="mail"></i> Email Us</button>
+        <button class="support-btn btn-wa" onclick="contactSupport('wa')"><i data-lucide="message-circle"></i> WhatsApp Support</button>
+        <button class="support-btn btn-email" onclick="contactSupport('email')"><i data-lucide="mail"></i> Email Support</button>
     </div>
+
     <div class="bottom-nav">
         <div class="nav-item active" id="navHome" onclick="switchCustomerTab('home', this)"><i data-lucide="home"></i> <span>Home</span></div>
-        <div class="nav-item" id="navOrders" onclick="switchCustomerTab('orders', this)"><i data-lucide="package"></i> <span>My Orders</span></div>
-        <div class="nav-item" id="navAccount" onclick="handleAccountTabClick(this)"><i data-lucide="user"></i> <span>Account</span></div>
+        <div class="nav-item" id="navOrders" onclick="switchCustomerTab('orders', this)"><i data-lucide="package"></i> <span>Orders</span></div>
+        <div class="nav-item" id="navAccount" onclick="handleAccountTabClick(this)"><i data-lucide="user"></i> <span>Profile</span></div>
         <div class="nav-item" onclick="openCart()">
             <div style="position:relative;"><i data-lucide="shopping-cart"></i><div class="badge" id="cartBadge" style="display: none;">0</div></div><span>Cart</span>
         </div>
     </div>
 
-    <div class="modal" id="productModal">
+    <div class="modal" id="productModal" style="background: var(--dark-bg);">
         <div class="header" style="flex-direction:row; flex-shrink:0; justify-content:space-between; align-items:center;">
-            <i data-lucide="arrow-left" onclick="closeModal('productModal')" style="cursor:pointer; width:24px;"></i>
-            <span style="font-weight:bold; font-size:16px;">Product Details</span>
-            <i data-lucide="share-2" id="modalShareBtn" style="cursor:pointer; width:20px; color:var(--primary);"></i>
+            <i data-lucide="arrow-left" onclick="closeModal('productModal')" style="cursor:pointer; width:24px; color: var(--primary);"></i>
+            <span style="font-weight:900; font-size:16px; color: var(--primary); letter-spacing: 1px; text-transform: uppercase;">Exclusive Details</span>
+            <i data-lucide="share-2" id="modalShareBtn" style="cursor:pointer; width:22px; color:var(--primary);"></i>
         </div>
-        <div style="flex:1; overflow-y:auto; background:white; padding-bottom:20px;">
+        <div style="flex:1; overflow-y:auto; background:var(--light-bg); padding-bottom:20px;">
             <div class="prod-img-slider" id="modalImgSlider"></div>
-            <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-bottom:15px;">Swipe left/right to see more images</div>
+            <div style="text-align:center; font-size:11px; color:var(--primary); margin-bottom:20px; font-weight: bold; margin-top: 10px; letter-spacing: 0.5px;">SWIPE LEFT TO SEE MORE</div>
+            
             <div style="padding:0 20px;">
-                <h2 id="modalProdName" style="font-size:18px; margin-bottom:5px; color:var(--text-main);"></h2>
-                <div id="modalProdPrice" style="font-size:22px; font-weight:900; color:var(--text-main); margin-bottom:15px;"></div>
-                <div id="sizeSelectionBox" style="display:none; margin-bottom:20px; padding:15px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
-                    <div style="font-size:13px; font-weight:bold; color:var(--text-muted); margin-bottom:10px;">SELECT SIZE</div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;" id="sizeButtonsContainer"></div>
+                <h2 id="modalProdName" style="font-size:20px; margin-bottom:8px; color:var(--text-main); font-weight: 800;"></h2>
+                <div id="modalProdPrice" style="font-size:26px; font-weight:900; color:var(--primary); margin-bottom:20px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></div>
+                
+                <div id="sizeSelectionBox" style="display:none; margin-bottom:20px; padding:20px; background:var(--card-bg); border-radius:12px; border:1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                    <div style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:15px; letter-spacing: 1px;">SELECT PREMIUM SIZE</div>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;" id="sizeButtonsContainer"></div>
                 </div>
             </div>
         </div>
-        <div style="padding: 15px; background: white; border-top: 1px solid #e0e0e0; flex-shrink:0;">
-            <button class="btn-add-cart" id="modalAddToCartBtn" onclick="addToCartFromModal()" style="padding:14px; font-size:14px;">Add to Cart</button>
+        <div style="padding: 15px 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); flex-shrink:0;">
+            <button class="btn-add-cart" id="modalAddToCartBtn" onclick="addToCartFromModal()" style="padding:16px; font-size:15px; letter-spacing: 1px;">Add to Luxury Cart</button>
         </div>
     </div>
 
-    <div class="modal" id="cartModal">
-        <div class="header" style="box-shadow:0 1px 3px rgba(0,0,0,0.1); flex-direction:row; flex-shrink:0;">
-            <i data-lucide="arrow-left" onclick="closeModal('cartModal')" style="cursor:pointer; width:24px;"></i>
-            <span style="font-weight:bold; font-size:16px;">My Cart</span>
-            <div style="width:24px;"></div>
-        </div>
-        <div style="padding: 15px; flex:1; overflow-y:auto; background:#f1f3f6; -webkit-overflow-scrolling:touch;" id="cartItemsList"></div>
-        <div style="padding: 15px; background: white; border-top: 1px solid #e0e0e0; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
-            <div>
-                <div style="font-size:12px; color:var(--text-muted); font-weight:bold;">Total Amount</div>
-                <div id="cartTotal" style="color:var(--text-main); font-weight:900; font-size:18px;">₹0</div>
-            </div>
-            <button class="btn-add-cart" style="width:50%; font-size:14px; padding:12px;" onclick="proceedToCheckout()">Proceed</button>
-        </div>
-    </div>
-
-    <div class="modal" id="checkoutModal">
+    <div class="modal" id="cartModal" style="background: var(--dark-bg);">
         <div class="header" style="flex-direction:row; flex-shrink:0;">
-            <i data-lucide="arrow-left" onclick="closeModal('checkoutModal')" style="cursor:pointer; width:24px;"></i> 
-            <span style="font-weight:bold; font-size:16px;">Order Details</span> 
+            <i data-lucide="arrow-left" onclick="closeModal('cartModal')" style="cursor:pointer; width:24px; color: var(--primary);"></i>
+            <span style="font-weight:900; font-size:16px; color: var(--primary); letter-spacing: 1px;">MY CART</span>
             <div style="width:24px;"></div>
         </div>
-        <div style="padding: 15px; flex:1; overflow-y:auto; background:#f1f3f6; -webkit-overflow-scrolling:touch;">
-            <div style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #e0e0e0;">
-                <h3 style="font-size: 13px; margin-bottom: 15px; color: var(--text-muted); font-weight:bold;">DELIVERY ADDRESS</h3>
-                <input type="text" id="cName" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main);" placeholder="Full Name">
-                <input type="tel" id="cPhone" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main);" placeholder="Mobile Number" maxlength="10">
-                <textarea id="cAddress" class="search-wrapper" style="width:100%; margin-bottom:10px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main); height:70px; resize:none;" placeholder="Full Address (House No, Area, Landmark)"></textarea>
-                <input type="number" id="cPin" class="search-wrapper" style="width:100%; margin-bottom:15px; border:1px solid #e0e0e0; padding:12px; background:white; color:var(--text-main);" placeholder="Pincode">
-                <button onclick="captureLocation()" style="width:100%; background:#f0f5ff; color:var(--primary); border:1px solid var(--primary); padding:10px; border-radius:6px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
-                    <i data-lucide="map-pin" style="width:16px;"></i> Send Live Location
+        <div style="padding: 15px; flex:1; overflow-y:auto; background:var(--light-bg);" id="cartItemsList"></div>
+        <div style="padding: 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+            <div>
+                <div style="font-size:12px; color:var(--text-muted); font-weight:bold; text-transform: uppercase;">Total Value</div>
+                <div id="cartTotal" style="color:var(--primary); font-weight:900; font-size:22px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">₹0</div>
+            </div>
+            <button class="btn-add-cart" style="width:55%; font-size:14px; padding:15px;" onclick="proceedToCheckout()">Checkout</button>
+        </div>
+    </div>
+
+    <div class="modal" id="checkoutModal" style="background: var(--dark-bg);">
+        <div class="header" style="flex-direction:row; flex-shrink:0;">
+            <i data-lucide="arrow-left" onclick="closeModal('checkoutModal')" style="cursor:pointer; width:24px; color: var(--primary);"></i> 
+            <span style="font-weight:900; font-size:16px; color: var(--primary); letter-spacing: 1px;">SECURE CHECKOUT</span> 
+            <div style="width:24px;"></div>
+        </div>
+        <div style="padding: 15px; flex:1; overflow-y:auto; background:var(--light-bg);">
+            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <h3 style="font-size: 12px; margin-bottom: 15px; color: var(--primary); font-weight:bold; letter-spacing: 1px;">DELIVERY ADDRESS</h3>
+                <input type="text" id="cName" class="search-wrapper" style="width:100%; background: #222; border-color: var(--border-color); color: white;" placeholder="Full Name">
+                <input type="tel" id="cPhone" class="search-wrapper" style="width:100%; background: #222; border-color: var(--border-color); color: white;" placeholder="Mobile Number" maxlength="10">
+                <textarea id="cAddress" class="search-wrapper" style="width:100%; height:70px; background: #222; border-color: var(--border-color); color: white;" placeholder="Full Address (House No, Area, Landmark)"></textarea>
+                <input type="number" id="cPin" class="search-wrapper" style="width:100%; background: #222; border-color: var(--border-color); color: white;" placeholder="Pincode">
+                <button onclick="captureLocation()" style="width:100%; background:rgba(212,175,55,0.1); color:var(--primary); border:1px solid var(--primary); padding:12px; border-radius:8px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
+                    <i data-lucide="map-pin" style="width:18px;"></i> Attach Live Location
                 </button>
-                <div id="locStatus" style="font-size:11px; text-align:center; margin-top:5px; color:var(--text-muted);">Helps delivery boy find you easily</div>
+                <div id="locStatus" style="font-size:11px; text-align:center; margin-top:8px; color:var(--text-muted);">For precise VIP delivery</div>
             </div>
             
-            <div style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #e0e0e0;">
-                <h3 style="font-size: 13px; margin-bottom: 15px; color: var(--text-muted); font-weight:bold;">PAYMENT OPTIONS</h3>
+            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <h3 style="font-size: 12px; margin-bottom: 15px; color: var(--primary); font-weight:bold; letter-spacing: 1px;">PAYMENT METHOD</h3>
                 <div class="payment-option active" id="payUPI" onclick="selectPaymentMethod('UPI')">
                     <div class="radio-custom"></div>
                     <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                         <div>
-                            <div style="font-weight: bold; font-size: 14px; color: var(--text-main);">Scan My QR Code (UPI)</div>
-                            <div style="font-size: 11px; color: var(--success); font-weight:bold; margin-top:2px;">PhonePe, GPay, Paytm</div>
+                            <div style="font-weight: 800; font-size: 15px; color: var(--text-main);">Scan Premium QR Code</div>
+                            <div style="font-size: 11px; color: var(--primary); font-weight:bold; margin-top:4px;">Secure via PhonePe, GPay, Paytm</div>
                         </div>
-                        <i data-lucide="smartphone" style="color:var(--text-muted); width:20px;"></i>
+                        <i data-lucide="qr-code" style="color:var(--primary); width:24px; height:24px;"></i>
                     </div>
                 </div>
                 <div class="payment-option" id="payCOD" onclick="selectPaymentMethod('COD')">
                     <div class="radio-custom"></div>
-                    <div><div style="font-weight: bold; font-size: 14px; color: var(--text-main);">Cash on Delivery</div></div>
+                    <div><div style="font-weight: 800; font-size: 15px; color: var(--text-main);">Cash on Delivery</div></div>
                 </div>
             </div>
         </div>
-        <div style="padding: 15px; background: white; border-top: 1px solid #e0e0e0; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+        <div style="padding: 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
             <div>
-                <div style="font-size:12px; color:var(--text-muted); font-weight:bold;">Payable</div>
-                <div id="checkoutTotal" style="color:var(--text-main); font-weight:900; font-size:18px;">₹0</div>
+                <div style="font-size:12px; color:var(--text-muted); font-weight:bold; text-transform: uppercase;">Payable</div>
+                <div id="checkoutTotal" style="color:var(--primary); font-weight:900; font-size:22px;">₹0</div>
             </div>
-            <button class="btn-add-cart" style="width:50%; font-size:14px; padding:12px; background:var(--secondary);" onclick="handleOrderPlacement()">Continue</button>
+            <button class="btn-add-cart" style="width:55%; font-size:15px; padding:15px;" onclick="handleOrderPlacement()">Confirm Order</button>
         </div>
     </div>
 
-    <div class="modal" id="qrPaymentModal" style="background:rgba(0,0,0,0.8); justify-content:center; padding:20px; z-index: 999;">
-        <div style="background:white; border-radius:16px; padding:20px; text-align:center; position:relative; width:100%; max-width:350px; margin:0 auto;">
+    <div class="modal" id="qrPaymentModal" style="background:rgba(0,0,0,0.9); justify-content:center; padding:20px; z-index: 999;">
+        <div style="background:var(--card-bg); border-radius:16px; padding:25px; text-align:center; position:relative; width:100%; max-width:350px; margin:0 auto; border: 1px solid var(--primary); box-shadow: 0 10px 40px rgba(212,175,55,0.2);">
             <i data-lucide="x" onclick="closeModal('qrPaymentModal')" style="position:absolute; top:15px; right:15px; cursor:pointer; color:var(--text-muted);"></i>
-            <h3 style="margin-bottom:5px; font-size:18px;">Scan & Pay</h3>
-            <p style="color:var(--text-muted); font-size:13px; margin-bottom:15px;">Please pay ₹<span id="qrPayAmount" style="font-weight:bold; color:black;">0</span> using any UPI app</p>
-            <div style="background:#f0f5ff; padding:10px; border-radius:12px; display:inline-block; border:1px solid #c0d5ff; margin-bottom:15px;">
-                <img id="adminPaymentQrImg" src="" style="width:220px; height:220px; object-fit:contain;">
+            <h3 style="margin-bottom:8px; font-size:20px; color: var(--text-main); font-weight: 900;">Scan & Pay</h3>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Please pay <span style="color:var(--primary); font-weight:bold; font-size: 16px;">₹<span id="qrPayAmount">0</span></span> securely</p>
+            <div style="background:#ffffff; padding:15px; border-radius:12px; display:inline-block; border:3px solid var(--primary); margin-bottom:20px;">
+                <img id="adminPaymentQrImg" src="" style="width:200px; height:200px; object-fit:contain;">
             </div>
-            <button class="btn-admin" style="background:var(--success);" onclick="confirmQrOrder()">I have Paid - Place Order</button>
+            <button class="btn-admin" onclick="confirmQrOrder()" style="padding: 16px; font-size: 15px;">I have Paid - Verify</button>
         </div>
     </div>
 
     <div class="auth-page" id="authPage">
-        <div class="auth-header" style="flex-direction:row; flex-shrink:0;"><i data-lucide="arrow-left" onclick="closeAuthPage()" style="cursor:pointer; margin-right: 15px;"></i><span>Login</span></div>
+        <div class="auth-header" style="flex-direction:row; flex-shrink:0;"><i data-lucide="arrow-left" onclick="closeAuthPage()" style="cursor:pointer; margin-right: 15px; color: var(--primary);"></i><span style="color: var(--primary); font-weight: 900; letter-spacing: 1px;">VIP LOGIN</span></div>
         <div class="auth-tabs">
             <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
             <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Sign Up</div>
@@ -289,21 +355,21 @@
         <div class="auth-body">
             <div id="authFormsSection">
                 <div id="registerForm" style="display:none;">
-                    <label style="font-size:12px; font-weight:bold; color:var(--text-muted); margin-bottom:5px; display:block;">FIRST NAME</label>
-                    <input type="text" id="regFirstName" class="search-wrapper" style="width:100%; padding:15px; border:1px solid #e0e0e0; background:white; margin-bottom:15px;" placeholder="e.g. Brahma">
-                    <label style="font-size:12px; font-weight:bold; color:var(--text-muted); margin-bottom:5px; display:block;">MOBILE NUMBER</label>
-                    <input type="tel" id="regPhone" class="search-wrapper" style="width:100%; padding:15px; border:1px solid #e0e0e0; background:white; margin-bottom:25px;" placeholder="10-digit number" maxlength="10">
-                    <button class="btn-admin" style="background:var(--secondary); padding:16px;" onclick="requestAuthOTP()">Continue</button>
+                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block; letter-spacing: 1px;">FIRST NAME</label>
+                    <input type="text" id="regFirstName" class="search-wrapper" style="width:100%; padding:16px; background:#222; border-color:var(--border-color); color: white; margin-bottom:20px;" placeholder="e.g. Brahma">
+                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block; letter-spacing: 1px;">MOBILE NUMBER</label>
+                    <input type="tel" id="regPhone" class="search-wrapper" style="width:100%; padding:16px; background:#222; border-color:var(--border-color); color: white; margin-bottom:30px;" placeholder="10-digit number" maxlength="10">
+                    <button class="btn-admin" style="padding:16px;" onclick="requestAuthOTP()">Continue to Luxury</button>
                 </div>
                 <div id="loginForm">
-                    <label style="font-size:12px; font-weight:bold; color:var(--text-muted); margin-bottom:5px; display:block;">MOBILE NUMBER</label>
-                    <input type="tel" id="logPhone" class="search-wrapper" style="width:100%; padding:15px; border:1px solid #e0e0e0; background:white; margin-bottom:25px;" placeholder="Enter registered number" maxlength="10">
-                    <button class="btn-admin" style="background:var(--secondary); padding:16px;" onclick="requestAuthOTP()">Continue</button>
+                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block; letter-spacing: 1px;">MOBILE NUMBER</label>
+                    <input type="tel" id="logPhone" class="search-wrapper" style="width:100%; padding:16px; background:#222; border-color:var(--border-color); color: white; margin-bottom:30px;" placeholder="Enter registered number" maxlength="10">
+                    <button class="btn-admin" style="padding:16px;" onclick="requestAuthOTP()">Secure Login</button>
                 </div>
             </div>
             <div id="authOtpSection" style="display:none; text-align: center;">
-                <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 5px;">Verify Phone</h3>
-                <p style="color: var(--text-muted); font-size: 14px;">OTP sent to <span id="displayOtpPhone" style="font-weight:bold; color:var(--text-main);"></span></p>
+                <h3 style="font-size: 22px; font-weight: 900; margin-bottom: 8px; color: var(--text-main);">Verify Phone</h3>
+                <p style="color: var(--text-muted); font-size: 14px;">OTP sent to <span id="displayOtpPhone" style="font-weight:bold; color:var(--primary);"></span></p>
                 <div class="otp-container">
                     <input type="text" class="otp-box" id="otp1" maxlength="1" readonly>
                     <input type="text" class="otp-box" id="otp2" maxlength="1" readonly>
@@ -311,73 +377,61 @@
                     <input type="text" class="otp-box" id="otp4" maxlength="1" readonly>
                 </div>
                 <div class="otp-msg" id="autoDetectMsg">Waiting for SMS...</div>
-                <button class="btn-admin" id="verifyOtpBtn" style="background:var(--success); padding:16px; opacity:0.5; pointer-events:none;" onclick="verifyCustomerOTP()">Verify</button>
+                <button class="btn-admin" id="verifyOtpBtn" style="padding:16px; opacity:0.5; pointer-events:none;" onclick="verifyCustomerOTP()">Verify Securely</button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="adminLoginModal" style="background: var(--dark-bg);">
-        <div class="header" style="background:var(--dark-bg); border-bottom:1px solid #1e293b; color:white; flex-direction:row; flex-shrink:0;">
-            <i data-lucide="arrow-left" onclick="closeModal('adminLoginModal')" style="cursor:pointer; width:24px;"></i> <span>Admin Access</span> <div style="width:24px;"></div>
+        <div class="header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); color:var(--primary); flex-direction:row; flex-shrink:0;">
+            <i data-lucide="arrow-left" onclick="closeModal('adminLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900; letter-spacing: 1px;">ADMIN ACCESS</span> <div style="width:24px;"></div>
         </div>
         <div style="padding: 30px; text-align:center; margin-top:30px;">
-            <i data-lucide="lock" style="width:60px; height:60px; color:var(--primary); margin-bottom:20px;"></i>
-            <input type="text" id="adminUser" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:15px; background:#1e293b; color:white;" placeholder="Enter Username">
-            <input type="password" id="adminPass" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:20px; background:#1e293b; color:white;" placeholder="Enter Password">
-            <button class="btn-admin" style="background:var(--primary);" onclick="verifyAdmin()">Login Dashboard</button>
+            <i data-lucide="lock" style="width:70px; height:70px; color:var(--primary); margin-bottom:25px;"></i>
+            <input type="text" id="adminUser" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px; background:#222; color:white; outline:none;" placeholder="Enter Username">
+            <input type="password" id="adminPass" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:25px; background:#222; color:white; outline:none;" placeholder="Enter Password">
+            <button class="btn-admin" onclick="verifyAdmin()">Login to Dashboard</button>
         </div>
     </div>
 
-    <div class="modal" id="riderLoginModal" style="background: #1e293b; color:white;">
-        <div class="header" style="background:#1e293b; border-bottom:1px solid #334155; color:white; flex-direction:row; flex-shrink:0;">
-            <i data-lucide="arrow-left" onclick="closeModal('riderLoginModal')" style="cursor:pointer; width:24px;"></i> <span>Rider Partner Login</span> <div style="width:24px;"></div>
+    <div class="modal" id="riderLoginModal" style="background: var(--dark-bg);">
+        <div class="header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); color:var(--primary); flex-direction:row; flex-shrink:0;">
+            <i data-lucide="arrow-left" onclick="closeModal('riderLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900; letter-spacing: 1px;">RIDER ACCESS</span> <div style="width:24px;"></div>
         </div>
         <div style="padding: 30px; text-align:center; margin-top:30px;">
-            <i data-lucide="bike" style="width:60px; height:60px; color:var(--secondary); margin-bottom:20px;"></i>
-            <input type="tel" id="riderPhoneLogin" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:15px; background:#0f172a; color:white;" placeholder="Registered Mobile Number">
-            <input type="password" id="riderPassLogin" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:20px; background:#0f172a; color:white;" placeholder="Password">
-            <button class="btn-admin" style="background:var(--secondary);" onclick="verifyRider()">Start Duty</button>
+            <i data-lucide="bike" style="width:70px; height:70px; color:var(--primary); margin-bottom:25px;"></i>
+            <input type="tel" id="riderPhoneLogin" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px; background:#222; color:white; outline:none;" placeholder="Registered Mobile Number">
+            <input type="password" id="riderPassLogin" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:25px; background:#222; color:white; outline:none;" placeholder="Password">
+            <button class="btn-admin" onclick="verifyRider()">Start Duty</button>
         </div>
     </div>
   </div>
 
-  <div class="app-view admin-bg" id="riderApp" style="background:#f1f5f9; color:var(--text-main);">
-      <div class="header" style="background:var(--secondary); color:white; border-bottom:none; flex-direction:row;">
-          <div style="font-weight:900; font-size:18px;"><i data-lucide="bike" style="vertical-align:middle; margin-right:5px;"></i> Rider App</div>
-          <button class="icon-btn" onclick="logoutRider()" style="background:white; color:var(--secondary); width:auto; padding:0 15px; font-size:12px; font-weight:bold;">Logout</button>
+  <div class="app-view admin-bg" id="riderApp">
+      <div class="header" style="background:var(--card-bg); color:var(--primary); border-bottom:1px solid var(--border-color); flex-direction:row;">
+          <div style="font-weight:900; font-size:18px; letter-spacing: 1px;"><i data-lucide="bike" style="vertical-align:middle; margin-right:8px;"></i> RIDER HUB</div>
+          <button class="icon-btn" onclick="logoutRider()" style="background:#222; color:var(--text-main); width:auto; padding:0 15px; font-size:12px; font-weight:bold; border:1px solid var(--border-color); border-radius:6px;">Logout</button>
       </div>
       <div class="main-content" style="padding:15px;">
-          <div style="background:white; border-radius:12px; padding:20px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-bottom:15px;">
-              <h2 id="riderGreeting" style="font-size:18px; margin-bottom:10px;">Welcome</h2>
-              <div style="font-size:12px; color:var(--text-muted);">TODAY'S DELIVERIES</div>
-              <div id="riderDeliveredCount" style="font-size:30px; font-weight:900; color:var(--success);">0</div>
+          <div style="background:var(--card-bg); border-radius:12px; padding:25px; text-align:center; border:1px solid var(--border-color); margin-bottom:20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+              <h2 id="riderGreeting" style="font-size:20px; margin-bottom:10px; color: var(--text-main);">Welcome</h2>
+              <div style="font-size:12px; color:var(--primary); font-weight: bold; letter-spacing: 1px;">TODAY'S DELIVERIES</div>
+              <div id="riderDeliveredCount" style="font-size:36px; font-weight:900; color:var(--primary); text-shadow: 0 2px 5px rgba(0,0,0,0.5);">0</div>
           </div>
-          <h3 style="font-size:15px; margin-bottom:10px; color:var(--text-muted); font-weight:bold;">ASSIGNED ORDERS</h3>
+          <h3 style="font-size:14px; margin-bottom:15px; color:var(--primary); font-weight:bold; letter-spacing: 1px;">ASSIGNED ORDERS</h3>
           <div id="riderOrdersList"></div>
-      </div>
-      <div class="modal" id="riderQrModal" style="background:rgba(0,0,0,0.8); justify-content:center; padding:20px;">
-          <div style="background:white; border-radius:16px; padding:20px; text-align:center; position:relative; width:100%; max-width:350px; margin:0 auto;">
-              <i data-lucide="x" onclick="closeModal('riderQrModal')" style="position:absolute; top:15px; right:15px; cursor:pointer; color:var(--text-muted);"></i>
-              <h3 style="margin-bottom:5px; font-size:18px;">Scan to Pay</h3>
-              <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Ask customer to scan with PhonePe/GPay</p>
-              <div style="background:#f0f5ff; padding:15px; border-radius:12px; display:inline-block; border:1px solid #c0d5ff; margin-bottom:15px;">
-                  <img id="dynamicQrImage" src="" style="width:200px; height:200px; mix-blend-mode:multiply;">
-              </div>
-              <div style="font-size:24px; font-weight:900; color:var(--primary); margin-bottom:5px;" id="qrAmountDisplay">₹0</div>
-              <div style="font-size:12px; color:var(--success); font-weight:bold;">UPI: <span id="qrUpiDisplay"></span></div>
-          </div>
       </div>
   </div>
 
   <div class="app-view admin-bg" id="adminApp">
-    <div id="newOrderAlert" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--success); color:white; padding:15px; border-radius:10px; z-index:9999; box-shadow:0 4px 15px rgba(0,0,0,0.2); width:90%; max-width:400px; text-align:center; animation: slideDown 0.3s forwards;">
-        <h3 style="margin-bottom:5px; font-size:16px;">🔔 Naya Order Aaya Hai!</h3>
-        <p id="newOrderAlertDetails" style="font-size:13px; font-weight:bold; margin-bottom:10px;"></p>
-        <button onclick="document.getElementById('newOrderAlert').style.display='none'; switchAdminTab('orders');" style="background:white; color:var(--success); border:none; padding:8px 15px; border-radius:6px; font-weight:bold; cursor:pointer;">Order Dekhein</button>
+    <div id="newOrderAlert" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--primary); color:var(--text-dark); padding:15px; border-radius:10px; z-index:9999; box-shadow:0 4px 20px rgba(212,175,55,0.4); width:90%; max-width:400px; text-align:center; animation: slideDown 0.3s forwards; border: 2px solid #000;">
+        <h3 style="margin-bottom:5px; font-size:16px; font-weight: 900;">🔔 New VIP Order!</h3>
+        <p id="newOrderAlertDetails" style="font-size:13px; font-weight:bold; margin-bottom:12px;"></p>
+        <button onclick="document.getElementById('newOrderAlert').style.display='none'; switchAdminTab('orders');" style="background:#000; color:var(--primary); border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">View Order</button>
     </div>
     <div class="admin-header">
-        <div class="header-logo" id="dynamicLogoAdmin" style="color:white; font-style:normal;">Admin Panel</div>
-        <button class="icon-btn" onclick="logoutAdmin()" style="background:#1e293b; color:white; width:auto; padding:0 15px; font-size:12px; font-weight:bold;">Logout</button>
+        <div class="header-logo" id="dynamicLogoAdmin" style="color:var(--primary); font-style:normal;">Admin Panel</div>
+        <button class="icon-btn" onclick="logoutAdmin()" style="background:#222; color:white; width:auto; padding:0 15px; font-size:12px; font-weight:bold; border: 1px solid var(--border-color); border-radius: 6px;">Logout</button>
     </div>
     <div class="admin-tab-scroll">
         <button class="admin-tab-btn active" id="btn-tab-dashboard" onclick="switchAdminTab('dashboard')">Dashboard</button>
@@ -390,116 +444,119 @@
     <div class="main-content">
         <div class="admin-section active" id="sec-dashboard">
             <div class="metric-grid">
-                <div class="metric-card"><div class="metric-title">TOTAL REVENUE</div><div class="metric-value revenue" id="metricRevenue">₹0</div></div>
+                <div class="metric-card"><div class="metric-title">TOTAL REVENUE</div><div class="metric-value revenue" id="metricRevenue" style="color: var(--primary);">₹0</div></div>
                 <div class="metric-card"><div class="metric-title">TOTAL ORDERS</div><div class="metric-value" id="metricOrders">0</div></div>
             </div>
             <div class="metric-grid" style="padding-top:0;">
-                <div class="metric-card" style="border-color:#388e3c; background:#0f172a;"><div class="metric-title" style="color:#388e3c;">UPI (ONLINE) SALES</div><div class="metric-value" id="metricUPI">₹0</div></div>
-                <div class="metric-card" style="border-color:#ff9f00; background:#0f172a;"><div class="metric-title" style="color:#ff9f00;">COD SALES</div><div class="metric-value" id="metricCOD">₹0</div></div>
+                <div class="metric-card"><div class="metric-title" style="color:#a8e6cf;">UPI (ONLINE) SALES</div><div class="metric-value" id="metricUPI">₹0</div></div>
+                <div class="metric-card"><div class="metric-title" style="color:var(--text-muted);">COD SALES</div><div class="metric-value" id="metricCOD">₹0</div></div>
             </div>
         </div>
 
         <div class="admin-section" id="sec-orders">
             <div class="admin-card">
-                <h3 style="margin-bottom: 15px; font-size:16px;">Live Orders Management</h3>
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Live Orders Management</h3>
                 <div id="adminOrdersList"></div>
             </div>
         </div>
 
         <div class="admin-section" id="sec-products">
             <div class="admin-card">
-                <h3 style="margin-bottom: 15px; font-size:16px;">Add / Edit Products</h3>
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Add / Edit Luxury Products</h3>
                 <input type="text" id="pName" class="admin-input" placeholder="Product Name">
                 <div style="display:flex; gap:10px;">
                     <input type="number" id="pPrice" class="admin-input" placeholder="Price (₹)">
                     <input type="number" id="pStock" class="admin-input" placeholder="Stock Qty">
                 </div>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">SIZE VARIATIONS</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">SIZE VARIATIONS</label>
                 <select id="pSizeType" class="admin-input">
                     <option value="None">None (Standard Product)</option>
                     <option value="Clothing">Clothing (S, M, L, XL, XXL)</option>
                     <option value="Shoes">Shoes (6, 7, 8, 9, 10, 11)</option>
                 </select>
                 <select id="pCat" class="admin-input"></select>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">MAIN IMAGE (Required)</label>
+                
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">MAIN IMAGE (Required)</label>
                 <input type="file" id="pImageFile1" class="admin-input" accept="image/*">
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">IMAGE 2 (Optional)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">IMAGE 2 (Optional)</label>
                 <input type="file" id="pImageFile2" class="admin-input" accept="image/*">
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">IMAGE 3 (Optional)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">IMAGE 3 (Optional)</label>
                 <input type="file" id="pImageFile3" class="admin-input" accept="image/*">
                 <input type="hidden" id="pExistingImage1"><input type="hidden" id="pExistingImage2"><input type="hidden" id="pExistingImage3">
+                
                 <button class="btn-admin" id="adminAddBtn" onclick="saveProductEntry()">Save Product</button>
-                <div style="margin-top: 25px; border-top: 1px solid #334155; padding-top:15px;" id="adminStockList"></div>
+                <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top:15px;" id="adminStockList"></div>
             </div>
         </div>
 
         <div class="admin-section" id="sec-categories">
             <div class="admin-card">
-                <h3 style="margin-bottom: 15px; font-size:16px;">Category Management</h3>
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Category Management</h3>
                 <input type="text" id="newCatName" class="admin-input" placeholder="New Category Name">
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">CATEGORY ICON/IMAGE (Optional)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">CATEGORY ICON/IMAGE (Optional)</label>
                 <div style="display:flex; gap:10px;">
                     <input type="file" id="newCatImage" class="admin-input" accept="image/*" style="margin-bottom:0;">
-                    <button class="btn-small" style="background:var(--success);" onclick="addCategory()">Add</button>
+                    <button class="btn-admin" style="width: auto; padding: 12px 25px;" onclick="addCategory()">Add</button>
                 </div>
-                <div style="margin-top: 15px;" id="adminCatList"></div>
+                <div style="margin-top: 20px;" id="adminCatList"></div>
             </div>
         </div>
 
         <div class="admin-section" id="sec-riders">
-            <div class="admin-card" style="border-color:var(--secondary);">
-                <h3 style="margin-bottom: 15px; font-size:16px; color:var(--secondary);">Add Delivery Rider</h3>
-                <input type="text" id="rName" class="admin-input" placeholder="Rider Name">
+            <div class="admin-card" style="border-color:var(--primary);">
+                <h3 style="margin-bottom: 15px; font-size:16px; color:var(--primary);">Register Delivery Partner</h3>
+                <input type="text" id="rName" class="admin-input" placeholder="Partner Name">
                 <input type="tel" id="rPhone" class="admin-input" placeholder="Mobile Number (Login ID)" maxlength="10">
                 <input type="password" id="rPass" class="admin-input" placeholder="Create Password">
-                <button class="btn-admin" style="background:var(--secondary);" onclick="saveRider()">Register Rider</button>
+                <button class="btn-admin" onclick="saveRider()">Register Partner</button>
             </div>
             <div class="admin-card">
-                <h3 style="margin-bottom: 15px; font-size:16px;">Active Riders</h3>
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Active Partners</h3>
                 <div id="adminRidersList"></div>
             </div>
         </div>
 
         <div class="admin-section" id="sec-settings">
-            <div class="admin-card" style="border-color:var(--success);">
-                <h3 style="margin-bottom: 15px; font-size:16px; color:var(--success);">UPI QR Code Setup</h3>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">MY QR CODE IMAGE (GPay/PhonePe)</label>
-                <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;">
+            <div class="admin-card" style="border-color:var(--primary); box-shadow: 0 0 15px rgba(212,175,55,0.2);">
+                <h3 style="margin-bottom: 15px; font-size:16px; color:var(--primary);">Secure Payment Setup</h3>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">MY QR CODE IMAGE (GPay/PhonePe)</label>
+                <div style="display:flex; gap:10px; margin-bottom:20px; align-items:center;">
                     <input type="file" id="adminPaymentQrFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
-                    <button class="btn-small" style="background:var(--success);" onclick="uploadAdminQr()">Save QR</button>
+                    <button class="btn-admin" style="width: auto; padding: 12px 20px;" onclick="uploadAdminQr()">Save QR</button>
                 </div>
-                <div id="qrPreviewArea" style="text-align:center; padding:10px; background:#0f172a; border-radius:8px;">
-                    <p style="font-size:10px; color:#94a3b8; margin-bottom:5px;">Current QR Preview</p>
-                    <img id="adminQrPreview" src="" style="width:100px; height:100px; object-fit:contain; border:1px dashed #334155;">
+                <div id="qrPreviewArea" style="text-align:center; padding:15px; background:#111; border-radius:8px; border: 1px solid #333;">
+                    <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px; letter-spacing: 1px;">CURRENT ACTIVE QR</p>
+                    <img id="adminQrPreview" src="" style="width:120px; height:120px; object-fit:contain; border:2px solid var(--primary); border-radius: 8px; background: white; padding: 5px;">
                 </div>
             </div>
 
-            <div class="admin-card" style="border-color:var(--secondary);">
-                <h3 style="margin-bottom: 15px; font-size:16px; color:var(--secondary);">Delivery Settings</h3>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">MINIMUM ORDER AMOUNT (₹)</label>
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Delivery Config</h3>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">MINIMUM ORDER AMOUNT (₹)</label>
                 <input type="number" id="adminMinOrder" class="admin-input" placeholder="e.g. 100">
-                <button class="btn-admin" style="margin-top:10px; background:var(--secondary);" onclick="updateAppConfig()">Save Delivery Setting</button>
+                <button class="btn-admin" style="margin-top:10px;" onclick="updateAppConfig()">Save Delivery Setting</button>
             </div>
             
             <div class="admin-card">
-                <h3 style="margin-bottom: 15px; font-size:16px;">App Config & Support</h3>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">WHATSAPP NUMBER</label>
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">App Support Info</h3>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">WHATSAPP NUMBER</label>
                 <input type="number" id="adminSupportWa" class="admin-input" placeholder="e.g. 919348954360">
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">SUPPORT EMAIL</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">SUPPORT EMAIL</label>
                 <input type="email" id="adminSupportEmail" class="admin-input" placeholder="e.g. help@bijumart.com">
-                <button class="btn-admin" style="margin-top:10px; background:var(--primary);" onclick="updateAppConfig()">Save Configuration</button>
+                <button class="btn-admin" style="margin-top:10px;" onclick="updateAppConfig()">Save Configuration</button>
             </div>
+
             <div class="admin-card">
-                <h3 style="margin-bottom: 15px; font-size:16px;">App Branding & Banners</h3>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">APP LOGO (Choose from Gallery)</label>
-                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Premium Branding</h3>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">APP LOGO</label>
+                <div style="display:flex; gap:10px; margin-bottom:25px;">
                     <input type="file" id="adminLogoFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
-                    <button class="btn-small" onclick="updateAppLogo()">Upload</button>
+                    <button class="btn-small" style="background: #222;" onclick="updateAppLogo()">Upload</button>
                 </div>
-                <label style="font-size:12px; color:#94a3b8; font-weight:bold; display:block; margin-bottom:5px;">PROMO BANNER (Choose from Gallery)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">PROMO BANNER</label>
                 <div style="display:flex; gap:10px;">
                     <input type="file" id="adminBannerFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
-                    <button class="btn-small" style="background:var(--success);" onclick="addPromoBanner()">Add Banner</button>
+                    <button class="btn-admin" style="width: auto; padding: 12px 20px;" onclick="addPromoBanner()">Add Banner</button>
                 </div>
                 <div style="margin-top: 15px;" id="adminBannerList"></div>
             </div>
@@ -510,7 +567,7 @@
 
  <div id="printBillArea" class="print-only">
     <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:15px; margin-bottom:15px;">
-        <h1 style="font-size:28px; margin:0; font-weight:900;" id="billStoreName">BIJU MART</h1>
+        <h1 style="font-size:28px; margin:0; font-weight:900;" id="billStoreName">BIJU MART PREMIUM</h1>
     </div>
     <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:12px;">
         <div><strong>BILLED TO:</strong><br><span id="billCustomerName"></span><br><span id="billCustomerPhone"></span><br><span id="billCustomerAddress"></span></div>
@@ -553,9 +610,9 @@
         return new Promise((resolve) => {
             if(!file) return resolve(null);
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = (e) => {
                 const img = new Image();
-                img.onload = function() {
+                img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const MAX_WIDTH = 400; 
                     let width = img.width, height = img.height;
@@ -583,7 +640,6 @@
                     }
                 }
                 applySettingsToUI();
-                if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
             });
 
             db.ref('categories').on('value', snap => {
@@ -599,7 +655,8 @@
                 if(!isInitialOrderLoad && newOrdersList.length > allOrders.length) {
                     const latest = newOrdersList[0];
                     if(document.getElementById('adminApp').classList.contains('active')) {
-                        document.getElementById('newOrderAlertDetails').innerText = `${latest.customer} ne ₹${(latest.total||0).toLocaleString('en-IN')} ka naya order diya hai!`; document.getElementById('newOrderAlert').style.display = 'block';
+                        document.getElementById('newOrderAlertDetails').innerText = `${latest.customer} ne ₹${(latest.total||0).toLocaleString('en-IN')} ka VIP order diya hai!`;
+                        document.getElementById('newOrderAlert').style.display = 'block';
                     }
                 }
                 allOrders = newOrdersList; isInitialOrderLoad = false; renderCustomerOrders();
@@ -608,21 +665,19 @@
             });
             db.ref('users').on('value', snap => { allUsers = safeParse(snap.val()); });
             db.ref('riders').on('value', snap => { allRiders = safeParse(snap.val()); if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard(); });
-        } catch(err) { console.error("Firebase load error", err); }
 
-        const savedSession = localStorage.getItem('shop_session_cloud'); if(savedSession) { loggedInUser = JSON.parse(savedSession); updateAppForLoggedInUser(); }
-        const savedRider = localStorage.getItem('rider_session_cloud'); if(savedRider) { loggedInRider = JSON.parse(savedRider); }
-        lucide.createIcons();
+            const savedSession = localStorage.getItem('shop_session_cloud'); if(savedSession) { loggedInUser = JSON.parse(savedSession); updateAppForLoggedInUser(); }
+            const savedRider = localStorage.getItem('rider_session_cloud'); if(savedRider) { loggedInRider = JSON.parse(savedRider); }
+            lucide.createIcons();
+        } catch(err) { console.error("Firebase load error", err); }
     };
 
-    // 🚀 NEW: ADMIN UPLOAD QR LOGIC
     async function uploadAdminQr() {
         const f = document.getElementById('adminPaymentQrFile');
-        if(!f.files[0]) return showToast("Please select QR image from gallery");
+        if(!f.files[0]) return showToast("Select QR Image");
         const b64 = await processImageFileAsync(f.files[0]);
         db.ref('settings/payment/qrCode').set(b64);
-        showToast("Payment QR Saved Successfully!");
-        f.value = '';
+        showToast("QR Saved!"); f.value = '';
     }
 
     function toggleSupportMenu() { document.getElementById('supportMenu').classList.toggle('active'); }
@@ -630,7 +685,7 @@
 
     function contactSupport(type) {
         document.getElementById('supportMenu').classList.remove('active');
-        if(type === 'wa') { window.open(`https://wa.me/${appSettings.support.whatsapp}?text=Hello Biju Mart`, '_blank'); } else { window.open(`mailto:${appSettings.support.email}`, '_blank'); }
+        if(type === 'wa') { window.open(`https://wa.me/${appSettings.support.whatsapp}?text=Hello Biju Mart Support`, '_blank'); } else { window.open(`mailto:${appSettings.support.email}`, '_blank'); }
     }
 
     function updateAppConfig() {
@@ -653,7 +708,7 @@
         if(document.getElementById('adminCatList')) {
             document.getElementById('adminCatList').innerHTML = allCategories.map(cat => {
                 if(!cat) return '';
-                return `<div style="display:flex; align-items:center; justify-content:space-between; background:#1e293b; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #334155;"><div style="display:flex; align-items:center; gap:10px;">${cat.image ? `<img src="${cat.image}" style="width:30px; height:30px; border-radius:4px; object-fit:cover;">` : ''}<span style="color:white; font-size:14px; font-weight:bold;">${cat.name}</span></div><button class="btn-danger-small" onclick="deleteCategory('${cat.id}', '${cat.name}')">Remove</button></div>`;
+                return `<div style="display:flex; align-items:center; justify-content:space-between; background:var(--card-bg); padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border-color);"><div style="display:flex; align-items:center; gap:12px;">${cat.image ? `<img src="${cat.image}" style="width:35px; height:35px; border-radius:6px; object-fit:cover; border:1px solid var(--primary);">` : ''}<span style="color:white; font-size:14px; font-weight:bold;">${cat.name}</span></div><button class="btn-danger-small" onclick="deleteCategory('${cat.id}', '${cat.name}')">Remove</button></div>`;
             }).join('');
         }
     }
@@ -678,8 +733,7 @@
             document.getElementById('adminMinOrder').value = appSettings.payment.minOrderAmount || 0;
         }
 
-        // Apply QR to UI
-        if(document.getElementById('adminQrPreview')) document.getElementById('adminQrPreview').src = appSettings.payment.qrCode || "";
+        if(document.getElementById('adminQrPreview')) document.getElementById('adminQrPreview').src = appSettings.payment.qrCode || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
         if(document.getElementById('adminPaymentQrImg')) document.getElementById('adminPaymentQrImg').src = appSettings.payment.qrCode || "";
 
         const bannerContainer = document.getElementById('promoBanners');
@@ -687,7 +741,7 @@
         if(bannerContainer) {
             if(bannerKeys.length > 0) {
                 bannerContainer.style.display = 'flex'; bannerContainer.innerHTML = bannerKeys.map(key => `<img src="${appSettings.banners[key]}" class="banner-slide">`).join('');
-                if(bannerKeys.length > 1) { clearInterval(autoSlideInterval); autoSlideInterval = setInterval(() => { if (bannerContainer.scrollLeft + bannerContainer.clientWidth >= bannerContainer.scrollWidth - 10) bannerContainer.scrollTo({ left: 0, behavior: 'smooth' }); else bannerContainer.scrollBy({ left: bannerContainer.clientWidth, behavior: 'smooth' }); }, 3000); }
+                if(bannerKeys.length > 1) { clearInterval(autoSlideInterval); autoSlideInterval = setInterval(() => { if (bannerContainer.scrollLeft + bannerContainer.clientWidth >= bannerContainer.scrollWidth - 10) bannerContainer.scrollTo({ left: 0, behavior: 'smooth' }); else bannerContainer.scrollBy({ left: bannerContainer.clientWidth, behavior: 'smooth' }); }, 4000); }
             } else { bannerContainer.style.display = 'none'; clearInterval(autoSlideInterval); }
         }
     }
@@ -701,8 +755,8 @@
     
     function resetAuthForms() {
         document.getElementById('authFormsSection').style.display = 'block'; document.getElementById('authOtpSection').style.display = 'none';
-        ['logPhone', 'regFirstName', 'regPhone', 'otp1', 'otp2', 'otp3', 'otp4'].forEach(id => { const el = document.getElementById(id); if(el) { el.value = ''; el.style.borderColor = '#e0e0e0'; } });
-        document.getElementById('autoDetectMsg').innerText = 'Waiting for SMS...'; document.getElementById('autoDetectMsg').style.color = 'var(--text-muted)';
+        ['logPhone', 'regFirstName', 'regPhone', 'otp1', 'otp2', 'otp3', 'otp4'].forEach(id => { const el = document.getElementById(id); if(el) { el.value = ''; el.style.borderColor = 'var(--border-color)'; } });
+        document.getElementById('autoDetectMsg').innerText = 'Waiting for secure code...'; document.getElementById('autoDetectMsg').style.color = 'var(--text-muted)';
         document.getElementById('verifyOtpBtn').style.opacity = '0.5'; document.getElementById('verifyOtpBtn').style.pointerEvents = 'none';
     }
 
@@ -717,13 +771,13 @@
     function requestAuthOTP() {
         let phone, firstName;
         if (currentAuthMode === 'login') {
-            phone = document.getElementById('logPhone').value.trim(); if (phone.length !== 10) return showToast("Enter 10 digit mobile number");
+            phone = document.getElementById('logPhone').value.trim(); if (phone.length !== 10) return showToast("Enter valid 10 digit number");
             const existingUser = allUsers.find(u => u && String(u.phone) === String(phone)); if (!existingUser) { showToast("Account not found. Sign Up."); return switchAuthTab('register'); }
             pendingAuthData = existingUser;
         } else {
             firstName = document.getElementById('regFirstName').value.trim(); phone = document.getElementById('regPhone').value.trim();
-            if (!firstName || phone.length !== 10) return showToast("Enter Name and 10 digit number");
-            const existingUser = allUsers.find(u => u && String(u.phone) === String(phone)); if (existingUser) { showToast("Number already registered. Login."); return switchAuthTab('login'); }
+            if (!firstName || phone.length !== 10) return showToast("Enter Name and valid number");
+            const existingUser = allUsers.find(u => u && String(u.phone) === String(phone)); if (existingUser) { showToast("Number registered. Login."); return switchAuthTab('login'); }
             pendingAuthData = { firstName, phone }; 
         }
         document.getElementById('authFormsSection').style.display = 'none'; document.getElementById('authOtpSection').style.display = 'block'; document.getElementById('displayOtpPhone').innerText = "+91 " + phone;
@@ -731,31 +785,33 @@
     }
 
     function simulateAutomaticOTP() {
-        const msg = document.getElementById('autoDetectMsg'); msg.innerText = "Reading SMS format...";
+        const msg = document.getElementById('autoDetectMsg'); msg.innerText = "Encrypting connection...";
         setTimeout(() => {
-            msg.innerText = "OTP Detected! Auto-filling..."; msg.style.color = "var(--success)";
-            setTimeout(() => { document.getElementById('otp1').value = '4'; }, 300); setTimeout(() => { document.getElementById('otp2').value = '2'; }, 600);
-            setTimeout(() => { document.getElementById('otp3').value = '8'; }, 900); setTimeout(() => { document.getElementById('otp4').value = '9'; }, 1200);
-            setTimeout(() => { msg.innerText = "✓ Verified securely."; document.getElementById('verifyOtpBtn').style.opacity = '1'; document.getElementById('verifyOtpBtn').style.pointerEvents = 'auto'; setTimeout(() => verifyCustomerOTP(), 800); }, 1500);
+            msg.innerText = "VIP Code Detected! Verifying..."; msg.style.color = "var(--primary)";
+            setTimeout(() => { document.getElementById('otp1').value = '7'; document.getElementById('otp1').style.borderColor = "var(--primary)"; }, 300); 
+            setTimeout(() => { document.getElementById('otp2').value = '0'; document.getElementById('otp2').style.borderColor = "var(--primary)";}, 600);
+            setTimeout(() => { document.getElementById('otp3').value = '0'; document.getElementById('otp3').style.borderColor = "var(--primary)";}, 900); 
+            setTimeout(() => { document.getElementById('otp4').value = '7'; document.getElementById('otp4').style.borderColor = "var(--primary)";}, 1200);
+            setTimeout(() => { msg.innerText = "✓ Access Granted."; document.getElementById('verifyOtpBtn').style.opacity = '1'; document.getElementById('verifyOtpBtn').style.pointerEvents = 'auto'; setTimeout(() => verifyCustomerOTP(), 800); }, 1500);
         }, 1500);
     }
 
     function verifyCustomerOTP() {
         if(currentAuthMode === 'register') db.ref('users/' + pendingAuthData.phone).set(pendingAuthData);
         loggedInUser = pendingAuthData; localStorage.setItem('shop_session_cloud', JSON.stringify(loggedInUser));
-        closeAuthPage(); showToast(currentAuthMode === 'login' ? "Welcome back!" : "Account created!"); updateAppForLoggedInUser();
+        closeAuthPage(); showToast(currentAuthMode === 'login' ? "Welcome back VIP!" : "VIP Account created!"); updateAppForLoggedInUser();
     }
 
     function logoutCustomer() {
         loggedInUser = null; localStorage.removeItem('shop_session_cloud'); document.getElementById('cName').value = ""; document.getElementById('cPhone').value = "";
-        document.getElementById('loginBannerBtn').style.display = 'flex'; document.getElementById('accountNavText').innerText = "Account";
+        document.getElementById('loginBannerBtn').style.display = 'flex'; document.getElementById('accountNavText').innerText = "Profile";
         switchCustomerTab('home', document.getElementById('navHome')); renderCustomerOrders(); showToast("Logged out securely.");
     }
 
     function updateAppForLoggedInUser() {
         document.getElementById('loginBannerBtn').style.display = 'none'; document.getElementById('cName').value = loggedInUser.firstName; document.getElementById('cPhone').value = loggedInUser.phone;
         document.getElementById('profileNameDisplay').innerText = loggedInUser.firstName; document.getElementById('profilePhoneDisplay').innerText = "+91 " + loggedInUser.phone;
-        document.getElementById('gridGreetingTitle').innerText = `${loggedInUser.firstName}, deals for you...`;
+        document.getElementById('gridGreetingTitle').innerText = `${loggedInUser.firstName}, Exclusive for you`;
     }
 
     function handleAccountTabClick(element) { if (loggedInUser) switchCustomerTab('profile', element); else openAuthPage(); }
@@ -763,9 +819,9 @@
 
     function shareProduct(id) {
         const p = allProducts.find(x => String(x.id) === String(id)); if(!p) return;
-        const shareText = `Check out ${p.name} for just ₹${p.price} at Biju Mart! 🛒\nOrder now:`;
+        const shareText = `💎 Checkout the Premium ${p.name} for just ₹${p.price} at Biju Mart!\nOrder now:`;
         if (navigator.share) { navigator.share({ title: 'Biju Mart', text: shareText, url: window.location.href }).catch(console.error); } 
-        else { const dummy = document.createElement('textarea'); document.body.appendChild(dummy); dummy.value = shareText + "\n" + window.location.href; dummy.select(); document.execCommand('copy'); document.body.removeChild(dummy); showToast("Link copied to clipboard!"); }
+        else { const dummy = document.createElement('textarea'); document.body.appendChild(dummy); dummy.value = shareText + "\n" + window.location.href; dummy.select(); document.execCommand('copy'); document.body.removeChild(dummy); showToast("Premium Link copied!"); }
     }
 
     function filterAndSortProducts() {
@@ -781,7 +837,7 @@
         if(item) {
             item.qty += delta; if(item.qty <= 0) cart = cart.filter(i => i.cartKey !== cartKey); else if (item.qty > product.stock) { item.qty = product.stock; showToast("Stock limit reached!"); }
         } else if (delta > 0) {
-            if(product.stock > 0) { cart.push({...product, qty: 1, size: size, cartKey: cartKey}); showToast("Added to Cart"); } else showToast("Out of Stock");
+            if(product.stock > 0) { cart.push({...product, qty: 1, size: size, cartKey: cartKey}); showToast("Added to VIP Cart"); } else showToast("Sold Out");
         }
         const badge = document.getElementById('cartBadge'); const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
         if(totalQty > 0) { badge.style.display = 'flex'; badge.innerText = totalQty; } else { badge.style.display = 'none'; }
@@ -814,7 +870,7 @@
         if(products.length === 0) { grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:#878787;">No products found</div>`; return; }
 
         grid.innerHTML = products.map(p => {
-            const isOutOfStock = p.stock <= 0; const stockBadge = isOutOfStock ? `<div class="stock-badge low">OUT OF STOCK</div>` : `<div class="stock-badge ok">${p.stock} LEFT</div>`;
+            const isOutOfStock = p.stock <= 0; const stockBadge = isOutOfStock ? `<div class="stock-badge low">SOLD OUT</div>` : `<div class="stock-badge ok">${p.stock} LEFT</div>`;
             const displayVisual = isImage(p.emoji) ? `<img src="${p.emoji}" class="product-img-real">` : `<div style="font-size:50px;">${p.emoji}</div>`;
             let actionHTML = '';
             if(p.sizeType && p.sizeType !== 'None') { actionHTML = `<button class="btn-add-cart" onclick="openProductDetails('${p.id}')">Select Size</button>`; } 
@@ -837,34 +893,33 @@
 
     function openCart() {
         document.getElementById('cartModal').classList.add('active'); const list = document.getElementById('cartItemsList');
-        if(cart.length === 0) { list.innerHTML = "<p style='text-align:center; margin-top:20px; color:#878787;'>Cart is empty</p>"; document.getElementById('cartTotal').innerText = '₹0'; return; }
+        if(cart.length === 0) { list.innerHTML = "<p style='text-align:center; margin-top:30px; color:var(--primary); font-weight:bold; font-size:16px;'>Your Luxury Cart is empty</p>"; document.getElementById('cartTotal').innerText = '₹0'; return; }
         let total = 0;
         list.innerHTML = cart.map(item => {
             total += (item.price||0) * item.qty;
-            const displayVisual = isImage(item.emoji) ? `<img src="${item.emoji}" class="cart-img-real">` : `<div style="font-size:30px; width:50px; text-align:center;">${item.emoji}</div>`;
-            const sizeLabel = item.size ? `<span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold; margin-left:5px;">Size: ${item.size}</span>` : '';
+            const displayVisual = isImage(item.emoji) ? `<img src="${item.emoji}" class="cart-img-real">` : `<div style="font-size:30px; width:60px; text-align:center;">${item.emoji}</div>`;
+            const sizeLabel = item.size ? `<span style="background:var(--primary); color:#000; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:900; margin-left:8px;">Size: ${item.size}</span>` : '';
             return `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-radius:8px; margin-bottom:10px; border:1px solid #e0e0e0;">
-                    <div style="display:flex; gap:15px; align-items:center;">${displayVisual}<div><div style="font-weight:600; font-size:13px; color:var(--text-main);">${item.name} ${sizeLabel}</div><div style="color:var(--text-main); font-weight:800; font-size:15px; margin-top:4px;">₹${(item.price||0).toLocaleString('en-IN')}</div></div></div>
-                    <div class="qty-controls" style="margin-top:0; width:80px;"><button class="btn-qty" style="width:22px; height:22px; font-size:12px;" onclick="updateQty('${item.id}', -1, '${item.size||''}')">-</button><span class="qty-val" style="font-size:12px;">${item.qty}</span><button class="btn-qty" style="width:22px; height:22px; font-size:12px;" onclick="updateQty('${item.id}', 1, '${item.size||''}')">+</button></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:var(--card-bg); border-radius:12px; margin-bottom:12px; border:1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                    <div style="display:flex; gap:15px; align-items:center;">${displayVisual}<div><div style="font-weight:700; font-size:13px; color:var(--text-main);">${item.name} ${sizeLabel}</div><div style="color:var(--primary); font-weight:900; font-size:16px; margin-top:6px;">₹${(item.price||0).toLocaleString('en-IN')}</div></div></div>
+                    <div class="qty-controls" style="margin-top:0; width:85px; background:#222;"><button class="btn-qty" onclick="updateQty('${item.id}', -1, '${item.size||''}')">-</button><span class="qty-val">${item.qty}</span><button class="btn-qty" onclick="updateQty('${item.id}', 1, '${item.size||''}')">+</button></div>
                 </div>`;
         }).join('');
         document.getElementById('cartTotal').innerText = '₹' + total.toLocaleString('en-IN'); document.getElementById('checkoutTotal').innerText = '₹' + total.toLocaleString('en-IN');
     }
 
-    function captureLocation() { showToast("Fetching Location..."); customerLat = "20.12"; customerLng = "85.45"; document.getElementById('locStatus').innerText = "✅ Location Attached!"; document.getElementById('locStatus').style.color="var(--success)";}
+    function captureLocation() { showToast("Fetching Location..."); customerLat = "20.12"; customerLng = "85.45"; document.getElementById('locStatus').innerText = "✅ Verified VIP Location!"; document.getElementById('locStatus').style.color="var(--success)";}
 
     function proceedToCheckout() {
         if(cart.length === 0) return showToast("Cart is empty");
-        if(!loggedInUser) { showToast("Sign in to place order!"); closeModal('cartModal'); openAuthPage(); return; }
+        if(!loggedInUser) { showToast("Sign in to place VIP order!"); closeModal('cartModal'); openAuthPage(); return; }
         let total = cart.reduce((sum, item) => sum + ((item.price||0) * item.qty), 0); let minAmount = parseInt(appSettings.payment?.minOrderAmount) || 0;
-        if (total < minAmount) return showToast("Minimum Order is ₹" + minAmount);
+        if (total < minAmount) return showToast("Minimum Premium Order is ₹" + minAmount);
         selectPaymentMethod('UPI'); closeModal('cartModal'); document.getElementById('checkoutModal').classList.add('active');
     }
 
-    function selectPaymentMethod(method) { selectedPaymentMethod = method; document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('active')); document.getElementById('pay' + method.toUpperCase()).classList.add('active'); }
+    function selectPaymentMethod(method) { selectedPaymentMethod = method; document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('active')); document.getElementById('pay' + method).classList.add('active'); }
 
-    // 🚀 NEW: HANDLE ORDER PLACEMENT WITH QR MODAL
     function handleOrderPlacement() {
         if(selectedPaymentMethod === 'UPI') {
             if(!appSettings.payment.qrCode) return showToast("Admin hasn't setup QR Code yet. Please use COD.");
@@ -876,11 +931,7 @@
         }
     }
 
-    // 🚀 NEW: CONFIRM PAYMENT DONE
-    function confirmQrOrder() {
-        placeOrder('UPI (Paid via QR)');
-        closeModal('qrPaymentModal');
-    }
+    function confirmQrOrder() { placeOrder('UPI (Paid via QR)'); closeModal('qrPaymentModal'); }
 
     function placeOrder(finalMethod = null) {
         const name = document.getElementById('cName').value.trim(), phone = document.getElementById('cPhone').value.trim(), address = document.getElementById('cAddress').value.trim(), pin = document.getElementById('cPin').value.trim();
@@ -894,7 +945,7 @@
 
         cart.forEach(cItem => { const p = allProducts.find(p => String(p.id) === String(cItem.id)); if(p) db.ref('products/' + p.id).update({ stock: p.stock - cItem.qty }); });
         cart = []; document.getElementById('cartBadge').style.display = 'none'; closeModal('checkoutModal'); switchCustomerTab('orders', document.getElementById('navOrders'));
-        showToast("Order Placed Successfully!");
+        showToast("Premium Order Placed Successfully!");
     }
 
     function requestCancelOrder(orderId) { if(confirm("Request cancellation?")) { db.ref('orders/' + orderId).update({ status: 'Cancel Requested' }); showToast("Request Sent"); } }
@@ -902,11 +953,11 @@
     function renderCustomerOrders() {
         const list = document.getElementById('customerOrdersList'); if(!list) return;
         let myOrders = loggedInUser ? allOrders.filter(o => String(o.phone) === String(loggedInUser.phone)) : [];
-        if(myOrders.length === 0) { list.innerHTML = "<p style='color:#878787; text-align:center;'>No orders found.</p>"; return; }
+        if(myOrders.length === 0) { list.innerHTML = "<p style='color:var(--text-muted); text-align:center; font-weight:bold; font-size:15px; margin-top:20px;'>No Premium Orders found.</p>"; return; }
         list.innerHTML = myOrders.map(o => {
             let color = o.status === 'Delivered' ? 'var(--success)' : (o.status === 'Cancelled' ? 'var(--danger)' : (o.status === 'Cancel Requested' ? '#ef4444' : 'var(--primary)'));
-            let cancelBtn = o.status === 'Pending' ? `<button onclick="requestCancelOrder('${o.id}')" style="margin-top:10px; width:100%; padding:8px; background:white; color:var(--danger); border:1px solid var(--danger); border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer;">Request Cancel</button>` : '';
-            return `<div style="background:white; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #e0e0e0;"><div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #f1f3f6; padding-bottom:10px;"><b style="color:var(--text-main); font-size:12px;">${o.id}</b><span style="font-weight:bold; font-size:11px; color:${color};">${o.status}</span></div><div style="font-size:13px; color:var(--text-muted); line-height:1.5;">${o.items}<br><div style="margin-top:4px; font-size:15px; font-weight:800; color:var(--text-main);">Total: ₹${(o.total||0).toLocaleString('en-IN')}</div></div>${cancelBtn}</div>`;
+            let cancelBtn = o.status === 'Pending' ? `<button onclick="requestCancelOrder('${o.id}')" style="margin-top:12px; width:100%; padding:10px; background:rgba(239, 83, 80, 0.1); color:var(--danger); border:1px solid var(--danger); border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer;">Request Cancel</button>` : '';
+            return `<div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);"><div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid var(--border-color); padding-bottom:12px;"><b style="color:var(--text-main); font-size:13px;">${o.id}</b><span style="font-weight:900; font-size:12px; color:${color}; letter-spacing:0.5px; text-transform:uppercase;">${o.status}</span></div><div style="font-size:14px; color:var(--text-muted); line-height:1.6;">${o.items}<br><div style="margin-top:6px; font-size:18px; font-weight:900; color:var(--primary); text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Total: ₹${(o.total||0).toLocaleString('en-IN')}</div></div>${cancelBtn}</div>`;
         }).join('');
     }
 
@@ -918,69 +969,6 @@
         else if (tab === 'profile') { document.getElementById('customerProfileView').style.display = 'block'; }
     }
 
-    // --- RIDER LOGIC ---
-    function openRiderLogin() {
-        if(loggedInRider) {
-            document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active'); renderRiderDashboard();
-        } else { document.getElementById('riderLoginModal').classList.add('active'); }
-    }
-
-    function saveRider() {
-        const name = document.getElementById('rName').value.trim(), phone = document.getElementById('rPhone').value.trim(), pass = document.getElementById('rPass').value.trim();
-        if(!name || phone.length !== 10 || !pass) { showToast("Enter Name, 10-digit Phone, and Password"); return; }
-        db.ref('riders/' + phone).set({ name: name, phone: phone, password: pass });
-        showToast("Rider Registered!"); document.getElementById('rName').value = ''; document.getElementById('rPhone').value = ''; document.getElementById('rPass').value = '';
-    }
-
-    function verifyRider() {
-        const phone = document.getElementById('riderPhoneLogin').value.trim(), pass = document.getElementById('riderPassLogin').value.trim();
-        if(!phone || !pass) return showToast("Enter credentials");
-        const rider = allRiders.find(r => String(r.phone) === String(phone) && String(r.password) === String(pass));
-        if(rider) {
-            loggedInRider = rider; localStorage.setItem('rider_session_cloud', JSON.stringify(rider));
-            closeModal('riderLoginModal'); document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active');
-            renderRiderDashboard(); showToast("Welcome Partner!"); document.getElementById('riderPhoneLogin').value = ''; document.getElementById('riderPassLogin').value = '';
-        } else { showToast("Invalid Rider Credentials"); }
-    }
-
-    function logoutRider() { loggedInRider = null; localStorage.removeItem('rider_session_cloud'); document.getElementById('riderApp').classList.remove('active'); document.getElementById('customerApp').classList.add('active'); showToast("Rider Logged Out"); }
-
-    function renderRiderDashboard() {
-        if(!loggedInRider) return;
-        document.getElementById('riderGreeting').innerText = `Welcome, ${loggedInRider.name}`;
-        let assignedOrders = allOrders.filter(o => String(o.assignedRider) === String(loggedInRider.phone));
-        document.getElementById('riderDeliveredCount').innerText = assignedOrders.filter(o => o.status === 'Delivered').length;
-        let activeDeliveries = assignedOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
-        
-        const list = document.getElementById('riderOrdersList');
-        if(activeDeliveries.length === 0) { list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">No active deliveries. Relax!</div>`; return; }
-
-        list.innerHTML = activeDeliveries.map(o => {
-            let mapBtn = o.lat && o.lng ? `<button onclick="window.open('http://googleusercontent.com/maps.google.com/maps?q=${o.lat},${o.lng}', '_blank')" style="background:#f0f5ff; color:var(--primary); border:1px solid #c0d5ff; padding:8px; border-radius:6px; width:100%; font-weight:bold; margin-bottom:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;"><i data-lucide="navigation" style="width:16px;"></i> Navigate</button>` : '';
-            return `
-            <div style="background:white; padding:15px; border-radius:12px; margin-bottom:15px; box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid #e2e8f0;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #f1f3f6; padding-bottom:10px;"><b style="color:var(--text-main); font-size:13px;">${o.id}</b><span style="font-weight:bold; font-size:11px; color:var(--primary); background:#f0f5ff; padding:3px 6px; border-radius:4px;">${o.status}</span></div>
-                <div style="font-size:13px; color:var(--text-muted); line-height:1.5; margin-bottom:10px;"><b style="color:var(--text-main); font-size:15px;">${o.customer}</b><br>${o.address || 'Address N/A'}<br><div style="margin-top:5px; padding:5px; background:#f8fafc; border-radius:4px; font-size:12px;">Items: ${o.items}</div></div>
-                ${mapBtn}
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <button onclick="window.location.href='tel:${o.phone}'" style="flex:1; background:white; color:var(--text-main); border:1px solid #cbd5e1; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">📞 Call</button>
-                    <button onclick="showRiderQR('${o.total}')" style="flex:1; background:var(--primary); color:white; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">📱 ₹${(o.total||0).toLocaleString('en-IN')}</button>
-                </div>
-                <button onclick="markOrderDelivered('${o.id}')" style="width:100%; background:var(--success); color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; font-size:14px; cursor:pointer;">✅ Mark as Delivered</button>
-            </div>`;
-        }).join('');
-        lucide.createIcons();
-    }
-
-    function showRiderQR(amount) {
-        document.getElementById('riderQrModal').classList.add('active'); document.getElementById('qrAmountDisplay').innerText = "₹" + Number(amount).toLocaleString('en-IN');
-        let upiId = appSettings.payment.upiId || "9348954360@ybl"; document.getElementById('qrUpiDisplay').innerText = upiId;
-        const upiString = `upi://pay?pa=${upiId}&pn=Biju%20Mart&am=${amount}&cu=INR`;
-        document.getElementById('dynamicQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
-    }
-    function markOrderDelivered(orderId) { if(confirm("Are you sure you have delivered this order and collected the payment?")) { db.ref('orders/' + orderId).update({ status: 'Delivered', paymentMethod: 'Paid on Delivery' }); showToast("Great Job! Order Delivered."); } }
-
-    // --- ADMIN LOGIC ---
     function openAdminLogin() { document.getElementById('adminLoginModal').classList.add('active'); }
     function verifyAdmin() {
         const user = document.getElementById('adminUser').value, pass = document.getElementById('adminPass').value;
@@ -1001,28 +989,28 @@
 
         const rList = document.getElementById('adminRidersList');
         if(rList) {
-            rList.innerHTML = allRiders.map(r => `<div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:12px; border-radius:8px; margin-bottom:8px; border:1px solid #334155;"><div><div style="color:white; font-weight:bold; font-size:14px;">${r.name}</div><div style="color:var(--text-muted); font-size:12px;">+91 ${r.phone}</div></div><button class="btn-danger-small" onclick="removeRider('${r.phone}')">Remove</button></div>`).join('') || "<p style='color:#64748b; font-size:12px;'>No riders registered.</p>";
+            rList.innerHTML = allRiders.map(r => `<div style="display:flex; justify-content:space-between; align-items:center; background:#222; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border-color);"><div><div style="color:var(--primary); font-weight:900; font-size:15px; letter-spacing:0.5px;">${r.name}</div><div style="color:var(--text-main); font-size:13px; margin-top:4px;">+91 ${r.phone}</div></div><button class="btn-danger-small" onclick="removeRider('${r.phone}')">Remove</button></div>`).join('') || "<p style='color:var(--text-muted); font-size:13px; font-weight:bold;'>No riders registered.</p>";
         }
 
         document.getElementById('adminStockList').innerHTML = allProducts.map(p => {
-            const displayVisual = isImage(p.emoji) ? `<img src="${p.emoji}" class="admin-img-real">` : `<span style="font-size:18px;">${p.emoji}</span>`;
-            return `<div class="inventory-item"><div style="display:flex; justify-content:space-between; margin-bottom:8px;"><div style="display:flex; align-items:center; gap:8px;">${displayVisual}<span style="font-size:14px; font-weight:bold; color:white;">${p.name}</span></div><div style="font-size:12px; font-weight:bold; padding:3px 6px; border-radius:4px; background:${p.stock <= 2 ? '#ef444430' : '#10b98130'}; color:${p.stock <= 2 ? 'var(--danger)' : 'var(--success)'}">Stock: ${p.stock}</div></div>
-                <div style="display:flex; justify-content:space-between; align-items:center;"><span style="color:var(--primary); font-weight:bold; font-size:15px;">₹${(p.price||0).toLocaleString('en-IN')}</span><div style="display:flex; gap:8px;"><button onclick="editProduct('${p.id}')" style="background:#3b82f6; border:none; padding:6px 12px; border-radius:6px; color:white; font-size:12px; cursor:pointer;">Edit</button><button onclick="deleteProduct('${p.id}')" style="background:var(--danger); border:none; padding:6px 12px; border-radius:6px; color:white; font-size:12px; cursor:pointer;">Delete</button></div></div></div>`;
+            const displayVisual = isImage(p.emoji) ? `<img src="${p.emoji}" style="width:40px; height:40px; border-radius:6px; object-fit:contain; background:white; border:1px solid #333; padding:2px;">` : `<span style="font-size:24px;">${p.emoji}</span>`;
+            return `<div style="background:#222; padding:15px; border-radius:8px; margin-bottom:12px; border:1px solid var(--border-color);"><div style="display:flex; justify-content:space-between; margin-bottom:12px;"><div style="display:flex; align-items:center; gap:12px;">${displayVisual}<span style="font-size:15px; font-weight:900; color:var(--text-main); letter-spacing:0.5px;">${p.name}</span></div><div style="font-size:12px; font-weight:900; padding:4px 8px; border-radius:4px; background:${p.stock <= 2 ? 'rgba(239,83,80,0.2)' : 'rgba(212,175,55,0.2)'}; color:${p.stock <= 2 ? 'var(--danger)' : 'var(--primary)'}">Stock: ${p.stock}</div></div>
+                <div style="display:flex; justify-content:space-between; align-items:center;"><span style="color:var(--primary); font-weight:900; font-size:18px;">₹${(p.price||0).toLocaleString('en-IN')}</span><div style="display:flex; gap:10px;"><button onclick="editProduct('${p.id}')" style="background:#1e88e5; border:none; padding:8px 15px; border-radius:6px; color:white; font-size:12px; font-weight:bold; cursor:pointer;">Edit</button><button onclick="deleteProduct('${p.id}')" style="background:var(--danger); border:none; padding:8px 15px; border-radius:6px; color:white; font-size:12px; font-weight:bold; cursor:pointer;">Delete</button></div></div></div>`;
         }).join('');
 
         document.getElementById('adminOrdersList').innerHTML = allOrders.map(o => {
-            let highlight = o.status === 'Cancel Requested' ? 'border: 2px solid #ef4444;' : 'border: 1px solid #334155;';
+            let highlight = o.status === 'Cancel Requested' ? 'border: 2px solid var(--danger); box-shadow: 0 0 10px rgba(239,83,80,0.3);' : 'border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);';
             let riderOptions = `<option value="">-- Assign Rider --</option>`;
             allRiders.forEach(r => { riderOptions += `<option value="${r.phone}" ${String(o.assignedRider) === String(r.phone) ? 'selected' : ''}>🏍️ ${r.name}</option>`; });
             return `
-            <div style="background:#0f172a; padding:15px; border-radius:10px; margin-bottom:15px; ${highlight}"><div style="display:flex; justify-content:space-between; margin-bottom:8px;"><b style="color:var(--primary);">${o.id}</b><span style="font-size:12px; color:#94a3b8;">${o.date}</span></div><div style="font-size:13px; color:#cbd5e1; margin-bottom:12px; line-height:1.5;"><b style="color:white;">${o.customer}</b> (+91 ${o.phone})<br>Address: ${o.address || 'N/A'}<br>Items: <span style="color:#94a3b8;">${o.items}</span><br>Total: <b style="color:white; font-size:15px;">₹${(o.total||0).toLocaleString('en-IN')}</b></div>
-                <div style="display:flex; gap:10px; margin-bottom:10px;"><select style="background:#1e293b; color:white; border:1px solid #475569; padding:8px; border-radius:6px; flex:1; outline:none;" onchange="updateOrderStatus('${o.id}', this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>⏳ Pending</option><option value="Packed" ${o.status==='Packed'?'selected':''}>📦 Packed</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>🏍️ Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>✅ Delivered</option><option value="Cancel Requested" ${o.status==='Cancel Requested'?'selected':''} disabled>⚠️ Cancel Requested</option><option value="Cancelled" ${o.status==='Cancelled'?'selected':''}>❌ Cancelled</option></select></div>
-                <div style="margin-bottom:10px;"><select style="background:#1e293b; color:var(--secondary); border:1px solid var(--secondary); padding:8px; border-radius:6px; width:100%; outline:none; font-weight:bold;" onchange="assignRiderToOrder('${o.id}', this.value)">${riderOptions}</select></div>
-                <div style="background:#1e293b; padding:10px; border-radius:6px; border:1px solid #334155; margin-bottom:10px;"><div style="font-size:11px; color:#94a3b8; font-weight:bold; margin-bottom:5px;">SET DELIVERY DATE & TIME</div><div style="display:flex; gap:5px;"><input type="date" id="delDate_${o.id}" class="admin-input" style="padding:6px; margin:0;" value="${o.deliveryDate || ''}"><input type="time" id="delTime_${o.id}" class="admin-input" style="padding:6px; margin:0; width:100px;" value="${o.deliveryTime || ''}"><button class="btn-small" style="padding:6px 12px;" onclick="saveDeliverySchedule('${o.id}')">Save</button></div></div>
-                <div style="display:flex; gap:10px; margin-bottom:10px;"><button onclick="downloadPDF('${o.id}')" style="background:#3b82f6; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; flex:1; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:5px;">PDF</button><button onclick="printBill('${o.id}')" style="background:#8b5cf6; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; flex:1; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:5px;">Print</button></div>
-                <div style="display:flex; gap:10px;"><button onclick="shareBillWhatsApp('${o.id}')" style="background:var(--whatsapp); color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; font-weight:bold; flex:1;">Send WhatsApp</button><button onclick="deleteOrder('${o.id}')" style="background:var(--danger); color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; width:45px; font-weight:bold;">X</button></div>
+            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:20px; ${highlight}"><div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;"><b style="color:var(--primary); font-size:14px; letter-spacing:0.5px;">${o.id}</b><span style="font-size:12px; color:var(--text-muted); font-weight:bold;">${o.date}</span></div><div style="font-size:14px; color:var(--text-main); margin-bottom:15px; line-height:1.6;"><b style="color:var(--primary); font-size:16px;">${o.customer}</b> (+91 ${o.phone})<br><span style="color:var(--text-muted);">Address:</span> ${o.address || 'N/A'}<br><span style="color:var(--text-muted);">Items:</span> <span style="font-weight:bold;">${o.items}</span><br><div style="margin-top:6px; font-size:18px; font-weight:900; color:var(--primary); text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Total: ₹${(o.total||0).toLocaleString('en-IN')}</div></div>
+                <div style="display:flex; gap:12px; margin-bottom:15px;"><select style="background:#222; color:white; border:1px solid var(--border-color); padding:10px; border-radius:8px; flex:1; outline:none; font-weight:bold;" onchange="updateOrderStatus('${o.id}', this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>⏳ Pending</option><option value="Packed" ${o.status==='Packed'?'selected':''}>📦 Packed</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>🏍️ Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>✅ Delivered</option><option value="Cancel Requested" ${o.status==='Cancel Requested'?'selected':''} disabled>⚠️ Cancel Requested</option><option value="Cancelled" ${o.status==='Cancelled'?'selected':''}>❌ Cancelled</option></select></div>
+                <div style="margin-bottom:15px;"><select style="background:rgba(212,175,55,0.1); color:var(--primary); border:1px solid var(--primary); padding:10px; border-radius:8px; width:100%; outline:none; font-weight:900; letter-spacing:0.5px;" onchange="assignRiderToOrder('${o.id}', this.value)">${riderOptions}</select></div>
+                <div style="background:#222; padding:15px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px;"><div style="font-size:11px; color:var(--primary); font-weight:900; margin-bottom:8px; letter-spacing:1px;">SET VIP DELIVERY SCHEDULE</div><div style="display:flex; gap:8px;"><input type="date" id="delDate_${o.id}" class="admin-input" style="padding:10px; margin:0;" value="${o.deliveryDate || ''}"><input type="time" id="delTime_${o.id}" class="admin-input" style="padding:10px; margin:0; width:110px;" value="${o.deliveryTime || ''}"><button class="btn-small" style="padding:10px 15px; background:var(--gold-gradient); color:var(--text-dark); border:none;" onclick="saveDeliverySchedule('${o.id}')">Save</button></div></div>
+                <div style="display:flex; gap:12px; margin-bottom:12px;"><button onclick="downloadPDF('${o.id}')" style="background:#1e88e5; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; flex:1; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">📄 PDF</button><button onclick="printBill('${o.id}')" style="background:#8e24aa; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; flex:1; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">🖨️ Print</button></div>
+                <div style="display:flex; gap:12px;"><button onclick="shareBillWhatsApp('${o.id}')" style="background:var(--whatsapp); color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:900; flex:1; text-transform:uppercase; letter-spacing:0.5px;">💬 WhatsApp Bill</button><button onclick="deleteOrder('${o.id}')" style="background:var(--danger); color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; width:55px; font-weight:bold; font-size:16px;">🗑️</button></div>
             </div>`;
-        }).join('') || "<p style='color:#64748b;'>No orders yet.</p>";
+        }).join('') || "<p style='color:var(--text-muted); font-weight:bold; text-align:center;'>No orders yet.</p>";
     }
 
     function populateBillTemplate(orderId) {
@@ -1034,16 +1022,16 @@
     }
     function printBill(orderId) { if(populateBillTemplate(orderId)) window.print(); }
     function downloadPDF(orderId) {
-        if(!populateBillTemplate(orderId)) return; showToast("Generating PDF..."); const element = document.getElementById('printBillArea'); element.style.display = 'block'; 
-        html2pdf().set({ margin: 10, filename: `BijuMart_Bill_${orderId}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } }).from(element).save().then(() => { element.style.display = 'none'; showToast("PDF Downloaded!"); });
+        if(!populateBillTemplate(orderId)) return; showToast("Generating Premium PDF..."); const element = document.getElementById('printBillArea'); element.style.display = 'block'; 
+        html2pdf().set({ margin: 10, filename: `BijuMart_VIP_Bill_${orderId}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } }).from(element).save().then(() => { element.style.display = 'none'; showToast("PDF Downloaded!"); });
     }
     function deleteOrder(orderId) { if(confirm("Permanently delete?")) { db.ref('orders/' + orderId).remove(); showToast("Deleted!"); } }
     function updateOrderStatus(orderId, newStatus) { db.ref('orders/' + orderId).update({ status: newStatus }); showToast("Status Updated!"); }
     function saveDeliverySchedule(orderId) { const dDate = document.getElementById(`delDate_${orderId}`).value, dTime = document.getElementById(`delTime_${orderId}`).value; db.ref('orders/' + orderId).update({ deliveryDate: dDate, deliveryTime: dTime }); showToast("Delivery Schedule Saved!"); }
     function shareBillWhatsApp(orderId) {
         const o = allOrders.find(order => String(order.id) === String(orderId)); if(!o) return;
-        let message = `🧾 *BIJU MART - E-BILL*\n-------------------------\n*Order ID:* ${o.id}\n*Date:* ${o.date}\n*Customer:* ${o.customer}\n-------------------------\n*Items Ordered:*\n${o.items.replace(/, /g, '\n')}\n-------------------------\n*Payment Method:* ${o.paymentMethod}\n*Total Amount:* ₹${(o.total||0).toLocaleString('en-IN')}\n*Status:* ${o.status}\n`;
-        if(o.deliveryDate) message += `*Expected Delivery:* ${o.deliveryDate} ${o.deliveryTime}\n`; message += `-------------------------\nThank you for shopping with Biju Mart! 🛍️`;
+        let message = `👑 *BIJU MART PREMIUM - VIP BILL*\n-------------------------\n*Order ID:* ${o.id}\n*Date:* ${o.date}\n*Customer:* ${o.customer}\n-------------------------\n*Items Ordered:*\n${o.items.replace(/, /g, '\n')}\n-------------------------\n*Payment Method:* ${o.paymentMethod}\n*Total Amount:* ₹${(o.total||0).toLocaleString('en-IN')}\n*Status:* ${o.status}\n`;
+        if(o.deliveryDate) message += `*Expected VIP Delivery:* ${o.deliveryDate} ${o.deliveryTime}\n`; message += `-------------------------\nThank you for shopping with Biju Mart Premium! 💎`;
         window.open(`https://wa.me/91${o.phone}?text=${encodeURIComponent(message)}`, '_blank'); showToast("Opening WhatsApp...");
     }
 
@@ -1056,7 +1044,7 @@
         let img2 = f2 ? await processImageFileAsync(f2) : document.getElementById('pExistingImage2').value || '';
         let img3 = f3 ? await processImageFileAsync(f3) : document.getElementById('pExistingImage3').value || '';
         db.ref('products/' + id).set({ id, name, price, stock, category: cat, sizeType: sizeType, emoji: img1, image2: img2, image3: img3 });
-        showToast(editingProductId ? "Product Updated!" : "Product Added!"); editingProductId = null; document.getElementById('adminAddBtn').innerText = "Add Product";
+        showToast(editingProductId ? "Product Updated!" : "Product Added!"); editingProductId = null; document.getElementById('adminAddBtn').innerText = "Save Product";
         ['pName', 'pPrice', 'pStock', 'pImageFile1', 'pImageFile2', 'pImageFile3', 'pExistingImage1', 'pExistingImage2', 'pExistingImage3'].forEach(el => document.getElementById(el).value = '');
     }
 
@@ -1071,6 +1059,67 @@
 
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
     function showToast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3500); }
+
+    function openRiderLogin() {
+        if(loggedInRider) {
+            document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active'); renderRiderDashboard();
+        } else { document.getElementById('riderLoginModal').classList.add('active'); }
+    }
+
+    function saveRider() {
+        const name = document.getElementById('rName').value.trim(), phone = document.getElementById('rPhone').value.trim(), pass = document.getElementById('rPass').value.trim();
+        if(!name || phone.length !== 10 || !pass) { showToast("Enter Name, 10-digit Phone, and Password"); return; }
+        db.ref('riders/' + phone).set({ name: name, phone: phone, password: pass });
+        showToast("Partner Registered!"); document.getElementById('rName').value = ''; document.getElementById('rPhone').value = ''; document.getElementById('rPass').value = '';
+    }
+
+    function verifyRider() {
+        const phone = document.getElementById('riderPhoneLogin').value.trim(), pass = document.getElementById('riderPassLogin').value.trim();
+        if(!phone || !pass) return showToast("Enter credentials");
+        const rider = allRiders.find(r => String(r.phone) === String(phone) && String(r.password) === String(pass));
+        if(rider) {
+            loggedInRider = rider; localStorage.setItem('rider_session_cloud', JSON.stringify(rider));
+            closeModal('riderLoginModal'); document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active');
+            renderRiderDashboard(); showToast("Welcome Partner!"); document.getElementById('riderPhoneLogin').value = ''; document.getElementById('riderPassLogin').value = '';
+        } else { showToast("Invalid Credentials"); }
+    }
+
+    function logoutRider() { loggedInRider = null; localStorage.removeItem('rider_session_cloud'); document.getElementById('riderApp').classList.remove('active'); document.getElementById('customerApp').classList.add('active'); showToast("Logged Out"); }
+
+    function renderRiderDashboard() {
+        if(!loggedInRider) return;
+        document.getElementById('riderGreeting').innerText = `Welcome, ${loggedInRider.name}`;
+        let assignedOrders = allOrders.filter(o => String(o.assignedRider) === String(loggedInRider.phone));
+        document.getElementById('riderDeliveredCount').innerText = assignedOrders.filter(o => o.status === 'Delivered').length;
+        let activeDeliveries = assignedOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
+        
+        const list = document.getElementById('riderOrdersList');
+        if(activeDeliveries.length === 0) { list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-weight:bold;">No active deliveries. Relax!</div>`; return; }
+
+        list.innerHTML = activeDeliveries.map(o => {
+            let mapBtn = o.lat && o.lng ? `<button onclick="window.open('http://googleusercontent.com/maps.google.com/maps?q=${o.lat},${o.lng}', '_blank')" style="background:rgba(212,175,55,0.1); color:var(--primary); border:1px solid var(--primary); padding:10px; border-radius:8px; width:100%; font-weight:bold; margin-bottom:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;"><i data-lucide="navigation" style="width:16px;"></i> Navigate</button>` : '';
+            return `
+            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 15px rgba(0,0,0,0.4); border:1px solid var(--border-color);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid var(--border-color); padding-bottom:10px;"><b style="color:var(--text-main); font-size:14px;">${o.id}</b><span style="font-weight:900; font-size:11px; color:var(--text-dark); background:var(--primary); padding:4px 8px; border-radius:6px; letter-spacing:0.5px; text-transform:uppercase;">${o.status}</span></div>
+                <div style="font-size:14px; color:var(--text-muted); line-height:1.6; margin-bottom:12px;"><b style="color:var(--primary); font-size:16px;">${o.customer}</b><br>${o.address || 'Address N/A'}<br><div style="margin-top:8px; padding:8px; background:#222; border-radius:6px; font-size:13px; border:1px solid var(--border-color);">Items: <span style="color:white;">${o.items}</span></div></div>
+                ${mapBtn}
+                <div style="display:flex; gap:10px; margin-bottom:12px;">
+                    <button onclick="window.location.href='tel:${o.phone}'" style="flex:1; background:#222; color:var(--text-main); border:1px solid var(--border-color); padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">📞 Call</button>
+                    <button onclick="showRiderQR('${o.total}')" style="flex:1; background:var(--gold-gradient); color:var(--text-dark); border:none; padding:12px; border-radius:8px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; box-shadow: 0 4px 10px rgba(212,175,55,0.3);">📱 ₹${(o.total||0).toLocaleString('en-IN')}</button>
+                </div>
+                <button onclick="markOrderDelivered('${o.id}')" style="width:100%; background:var(--success); color:white; border:none; padding:14px; border-radius:8px; font-weight:900; font-size:15px; cursor:pointer; text-transform:uppercase; letter-spacing:1px; box-shadow: 0 4px 10px rgba(76,175,80,0.3);">✅ Mark as Delivered</button>
+            </div>`;
+        }).join('');
+        lucide.createIcons();
+    }
+
+    function showRiderQR(amount) {
+        document.getElementById('riderQrModal').classList.add('active'); document.getElementById('qrAmountDisplay').innerText = "₹" + Number(amount).toLocaleString('en-IN');
+        let upiId = appSettings.payment.upiId || "9348954360@ybl"; document.getElementById('qrUpiDisplay').innerText = upiId;
+        const upiString = `upi://pay?pa=${upiId}&pn=Biju%20Mart&am=${amount}&cu=INR`;
+        document.getElementById('dynamicQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
+    }
+
   </script>
 </body>
 </html>
