@@ -4,171 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Biju Mart Premium</title>
-  
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  
   <style>
-        :root { 
-            --primary: #D4AF37; 
-            --primary-light: #F3E5AB; 
-            --gold-gradient: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
-            --secondary: #E5C158; 
-            --dark-bg: #000000; 
-            --light-bg: #121212; 
-            --card-bg: #1a1a1a; 
-            --border-color: #333333;
-            --text-main: #f1f1f1; 
-            --text-muted: #888888; 
-            --text-dark: #000000; 
-            --success: #4caf50; 
-            --danger: #ef5350; 
-            --whatsapp: #25D366; 
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100dvh; font-family: Roboto, 'Segoe UI', sans-serif; background: var(--light-bg); overflow: hidden; color: var(--text-main); }
-        body { max-width: 480px; margin: 0 auto; position: relative; background: var(--light-bg); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
-        
-        .app-view { display: none; width: 100%; height: 100dvh; flex-direction: column; overflow: hidden; position: absolute; top:0; left:0; background: var(--light-bg); }
-        .app-view.active { display: flex; }
-        
-        .header { flex-shrink: 0; background: var(--card-bg); padding: 10px 15px; z-index: 40; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border-color); }
-        .main-content { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 90px; }
-        .main-content::-webkit-scrollbar { display: none; }
-        .bottom-nav { flex-shrink: 0; position: absolute; bottom: 0; width: 100%; max-width: 480px; background: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
-
-        .header-top-row { display: flex; justify-content: space-between; align-items: center; }
-        .header-logo { font-size: 22px; font-weight: 900; color: var(--primary); display: flex; align-items: center; font-style: italic; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(212,175,55,0.2); }
-        .header-logo img { height: 32px; max-width: 140px; object-fit: contain; }
-        .icon-btn { background: transparent; border: none; color: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: 0.2s; }
-        .badge { position: absolute; top: -2px; right: -2px; background: var(--primary); color: var(--text-dark); font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg); box-shadow: 0 0 5px rgba(212,175,55,0.5); }
-
-        .search-wrapper { display: flex; background: #222222; border-radius: 8px; padding: 12px 15px; align-items: center; border: 1px solid var(--border-color); margin-bottom: 10px; }
-        .search-wrapper input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 14px; color: var(--text-main); background: transparent; }
-        .search-wrapper input::placeholder { color: var(--text-muted); }
-        
-        .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 15px 15px 0; gap: 10px; scroll-behavior: smooth; }
-        .banner-slider::-webkit-scrollbar { display: none; }
-        .banner-slide { min-width: 100%; height: 160px; border-radius: 12px; scroll-snap-align: center; object-fit: cover; background: #2a2a2a; border: 1px solid var(--border-color); }
-        
-        .cat-scroll { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding: 15px; background: var(--card-bg); margin-bottom: 10px; border-bottom: 1px solid var(--border-color); }
-        .cat-scroll::-webkit-scrollbar { display: none; }
-        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; opacity: 0.7; transition: 0.3s; min-width: 65px; }
-        .cat-item.active { opacity: 1; }
-        .cat-icon-circle { width: 50px; height: 50px; background: #222222; border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.3s; overflow:hidden; }
-        .cat-icon-circle img { width: 100%; height: 100%; object-fit: cover; }
-        .cat-item.active .cat-icon-circle { background: var(--gold-gradient); color: var(--text-dark); box-shadow: 0 4px 15px rgba(212,175,55,0.4); border: none; }
-        .cat-item span { font-size: 11px; font-weight: 600; color: var(--text-main); white-space: nowrap; }
-
-        .products-grid-container { background: transparent; padding-top: 10px; padding-bottom: 20px; min-height: 50vh; }
-        .grid-greeting { padding: 0 15px 15px; font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
-        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
-        
-        .product-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; border: 1px solid var(--border-color); cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .share-badge { position: absolute; top: 8px; left: 8px; width: 30px; height: 30px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid var(--primary); cursor: pointer; color: var(--primary); backdrop-filter: blur(4px); }
-        
-        .product-image { background: #ffffff; height: 160px; display: flex; align-items: center; justify-content: center; font-size: 50px; overflow: hidden; position: relative; padding: 15px; border-bottom: 1px solid var(--border-color); }
-        .product-img-real { width: 100%; height: 100%; object-fit: contain; }
-        
-        .stock-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.8); z-index: 10; border: 1px solid var(--border-color); color: var(--text-main); backdrop-filter: blur(4px); }
-        .stock-badge.low { color: var(--danger); border-color: var(--danger); }
-        .stock-badge.ok { color: var(--primary); border-color: var(--primary); }
-        
-        .product-info { padding: 12px; flex: 1; display: flex; flex-direction: column; }
-        .product-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .product-price { font-size: 18px; font-weight: 900; color: var(--primary); margin-bottom: 12px; margin-top: 4px; }
-        
-        .btn-add-cart { background: var(--gold-gradient); color: var(--text-dark); border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: auto; transition: 0.2s; text-transform: uppercase; width: 100%; box-shadow: 0 4px 10px rgba(212,175,55,0.2); }
-        .btn-add-cart:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
-        
-        .qty-controls { display:flex; justify-content:space-between; align-items:center; background:#222; border-radius:6px; padding:4px; margin-top:auto; border: 1px solid var(--border-color); }
-        .btn-qty { border: none; background: transparent; color: var(--primary); width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .qty-val { font-weight: bold; font-size: 15px; color: var(--text-main); }
-
-        .prod-img-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #ffffff; padding: 15px; gap: 10px; scrollbar-width: none; border-bottom: 1px solid var(--border-color); }
-        .prod-img-slider::-webkit-scrollbar { display: none; }
-        .prod-img-box { min-width: 100%; height: 320px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; background: transparent; border-radius: 12px; font-size: 80px; }
-        .prod-img-box img { width: 100%; height: 100%; object-fit: contain; }
-        .size-btn { border: 1px solid var(--border-color); background: #222; padding: 10px 18px; border-radius: 6px; font-weight: bold; color: var(--text-main); cursor: pointer; transition: 0.2s; }
-        .size-btn.active { background: var(--gold-gradient); color: var(--text-dark); border: none; box-shadow: 0 4px 10px rgba(212,175,55,0.3); }
-
-        .support-fab { position: absolute; bottom: 80px; right: 20px; background: var(--gold-gradient); color: var(--text-dark); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(212,175,55,0.4); z-index: 90; cursor: pointer; border: 2px solid #000; }
-        .support-menu { position: absolute; bottom: 145px; right: 20px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); padding: 10px; display: none; flex-direction: column; gap: 10px; z-index: 91; border: 1px solid var(--border-color); }
-        .support-menu.active { display: flex; animation: fadeIn 0.2s; }
-        .support-btn { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border: none; background: #222; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 160px; color: var(--text-main); border: 1px solid var(--border-color); }
-        .btn-wa { color: var(--whatsapp); }
-        .btn-email { color: var(--primary); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
-
-        .admin-bg { background: var(--dark-bg); color: var(--text-main); }
-        .admin-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items:center; flex-shrink:0; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
-        .admin-tab-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 15px 20px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); scrollbar-width: none; flex-shrink:0; }
-        .admin-tab-scroll::-webkit-scrollbar { display: none; }
-        .admin-tab-btn { background: #222; color: var(--text-muted); border: 1px solid var(--border-color); font-weight: bold; font-size: 13px; white-space: nowrap; padding: 10px 18px; cursor: pointer; border-radius: 30px; transition: 0.3s; }
-        .admin-tab-btn.active { background: var(--gold-gradient); color: var(--text-dark); border: none; box-shadow: 0 4px 10px rgba(212,175,55,0.2); }
-        .admin-section { display: none; padding-top:20px; }
-        .admin-section.active { display: block; animation: fadeIn 0.3s; }
-
-        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px 15px; }
-        .metric-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); display:flex; flex-direction:column; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .metric-title { font-size: 11px; color: var(--primary); margin-bottom: 8px; font-weight:bold; letter-spacing:1px; text-transform: uppercase; }
-        .metric-value { font-size: 24px; font-weight: 900; color: white; }
-        
-        .admin-card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin: 0 20px 20px; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .admin-input { width: 100%; padding: 14px; background: #222; border: 1px solid var(--border-color); color: white; border-radius: 8px; margin-bottom: 15px; font-size: 14px; outline: none; transition: 0.3s; }
-        .admin-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(212,175,55,0.2); }
-        
-        input[type="file"].admin-input { background: #222; color: var(--text-muted); padding: 10px; cursor: pointer; }
-        input[type="file"].admin-input::-webkit-file-upload-button { background: var(--gold-gradient); color: var(--text-dark); border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 15px; }
-
-        .btn-admin { background: var(--gold-gradient); color: var(--text-dark); padding: 15px; border: none; border-radius: 8px; font-weight: 900; font-size: 14px; cursor: pointer; width: 100%; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(212,175,55,0.3); }
-        .btn-small { background: #333; color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        .btn-danger-small { background: rgba(239, 83, 80, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
-
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .nav-item.active { color: var(--primary); text-shadow: 0 0 10px rgba(212,175,55,0.5); }
-        
-        .modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--dark-bg); z-index: 100; flex-direction: column; }
-        .modal.active { display: flex; animation: fadeIn 0.2s; }
-        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--primary); color: var(--text-dark); padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.5); text-align:center; width:max-content; max-width:90%; border: 2px solid #000; }
-
-        .payment-option { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; }
-        .payment-option.active { border-color: var(--primary); background: rgba(212,175,55,0.05); }
-        .radio-custom { width: 22px; height: 22px; border: 2px solid #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .payment-option.active .radio-custom { border-color: var(--primary); }
-        .payment-option.active .radio-custom::after { content: ''; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 5px var(--primary); }
-
-        .auth-page { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--dark-bg); z-index: 200; flex-direction: column; overflow-y: auto; }
-        .auth-page.active { display: flex; animation: slideInRight 0.3s forwards; }
-        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        
-        .auth-header { padding: 20px; display: flex; align-items: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid var(--border-color); flex-shrink:0; background: var(--card-bg); }
-        .auth-tabs { display: flex; margin: 20px 20px 0; background: #222; border-radius: 12px; padding: 5px; flex-shrink:0; border: 1px solid var(--border-color); }
-        .auth-tab { flex: 1; text-align: center; padding: 12px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.3s; font-size: 14px; }
-        .auth-tab.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.5); border: 1px solid var(--border-color); }
-        .auth-body { padding: 30px 20px; flex: 1; overflow-y:auto; }
-        
-        .otp-container { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
-        .otp-box { width: 55px; height: 60px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 26px; text-align: center; font-weight: 900; outline: none; transition: 0.3s; color: var(--primary); background: #222; }
-        .otp-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(212,175,55, 0.2); }
-        .otp-msg { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px; color: var(--text-muted); height: 20px; }
-        
-        .cart-img-real { width: 60px; height: 60px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border-color); padding: 4px; background: white; }
-
-        .print-only { display: none; }
-        @media print {
-            .no-print { display: none !important; }
-            .print-only { display: block !important; position: absolute; top:0; left:0; width: 100%; background: white; z-index: 99999; padding: 20px; color: black; font-family: sans-serif; }
-            body { background: white; }
-        }
-        .bill-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 12px; }
-        .bill-table th, .bill-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .bill-table th { background-color: #f8fafc; font-weight: bold; }
+    :root { --primary: #D4AF37; --gold-gradient: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C); --dark-bg: #000; --light-bg: #121212; --card-bg: #1a1a1a; --border-color: #333; --text-main: #f1f1f1; --text-muted: #888; --text-dark: #000; --success: #4caf50; --danger: #ef5350; --whatsapp: #25D366; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100dvh; font-family: Roboto, sans-serif; background: var(--light-bg); overflow: hidden; color: var(--text-main); }
+    body { max-width: 480px; margin: 0 auto; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+    .app-view { display: none; width: 100%; height: 100dvh; flex-direction: column; overflow: hidden; position: absolute; top:0; left:0; background: var(--light-bg); }
+    .app-view.active { display: flex; }
+    .header { flex-shrink: 0; background: var(--card-bg); padding: 10px 15px; z-index: 40; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border-color); }
+    .main-content { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 90px; }
+    .main-content::-webkit-scrollbar { display: none; }
+    .bottom-nav { flex-shrink: 0; position: absolute; bottom: 0; width: 100%; background: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
+    .header-top-row { display: flex; justify-content: space-between; align-items: center; }
+    .header-logo { font-size: 22px; font-weight: 900; color: var(--primary); display: flex; align-items: center; font-style: italic; text-shadow: 0 2px 4px rgba(212,175,55,0.2); }
+    .header-logo img { height: 32px; max-width: 140px; object-fit: contain; }
+    .icon-btn { background: transparent; border: none; color: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .badge { position: absolute; top: -2px; right: -2px; background: var(--primary); color: var(--text-dark); font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg); }
+    .search-wrapper { display: flex; background: #222; border-radius: 8px; padding: 12px 15px; align-items: center; border: 1px solid var(--border-color); margin-bottom: 10px; }
+    .search-wrapper input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 14px; color: var(--text-main); background: transparent; }
+    .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 15px 15px 0; gap: 10px; }
+    .banner-slider::-webkit-scrollbar { display: none; }
+    .banner-slide { min-width: 100%; height: 160px; border-radius: 12px; scroll-snap-align: center; object-fit: cover; background: #2a2a2a; border: 1px solid var(--border-color); }
+    .cat-scroll { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding: 15px; background: var(--card-bg); margin-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+    .cat-scroll::-webkit-scrollbar { display: none; }
+    .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; opacity: 0.7; min-width: 65px; }
+    .cat-item.active { opacity: 1; }
+    .cat-icon-circle { width: 50px; height: 50px; background: #222; border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); overflow:hidden; }
+    .cat-icon-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .cat-item.active .cat-icon-circle { background: var(--gold-gradient); color: var(--text-dark); border: none; }
+    .cat-item span { font-size: 11px; font-weight: 600; color: var(--text-main); white-space: nowrap; }
+    .products-grid-container { padding-top: 10px; padding-bottom: 20px; min-height: 50vh; }
+    .grid-greeting { padding: 0 15px 15px; font-size: 18px; font-weight: 800; color: var(--primary); }
+    .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
+    .product-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; position: relative; border: 1px solid var(--border-color); cursor:pointer; }
+    .share-badge { position: absolute; top: 8px; left: 8px; width: 30px; height: 30px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid var(--primary); color: var(--primary); backdrop-filter: blur(4px); }
+    .product-image { background: #fff; height: 160px; display: flex; align-items: center; justify-content: center; font-size: 50px; overflow: hidden; position: relative; padding: 15px; border-bottom: 1px solid var(--border-color); }
+    .product-img-real { width: 100%; height: 100%; object-fit: contain; }
+    .stock-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.8); z-index: 10; border: 1px solid var(--border-color); color: var(--text-main); }
+    .stock-badge.low { color: var(--danger); border-color: var(--danger); }
+    .stock-badge.ok { color: var(--primary); border-color: var(--primary); }
+    .product-info { padding: 12px; flex: 1; display: flex; flex-direction: column; }
+    .product-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-price { font-size: 18px; font-weight: 900; color: var(--primary); margin-bottom: 12px; margin-top: 4px; }
+    .btn-add-cart { background: var(--gold-gradient); color: var(--text-dark); border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: auto; text-transform: uppercase; width: 100%; }
+    .btn-add-cart:disabled { background: #333; color: #777; cursor: not-allowed; }
+    .qty-controls { display:flex; justify-content:space-between; align-items:center; background:#222; border-radius:6px; padding:4px; margin-top:auto; border: 1px solid var(--border-color); }
+    .btn-qty { border: none; background: transparent; color: var(--primary); width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+    .qty-val { font-weight: bold; font-size: 15px; color: var(--text-main); }
+    .prod-img-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #fff; padding: 15px; gap: 10px; scrollbar-width: none; border-bottom: 1px solid var(--border-color); }
+    .prod-img-slider::-webkit-scrollbar { display: none; }
+    .prod-img-box { min-width: 100%; height: 320px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; font-size: 80px; }
+    .prod-img-box img { width: 100%; height: 100%; object-fit: contain; }
+    .size-btn { border: 1px solid var(--border-color); background: #222; padding: 10px 18px; border-radius: 6px; font-weight: bold; color: var(--text-main); cursor: pointer; }
+    .size-btn.active { background: var(--gold-gradient); color: var(--text-dark); border: none; }
+    .support-fab { position: absolute; bottom: 80px; right: 20px; background: var(--gold-gradient); color: var(--text-dark); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 90; cursor: pointer; border: 2px solid #000; }
+    .support-menu { position: absolute; bottom: 145px; right: 20px; background: var(--card-bg); border-radius: 12px; padding: 10px; display: none; flex-direction: column; gap: 10px; z-index: 91; border: 1px solid var(--border-color); }
+    .support-menu.active { display: flex; }
+    .support-btn { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border: none; background: #222; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 160px; color: var(--text-main); border: 1px solid var(--border-color); }
+    .admin-bg { background: var(--dark-bg); color: var(--text-main); }
+    .admin-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items:center; flex-shrink:0; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
+    .admin-tab-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 15px 20px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); scrollbar-width: none; flex-shrink:0; }
+    .admin-tab-scroll::-webkit-scrollbar { display: none; }
+    .admin-tab-btn { background: #222; color: var(--text-muted); border: 1px solid var(--border-color); font-weight: bold; font-size: 13px; white-space: nowrap; padding: 10px 18px; cursor: pointer; border-radius: 30px; }
+    .admin-tab-btn.active { background: var(--gold-gradient); color: var(--text-dark); border: none; }
+    .admin-section { display: none; padding-top:20px; }
+    .admin-section.active { display: block; }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px 15px; }
+    .metric-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); display:flex; flex-direction:column; justify-content:center; }
+    .metric-title { font-size: 11px; color: var(--primary); margin-bottom: 8px; font-weight:bold; letter-spacing:1px; text-transform: uppercase; }
+    .metric-value { font-size: 24px; font-weight: 900; color: white; }
+    .admin-card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin: 0 20px 20px; border: 1px solid var(--border-color); }
+    .admin-input { width: 100%; padding: 14px; background: #222; border: 1px solid var(--border-color); color: white; border-radius: 8px; margin-bottom: 15px; font-size: 14px; outline: none; }
+    .admin-input:focus { border-color: var(--primary); }
+    input[type="file"].admin-input { background: #222; color: var(--text-muted); padding: 10px; cursor: pointer; }
+    input[type="file"].admin-input::-webkit-file-upload-button { background: var(--gold-gradient); color: var(--text-dark); border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 15px; }
+    .btn-admin { background: var(--gold-gradient); color: var(--text-dark); padding: 15px; border: none; border-radius: 8px; font-weight: 900; font-size: 14px; cursor: pointer; width: 100%; text-transform: uppercase; }
+    .btn-small { background: #333; color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    .btn-danger-small { background: rgba(239, 83, 80, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; }
+    .nav-item.active { color: var(--primary); text-shadow: 0 0 10px rgba(212,175,55,0.5); }
+    .modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--dark-bg); z-index: 100; flex-direction: column; }
+    .modal.active { display: flex; }
+    .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--primary); color: var(--text-dark); padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 9999; border: 2px solid #000; }
+    .payment-option { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px; cursor: pointer; }
+    .payment-option.active { border-color: var(--primary); background: rgba(212,175,55,0.05); }
+    .radio-custom { width: 22px; height: 22px; border: 2px solid #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .payment-option.active .radio-custom { border-color: var(--primary); }
+    .payment-option.active .radio-custom::after { content: ''; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; }
+    .auth-page { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--dark-bg); z-index: 200; flex-direction: column; overflow-y: auto; }
+    .auth-page.active { display: flex; }
+    .auth-header { padding: 20px; display: flex; align-items: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid var(--border-color); flex-shrink:0; background: var(--card-bg); }
+    .auth-tabs { display: flex; margin: 20px 20px 0; background: #222; border-radius: 12px; padding: 5px; flex-shrink:0; border: 1px solid var(--border-color); }
+    .auth-tab { flex: 1; text-align: center; padding: 12px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-radius: 8px; font-size: 14px; }
+    .auth-tab.active { background: var(--card-bg); color: var(--primary); border: 1px solid var(--border-color); }
+    .auth-body { padding: 30px 20px; flex: 1; overflow-y:auto; }
+    .otp-container { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
+    .otp-box { width: 55px; height: 60px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 26px; text-align: center; font-weight: 900; outline: none; color: var(--primary); background: #222; }
+    .otp-msg { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px; color: var(--text-muted); height: 20px; }
+    .cart-img-real { width: 60px; height: 60px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border-color); padding: 4px; background: white; }
+    .print-only { display: none; }
+    @media print { .no-print { display: none !important; } .print-only { display: block !important; position: absolute; top:0; left:0; width: 100%; background: white; z-index: 99999; padding: 20px; color: black; font-family: sans-serif; } body { background: white; } }
+    .bill-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 12px; }
+    .bill-table th, .bill-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .bill-table th { background-color: #f8fafc; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -210,13 +152,12 @@
     </div>
 
     <div class="main-content" id="customerProfileView" style="display:none; padding: 20px;">
-        <div style="background: var(--card-bg); padding: 30px 20px; border-radius: 12px; text-align: center; border: 1px solid var(--primary); box-shadow: 0 10px 30px rgba(212,175,55,0.1);">
-            <div style="width: 90px; height: 90px; background: #222; border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 0 15px rgba(212,175,55,0.3);">
+        <div style="background: var(--card-bg); padding: 30px 20px; border-radius: 12px; text-align: center; border: 1px solid var(--primary);">
+            <div style="width: 90px; height: 90px; background: #222; border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
                 <i data-lucide="user" style="width: 45px; height: 45px; color: var(--primary);"></i>
             </div>
             <h2 id="profileNameDisplay" style="font-size: 24px; font-weight: 900; margin-bottom: 5px; color: var(--text-main);">User</h2>
-            <p id="profilePhoneDisplay" style="color: var(--primary); font-size: 15px; font-weight: bold; margin-bottom: 25px; letter-spacing: 1px;">+91 XXXXXXXXXX</p>
-            
+            <p id="profilePhoneDisplay" style="color: var(--primary); font-size: 15px; font-weight: bold; margin-bottom: 25px;">+91 XXXXXXXXXX</p>
             <div style="display: flex; gap: 15px; flex-direction: column;">
                 <button class="search-wrapper" style="width: 100%; justify-content: space-between; font-weight: bold; cursor: pointer; padding: 15px; background: #222; border-color: var(--border-color);" onclick="switchCustomerTab('orders', document.getElementById('navOrders'))">
                     <span style="display: flex; gap: 12px; color: var(--text-main);"><i data-lucide="package" style="color: var(--primary);"></i> My Orders</span>
@@ -250,20 +191,18 @@
         </div>
         <div style="flex:1; overflow-y:auto; background:var(--light-bg); padding-bottom:20px;">
             <div class="prod-img-slider" id="modalImgSlider"></div>
-            <div style="text-align:center; font-size:11px; color:var(--primary); margin-bottom:20px; font-weight: bold; margin-top: 10px; letter-spacing: 0.5px;">SWIPE LEFT TO SEE MORE</div>
-            
+            <div style="text-align:center; font-size:11px; color:var(--primary); margin-bottom:20px; font-weight: bold; margin-top: 10px;">SWIPE LEFT TO SEE MORE</div>
             <div style="padding:0 20px;">
                 <h2 id="modalProdName" style="font-size:20px; margin-bottom:8px; color:var(--text-main); font-weight: 800;"></h2>
-                <div id="modalProdPrice" style="font-size:26px; font-weight:900; color:var(--primary); margin-bottom:20px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></div>
-                
-                <div id="sizeSelectionBox" style="display:none; margin-bottom:20px; padding:20px; background:var(--card-bg); border-radius:12px; border:1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                    <div style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:15px; letter-spacing: 1px;">SELECT PREMIUM SIZE</div>
+                <div id="modalProdPrice" style="font-size:26px; font-weight:900; color:var(--primary); margin-bottom:20px;"></div>
+                <div id="sizeSelectionBox" style="display:none; margin-bottom:20px; padding:20px; background:var(--card-bg); border-radius:12px; border:1px solid var(--border-color);">
+                    <div style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:15px;">SELECT PREMIUM SIZE</div>
                     <div style="display:flex; gap:12px; flex-wrap:wrap;" id="sizeButtonsContainer"></div>
                 </div>
             </div>
         </div>
         <div style="padding: 15px 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); flex-shrink:0;">
-            <button class="btn-add-cart" id="modalAddToCartBtn" onclick="addToCartFromModal()" style="padding:16px; font-size:15px; letter-spacing: 1px;">Add to Luxury Cart</button>
+            <button class="btn-add-cart" id="modalAddToCartBtn" onclick="addToCartFromModal()" style="padding:16px; font-size:15px;">Add to Luxury Cart</button>
         </div>
     </div>
 
@@ -277,7 +216,7 @@
         <div style="padding: 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
             <div>
                 <div style="font-size:12px; color:var(--text-muted); font-weight:bold; text-transform: uppercase;">Total Value</div>
-                <div id="cartTotal" style="color:var(--primary); font-weight:900; font-size:22px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">₹0</div>
+                <div id="cartTotal" style="color:var(--primary); font-weight:900; font-size:22px;">₹0</div>
             </div>
             <button class="btn-add-cart" style="width:55%; font-size:14px; padding:15px;" onclick="proceedToCheckout()">Checkout</button>
         </div>
@@ -286,15 +225,15 @@
     <div class="modal" id="checkoutModal" style="background: var(--dark-bg);">
         <div class="header" style="flex-direction:row; flex-shrink:0;">
             <i data-lucide="arrow-left" onclick="closeModal('checkoutModal')" style="cursor:pointer; width:24px; color: var(--primary);"></i> 
-            <span style="font-weight:900; font-size:16px; color: var(--primary); letter-spacing: 1px;">SECURE CHECKOUT</span> 
+            <span style="font-weight:900; font-size:16px; color: var(--primary);">SECURE CHECKOUT</span> 
             <div style="width:24px;"></div>
         </div>
         <div style="padding: 15px; flex:1; overflow-y:auto; background:var(--light-bg);">
-            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-                <h3 style="font-size: 12px; margin-bottom: 15px; color: var(--primary); font-weight:bold; letter-spacing: 1px;">DELIVERY ADDRESS</h3>
+            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color);">
+                <h3 style="font-size: 12px; margin-bottom: 15px; color: var(--primary); font-weight:bold;">DELIVERY ADDRESS</h3>
                 <input type="text" id="cName" class="search-wrapper" style="width:100%; background: #222; border-color: var(--border-color); color: white;" placeholder="Full Name">
                 <input type="tel" id="cPhone" class="search-wrapper" style="width:100%; background: #222; border-color: var(--border-color); color: white;" placeholder="Mobile Number" maxlength="10">
-                <textarea id="cAddress" class="search-wrapper" style="width:100%; height:70px; background: #222; border-color: var(--border-color); color: white;" placeholder="Full Address (House No, Area, Landmark)"></textarea>
+                <textarea id="cAddress" class="search-wrapper" style="width:100%; height:70px; background: #222; border-color: var(--border-color); color: white;" placeholder="Full Address (House No, Area)"></textarea>
                 <input type="number" id="cPin" class="search-wrapper" style="width:100%; background: #222; border-color: var(--border-color); color: white;" placeholder="Pincode">
                 <button onclick="captureLocation()" style="width:100%; background:rgba(212,175,55,0.1); color:var(--primary); border:1px solid var(--primary); padding:12px; border-radius:8px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
                     <i data-lucide="map-pin" style="width:18px;"></i> Attach Live Location
@@ -302,14 +241,14 @@
                 <div id="locStatus" style="font-size:11px; text-align:center; margin-top:8px; color:var(--text-muted);">For precise VIP delivery</div>
             </div>
             
-            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-                <h3 style="font-size: 12px; margin-bottom: 15px; color: var(--primary); font-weight:bold; letter-spacing: 1px;">PAYMENT METHOD</h3>
+            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color);">
+                <h3 style="font-size: 12px; margin-bottom: 15px; color: var(--primary); font-weight:bold;">PAYMENT METHOD</h3>
                 <div class="payment-option active" id="payUPI" onclick="selectPaymentMethod('UPI')">
                     <div class="radio-custom"></div>
                     <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                         <div>
                             <div style="font-weight: 800; font-size: 15px; color: var(--text-main);">Scan Premium QR Code</div>
-                            <div style="font-size: 11px; color: var(--primary); font-weight:bold; margin-top:4px;">Secure via PhonePe, GPay, Paytm</div>
+                            <div style="font-size: 11px; color: var(--primary); font-weight:bold; margin-top:4px;">Secure via PhonePe, GPay</div>
                         </div>
                         <i data-lucide="qr-code" style="color:var(--primary); width:24px; height:24px;"></i>
                     </div>
@@ -320,17 +259,14 @@
                 </div>
             </div>
         </div>
-        <div style="padding: 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
-            <div>
-                <div style="font-size:12px; color:var(--text-muted); font-weight:bold; text-transform: uppercase;">Payable</div>
-                <div id="checkoutTotal" style="color:var(--primary); font-weight:900; font-size:22px;">₹0</div>
-            </div>
+        <div style="padding: 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;">
+            <div><div style="font-size:12px; color:var(--text-muted); font-weight:bold;">Payable</div><div id="checkoutTotal" style="color:var(--primary); font-weight:900; font-size:22px;">₹0</div></div>
             <button class="btn-add-cart" style="width:55%; font-size:15px; padding:15px;" onclick="handleOrderPlacement()">Confirm Order</button>
         </div>
     </div>
 
     <div class="modal" id="qrPaymentModal" style="background:rgba(0,0,0,0.9); justify-content:center; padding:20px; z-index: 999;">
-        <div style="background:var(--card-bg); border-radius:16px; padding:25px; text-align:center; position:relative; width:100%; max-width:350px; margin:0 auto; border: 1px solid var(--primary); box-shadow: 0 10px 40px rgba(212,175,55,0.2);">
+        <div style="background:var(--card-bg); border-radius:16px; padding:25px; text-align:center; position:relative; width:100%; max-width:350px; margin:0 auto; border: 1px solid var(--primary);">
             <i data-lucide="x" onclick="closeModal('qrPaymentModal')" style="position:absolute; top:15px; right:15px; cursor:pointer; color:var(--text-muted);"></i>
             <h3 style="margin-bottom:8px; font-size:20px; color: var(--text-main); font-weight: 900;">Scan & Pay</h3>
             <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Please pay <span style="color:var(--primary); font-weight:bold; font-size: 16px;">₹<span id="qrPayAmount">0</span></span> securely</p>
@@ -342,7 +278,7 @@
     </div>
 
     <div class="auth-page" id="authPage">
-        <div class="auth-header" style="flex-direction:row; flex-shrink:0;"><i data-lucide="arrow-left" onclick="closeAuthPage()" style="cursor:pointer; margin-right: 15px; color: var(--primary);"></i><span style="color: var(--primary); font-weight: 900; letter-spacing: 1px;">VIP LOGIN</span></div>
+        <div class="auth-header" style="flex-direction:row; flex-shrink:0;"><i data-lucide="arrow-left" onclick="closeAuthPage()" style="cursor:pointer; margin-right: 15px; color: var(--primary);"></i><span style="color: var(--primary); font-weight: 900;">VIP LOGIN</span></div>
         <div class="auth-tabs">
             <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
             <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Sign Up</div>
@@ -350,14 +286,14 @@
         <div class="auth-body">
             <div id="authFormsSection">
                 <div id="registerForm" style="display:none;">
-                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block; letter-spacing: 1px;">FIRST NAME</label>
+                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block;">FIRST NAME</label>
                     <input type="text" id="regFirstName" class="search-wrapper" style="width:100%; padding:16px; background:#222; border-color:var(--border-color); color: white; margin-bottom:20px;" placeholder="e.g. Brahma">
-                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block; letter-spacing: 1px;">MOBILE NUMBER</label>
+                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block;">MOBILE NUMBER</label>
                     <input type="tel" id="regPhone" class="search-wrapper" style="width:100%; padding:16px; background:#222; border-color:var(--border-color); color: white; margin-bottom:30px;" placeholder="10-digit number" maxlength="10">
-                    <button class="btn-admin" style="padding:16px;" onclick="requestAuthOTP()">Continue to Luxury</button>
+                    <button class="btn-admin" style="padding:16px;" onclick="requestAuthOTP()">Continue</button>
                 </div>
                 <div id="loginForm">
-                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block; letter-spacing: 1px;">MOBILE NUMBER</label>
+                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block;">MOBILE NUMBER</label>
                     <input type="tel" id="logPhone" class="search-wrapper" style="width:100%; padding:16px; background:#222; border-color:var(--border-color); color: white; margin-bottom:30px;" placeholder="Enter registered number" maxlength="10">
                     <button class="btn-admin" style="padding:16px;" onclick="requestAuthOTP()">Secure Login</button>
                 </div>
@@ -377,9 +313,21 @@
         </div>
     </div>
 
+    <div class="modal" id="adminLoginModal" style="background: var(--dark-bg);">
+        <div class="header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); color:var(--primary); flex-direction:row; flex-shrink:0;">
+            <i data-lucide="arrow-left" onclick="closeModal('adminLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900;">ADMIN ACCESS</span> <div style="width:24px;"></div>
+        </div>
+        <div style="padding: 30px; text-align:center; margin-top:30px;">
+            <i data-lucide="lock" style="width:70px; height:70px; color:var(--primary); margin-bottom:25px;"></i>
+            <input type="text" id="adminUser" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px; background:#222; color:white; outline:none;" placeholder="Enter Username">
+            <input type="password" id="adminPass" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:25px; background:#222; color:white; outline:none;" placeholder="Enter Password">
+            <button class="btn-admin" onclick="verifyAdmin()">Login Dashboard</button>
+        </div>
+    </div>
+
     <div class="modal" id="riderLoginModal" style="background: var(--dark-bg);">
         <div class="header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); color:var(--primary); flex-direction:row; flex-shrink:0;">
-            <i data-lucide="arrow-left" onclick="closeModal('riderLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900; letter-spacing: 1px;">RIDER ACCESS</span> <div style="width:24px;"></div>
+            <i data-lucide="arrow-left" onclick="closeModal('riderLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900;">RIDER ACCESS</span> <div style="width:24px;"></div>
         </div>
         <div style="padding: 30px; text-align:center; margin-top:30px;">
             <i data-lucide="bike" style="width:70px; height:70px; color:var(--primary); margin-bottom:25px;"></i>
@@ -392,22 +340,22 @@
 
   <div class="app-view admin-bg" id="riderApp">
       <div class="header" style="background:var(--card-bg); color:var(--primary); border-bottom:1px solid var(--border-color); flex-direction:row;">
-          <div style="font-weight:900; font-size:18px; letter-spacing: 1px;"><i data-lucide="bike" style="vertical-align:middle; margin-right:8px;"></i> RIDER HUB</div>
+          <div style="font-weight:900; font-size:18px;"><i data-lucide="bike" style="vertical-align:middle; margin-right:8px;"></i> RIDER HUB</div>
           <button class="icon-btn" onclick="logoutRider()" style="background:#222; color:var(--text-main); width:auto; padding:0 15px; font-size:12px; font-weight:bold; border:1px solid var(--border-color); border-radius:6px;">Logout</button>
       </div>
       <div class="main-content" style="padding:15px;">
-          <div style="background:var(--card-bg); border-radius:12px; padding:25px; text-align:center; border:1px solid var(--border-color); margin-bottom:20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+          <div style="background:var(--card-bg); border-radius:12px; padding:25px; text-align:center; border:1px solid var(--border-color); margin-bottom:20px;">
               <h2 id="riderGreeting" style="font-size:20px; margin-bottom:10px; color: var(--text-main);">Welcome</h2>
-              <div style="font-size:12px; color:var(--primary); font-weight: bold; letter-spacing: 1px;">TODAY'S DELIVERIES</div>
-              <div id="riderDeliveredCount" style="font-size:36px; font-weight:900; color:var(--primary); text-shadow: 0 2px 5px rgba(0,0,0,0.5);">0</div>
+              <div style="font-size:12px; color:var(--primary); font-weight: bold;">TODAY'S DELIVERIES</div>
+              <div id="riderDeliveredCount" style="font-size:36px; font-weight:900; color:var(--primary);">0</div>
           </div>
-          <h3 style="font-size:14px; margin-bottom:15px; color:var(--primary); font-weight:bold; letter-spacing: 1px;">ASSIGNED ORDERS</h3>
+          <h3 style="font-size:14px; margin-bottom:15px; color:var(--primary); font-weight:bold;">ASSIGNED ORDERS</h3>
           <div id="riderOrdersList"></div>
       </div>
   </div>
 
   <div class="app-view admin-bg" id="adminApp">
-    <div id="newOrderAlert" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--primary); color:var(--text-dark); padding:15px; border-radius:10px; z-index:9999; box-shadow:0 4px 20px rgba(212,175,55,0.4); width:90%; max-width:400px; text-align:center; animation: slideDown 0.3s forwards; border: 2px solid #000;">
+    <div id="newOrderAlert" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--primary); color:var(--text-dark); padding:15px; border-radius:10px; z-index:9999; width:90%; max-width:400px; text-align:center; animation: slideDown 0.3s forwards; border: 2px solid #000;">
         <h3 style="margin-bottom:5px; font-size:16px; font-weight: 900;">🔔 New VIP Order!</h3>
         <p id="newOrderAlertDetails" style="font-size:13px; font-weight:bold; margin-bottom:12px;"></p>
         <button onclick="document.getElementById('newOrderAlert').style.display='none'; switchAdminTab('orders');" style="background:#000; color:var(--primary); border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">View Order</button>
@@ -418,7 +366,7 @@
     </div>
     <div class="admin-tab-scroll">
         <button class="admin-tab-btn active" id="btn-tab-dashboard" onclick="switchAdminTab('dashboard')">Dashboard</button>
-        <button class="admin-tab-btn" id="btn-tab-orders" onclick="switchAdminTab('orders')">Live Orders</button>
+        <button class="admin-tab-btn" id="btn-tab-orders" onclick="switchAdminTab('orders')">Orders</button>
         <button class="admin-tab-btn" id="btn-tab-products" onclick="switchAdminTab('products')">Products</button>
         <button class="admin-tab-btn" id="btn-tab-customers" onclick="switchAdminTab('customers')">Customers</button>
         <button class="admin-tab-btn" id="btn-tab-categories" onclick="switchAdminTab('categories')">Categories</button>
@@ -437,58 +385,36 @@
             </div>
         </div>
 
-        <div class="admin-section" id="sec-orders">
-            <div class="admin-card">
-                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Live Orders Management</h3>
-                <div id="adminOrdersList"></div>
-            </div>
-        </div>
+        <div class="admin-section" id="sec-orders"><div class="admin-card"><h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Live Orders Management</h3><div id="adminOrdersList"></div></div></div>
 
         <div class="admin-section" id="sec-products">
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Add / Edit Luxury Products</h3>
                 <input type="text" id="pName" class="admin-input" placeholder="Product Name">
-                <div style="display:flex; gap:10px;">
-                    <input type="number" id="pPrice" class="admin-input" placeholder="Price (₹)">
-                    <input type="number" id="pStock" class="admin-input" placeholder="Stock Qty">
-                </div>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">SIZE VARIATIONS</label>
-                <select id="pSizeType" class="admin-input">
-                    <option value="None">None (Standard Product)</option>
-                    <option value="Clothing">Clothing (S, M, L, XL, XXL)</option>
-                    <option value="Shoes">Shoes (6, 7, 8, 9, 10, 11)</option>
-                </select>
+                <div style="display:flex; gap:10px;"><input type="number" id="pPrice" class="admin-input" placeholder="Price (₹)"><input type="number" id="pStock" class="admin-input" placeholder="Stock Qty"></div>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">SIZE VARIATIONS</label>
+                <select id="pSizeType" class="admin-input"><option value="None">None (Standard Product)</option><option value="Clothing">Clothing (S, M, L, XL, XXL)</option><option value="Shoes">Shoes (6, 7, 8, 9, 10, 11)</option></select>
                 <select id="pCat" class="admin-input"></select>
-                
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">MAIN IMAGE (Required)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">MAIN IMAGE (Required)</label>
                 <input type="file" id="pImageFile1" class="admin-input" accept="image/*">
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">IMAGE 2 (Optional)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">IMAGE 2 (Optional)</label>
                 <input type="file" id="pImageFile2" class="admin-input" accept="image/*">
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">IMAGE 3 (Optional)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">IMAGE 3 (Optional)</label>
                 <input type="file" id="pImageFile3" class="admin-input" accept="image/*">
                 <input type="hidden" id="pExistingImage1"><input type="hidden" id="pExistingImage2"><input type="hidden" id="pExistingImage3">
-                
                 <button class="btn-admin" id="adminAddBtn" onclick="saveProductEntry()">Save Product</button>
                 <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top:15px;" id="adminStockList"></div>
             </div>
         </div>
 
-        <div class="admin-section" id="sec-customers">
-            <div class="admin-card">
-                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Registered Customers</h3>
-                <div id="adminCustomersList"></div>
-            </div>
-        </div>
+        <div class="admin-section" id="sec-customers"><div class="admin-card"><h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Registered Customers</h3><div id="adminCustomersList"></div></div></div>
 
         <div class="admin-section" id="sec-categories">
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Category Management</h3>
                 <input type="text" id="newCatName" class="admin-input" placeholder="New Category Name">
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">CATEGORY ICON/IMAGE (Optional)</label>
-                <div style="display:flex; gap:10px;">
-                    <input type="file" id="newCatImage" class="admin-input" accept="image/*" style="margin-bottom:0;">
-                    <button class="btn-admin" style="width: auto; padding: 12px 25px;" onclick="addCategory()">Add</button>
-                </div>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">CATEGORY ICON/IMAGE</label>
+                <div style="display:flex; gap:10px;"><input type="file" id="newCatImage" class="admin-input" accept="image/*" style="margin-bottom:0;"><button class="btn-admin" style="width: auto; padding: 12px 25px;" onclick="addCategory()">Add</button></div>
                 <div style="margin-top: 20px;" id="adminCatList"></div>
             </div>
         </div>
@@ -497,58 +423,40 @@
             <div class="admin-card" style="border-color:var(--primary);">
                 <h3 style="margin-bottom: 15px; font-size:16px; color:var(--primary);">Register Delivery Partner</h3>
                 <input type="text" id="rName" class="admin-input" placeholder="Partner Name">
-                <input type="tel" id="rPhone" class="admin-input" placeholder="Mobile Number (Login ID)" maxlength="10">
+                <input type="tel" id="rPhone" class="admin-input" placeholder="Mobile Number" maxlength="10">
                 <input type="password" id="rPass" class="admin-input" placeholder="Create Password">
                 <button class="btn-admin" onclick="saveRider()">Register Partner</button>
             </div>
-            <div class="admin-card">
-                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Active Partners</h3>
-                <div id="adminRidersList"></div>
-            </div>
+            <div class="admin-card"><h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Active Partners</h3><div id="adminRidersList"></div></div>
         </div>
 
         <div class="admin-section" id="sec-settings">
-            <div class="admin-card" style="border-color:var(--success); box-shadow: 0 0 15px rgba(76,175,80,0.2);">
+            <div class="admin-card" style="border-color:var(--success);">
                 <h3 style="margin-bottom: 15px; font-size:16px; color:var(--success);">UPI QR Code Setup</h3>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">MY QR CODE IMAGE (GPay/PhonePe)</label>
-                <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;">
-                    <input type="file" id="adminPaymentQrFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
-                    <button class="btn-small" style="background:var(--success);" onclick="uploadAdminQr()">Save QR</button>
-                </div>
-                <div id="qrPreviewArea" style="text-align:center; padding:15px; background:#111; border-radius:8px; border: 1px solid #333;">
-                    <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px; letter-spacing: 1px;">CURRENT ACTIVE QR</p>
-                    <img id="adminQrPreview" src="" style="width:120px; height:120px; object-fit:contain; border:2px solid var(--primary); border-radius: 8px; background: white; padding: 5px;">
-                </div>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">MY QR CODE IMAGE (GPay/PhonePe)</label>
+                <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;"><input type="file" id="adminPaymentQrFile" class="admin-input" accept="image/*" style="margin-bottom:0;"><button class="btn-small" style="background:var(--success);" onclick="uploadAdminQr()">Save QR</button></div>
+                <div id="qrPreviewArea" style="text-align:center; padding:15px; background:#111; border-radius:8px; border: 1px solid #333;"><p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">CURRENT ACTIVE QR</p><img id="adminQrPreview" src="" style="width:120px; height:120px; object-fit:contain; border:2px solid var(--primary); border-radius: 8px; background: white; padding: 5px;"></div>
             </div>
-
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Delivery Config</h3>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">MINIMUM ORDER AMOUNT (₹)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">MINIMUM ORDER AMOUNT (₹)</label>
                 <input type="number" id="adminMinOrder" class="admin-input" placeholder="e.g. 100">
                 <button class="btn-admin" style="margin-top:10px;" onclick="updateAppConfig()">Save Delivery Setting</button>
             </div>
-            
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">App Support Info</h3>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">WHATSAPP NUMBER</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">WHATSAPP NUMBER</label>
                 <input type="number" id="adminSupportWa" class="admin-input" placeholder="e.g. 919348954360">
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">SUPPORT EMAIL</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">SUPPORT EMAIL</label>
                 <input type="email" id="adminSupportEmail" class="admin-input" placeholder="e.g. help@bijumart.com">
                 <button class="btn-admin" style="margin-top:10px;" onclick="updateAppConfig()">Save Configuration</button>
             </div>
-
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Premium Branding</h3>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">APP LOGO</label>
-                <div style="display:flex; gap:10px; margin-bottom:25px;">
-                    <input type="file" id="adminLogoFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
-                    <button class="btn-small" style="background: #222;" onclick="updateAppLogo()">Upload</button>
-                </div>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">PROMO BANNER</label>
-                <div style="display:flex; gap:10px;">
-                    <input type="file" id="adminBannerFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
-                    <button class="btn-admin" style="width: auto; padding: 12px 20px;" onclick="addPromoBanner()">Add Banner</button>
-                </div>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">APP LOGO</label>
+                <div style="display:flex; gap:10px; margin-bottom:25px;"><input type="file" id="adminLogoFile" class="admin-input" accept="image/*" style="margin-bottom:0;"><button class="btn-small" style="background: #222;" onclick="updateAppLogo()">Upload</button></div>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">PROMO BANNER</label>
+                <div style="display:flex; gap:10px;"><input type="file" id="adminBannerFile" class="admin-input" accept="image/*" style="margin-bottom:0;"><button class="btn-admin" style="width: auto; padding: 12px 20px;" onclick="addPromoBanner()">Add Banner</button></div>
                 <div style="margin-top: 15px;" id="adminBannerList"></div>
             </div>
         </div>
@@ -557,45 +465,24 @@
  </div> 
 
  <div id="printBillArea" class="print-only">
-    <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:15px; margin-bottom:15px;">
-        <h1 style="font-size:28px; margin:0; font-weight:900;" id="billStoreName">BIJU MART PREMIUM</h1>
-    </div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:12px;">
-        <div><strong>BILLED TO:</strong><br><span id="billCustomerName"></span><br><span id="billCustomerPhone"></span><br><span id="billCustomerAddress"></span></div>
-        <div style="text-align:right;"><strong>Order ID:</strong> <span id="billOrderId"></span><br><strong>Date:</strong> <span id="billDate"></span><br><strong>Payment:</strong> <span id="billPayment"></span></div>
-    </div>
-    <table class="bill-table" id="billTable">
-        <thead><tr><th style="width:50%">Item Description</th><th style="width:15%">Qty</th><th style="width:15%">Price</th><th style="width:20%; text-align:right;">Amount</th></tr></thead>
-        <tbody id="billTableBody"></tbody>
-    </table>
+    <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:15px; margin-bottom:15px;"><h1 style="font-size:28px; margin:0; font-weight:900;" id="billStoreName">BIJU MART PREMIUM</h1></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:12px;"><div><strong>BILLED TO:</strong><br><span id="billCustomerName"></span><br><span id="billCustomerPhone"></span><br><span id="billCustomerAddress"></span></div><div style="text-align:right;"><strong>Order ID:</strong> <span id="billOrderId"></span><br><strong>Date:</strong> <span id="billDate"></span><br><strong>Payment:</strong> <span id="billPayment"></span></div></div>
+    <table class="bill-table" id="billTable"><thead><tr><th style="width:50%">Item Description</th><th style="width:15%">Qty</th><th style="width:15%">Price</th><th style="width:20%; text-align:right;">Amount</th></tr></thead><tbody id="billTableBody"></tbody></table>
     <div style="text-align:right; font-size:16px; margin-top:15px;"><strong>Total Amount: ₹<span id="billTotalAmount"></span></strong></div>
  </div>
- <script>
-    // ⚠️ IMPORTANT: Aapki Biju Mart Firebase Keys
-    const firebaseConfig = {
-      apiKey: "AIzaSyA7-fLETBmZiw39_nwT8i1v4GmPGYNB_m0",
-      authDomain: "biju-mart.firebaseapp.com",
-      databaseURL: "https://biju-mart-default-rtdb.firebaseio.com", 
-      projectId: "biju-mart",
-      storageBucket: "biju-mart.firebasestorage.app",
-      messagingSenderId: "897539763161",
-      appId: "1:897539763161:web:f07951d66e62363b85c7c8"
-    };
 
+  <script>
+    const firebaseConfig = { apiKey: "AIzaSyA7-fLETBmZiw39_nwT8i1v4GmPGYNB_m0", authDomain: "biju-mart.firebaseapp.com", databaseURL: "https://biju-mart-default-rtdb.firebaseio.com", projectId: "biju-mart", storageBucket: "biju-mart.firebasestorage.app", messagingSenderId: "897539763161", appId: "1:897539763161:web:f07951d66e62363b85c7c8" };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let allProducts = [], allOrders = [], allUsers = [], allCategories = [], allRiders = []; 
-    let appSettings = { logo: '', banners: {}, support: { whatsapp: "919348954360", email: "support@bijumart.com" }, payment: { minOrderAmount: 0, qrCode: "" } };
-    let cart = [], currentCategory = 'All', editingProductId = null;
-    let loggedInUser = null, currentAuthMode = 'login', pendingAuthData = null;
-    let loggedInRider = null; 
-    let selectedPaymentMethod = 'UPI', customerLat = null, customerLng = null;
-    let autoSlideInterval = null, isInitialOrderLoad = true;
-    let activeModalProduct = null, selectedModalSize = null;
+    let allProducts=[], allOrders=[], allUsers=[], allCategories=[], allRiders=[]; 
+    let appSettings={ logo:'', banners:{}, support:{whatsapp:"919348954360", email:"support@bijumart.com"}, payment:{minOrderAmount:0, qrCode:""} };
+    let cart=[], currentCategory='All', editingProductId=null, loggedInUser=null, currentAuthMode='login', pendingAuthData=null;
+    let loggedInRider=null, selectedPaymentMethod='UPI', customerLat=null, customerLng=null, autoSlideInterval=null, isInitialOrderLoad=true, activeModalProduct=null, selectedModalSize=null;
 
-    function isImage(string) { if(!string) return false; return string.startsWith('http') || string.startsWith('data:image'); }
-    function safeParse(data) { if (!data) return []; if (Array.isArray(data)) return data.filter(item => item !== null && item !== undefined); return Object.values(data).filter(item => item !== null && item !== undefined); }
+    function isImage(str) { return str && (str.startsWith('http') || str.startsWith('data:image')); }
+    function safeParse(data) { if(!data) return []; return Array.isArray(data) ? data.filter(i=>i!==null) : Object.values(data).filter(i=>i!==null); }
 
     function processImageFileAsync(file) {
         return new Promise((resolve) => {
@@ -605,484 +492,253 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 400; 
-                    let width = img.width, height = img.height;
-                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                    let w = img.width, h = img.height;
+                    if(w > 400) { h *= 400/w; w = 400; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     resolve(canvas.toDataURL('image/jpeg', 0.6)); 
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+                }; img.src = e.target.result;
+            }; reader.readAsDataURL(file);
         });
     }
 
     window.onload = () => {
         try {
-            if(!sessionStorage.getItem('visited_biju_mart')) {
-                db.ref('stats/totalVisits').set(firebase.database.ServerValue.increment(1));
-                sessionStorage.setItem('visited_biju_mart', 'true');
-            }
-
-            db.ref('stats/totalVisits').on('value', snap => {
-                const visits = snap.val() || 0;
-                if(document.getElementById('metricVisits')) document.getElementById('metricVisits').innerText = visits;
-            });
-
+            if(!sessionStorage.getItem('visited_biju_mart')) { db.ref('stats/totalVisits').set(firebase.database.ServerValue.increment(1)); sessionStorage.setItem('visited_biju_mart', 'true'); }
+            db.ref('stats/totalVisits').on('value', snap => { if(document.getElementById('metricVisits')) document.getElementById('metricVisits').innerText = snap.val() || 0; });
             db.ref('settings').on('value', snap => {
                 const data = snap.val();
                 if(data) {
-                    appSettings.logo = data.logo || ''; appSettings.banners = data.banners || {};
+                    appSettings.logo = data.logo||''; appSettings.banners = data.banners||{};
                     if(data.support) appSettings.support = data.support;
-                    if(data.payment) { 
-                        appSettings.payment.minOrderAmount = data.payment.minOrderAmount || 0;
-                        appSettings.payment.qrCode = data.payment.qrCode || "";
-                    }
-                }
-                applySettingsToUI();
+                    if(data.payment) { appSettings.payment.minOrderAmount = data.payment.minOrderAmount||0; appSettings.payment.qrCode = data.payment.qrCode||""; }
+                } applySettingsToUI();
             });
-
             db.ref('categories').on('value', snap => {
-                const data = snap.val();
-                if(data) { allCategories = safeParse(data).map(c => typeof c === 'string' ? {id: c.replace(/[^a-zA-Z0-9]/g, ''), name: c, image: null} : c); } 
-                else { const defaultCats = ['Fashion', 'Mobiles', 'Beauty', 'Electronics', 'Grocery']; defaultCats.forEach(c => db.ref('categories/' + c.replace(/[^a-zA-Z0-9]/g, '')).set({id: c.replace(/[^a-zA-Z0-9]/g, ''), name: c, image: null})); }
+                allCategories = safeParse(snap.val()).map(c => typeof c==='string' ? {id:c.replace(/[^a-zA-Z0-9]/g,''), name:c, image:null} : c);
+                if(allCategories.length===0) { const dCats = ['Fashion','Mobiles','Beauty','Electronics','Grocery']; dCats.forEach(c => db.ref('categories/'+c.replace(/[^a-zA-Z0-9]/g,'')).set({id:c.replace(/[^a-zA-Z0-9]/g,''), name:c, image:null})); }
                 renderCategories();
             });
-
             db.ref('products').on('value', snap => { allProducts = safeParse(snap.val()); filterAndSortProducts(); if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard(); });
-            
             db.ref('orders').on('value', snap => {
-                let newOrdersList = safeParse(snap.val()).sort((a,b) => b.timestamp - a.timestamp);
-                if(!isInitialOrderLoad && newOrdersList.length > allOrders.length) {
-                    const latest = newOrdersList[0];
-                    if(document.getElementById('adminApp').classList.contains('active')) {
-                        document.getElementById('newOrderAlertDetails').innerText = `${latest.customer} ne ₹${(latest.total||0).toLocaleString('en-IN')} ka VIP order diya hai!`;
-                        document.getElementById('newOrderAlert').style.display = 'block';
-                    }
+                let nOrders = safeParse(snap.val()).sort((a,b) => b.timestamp - a.timestamp);
+                if(!isInitialOrderLoad && nOrders.length > allOrders.length && document.getElementById('adminApp').classList.contains('active')) {
+                    document.getElementById('newOrderAlertDetails').innerText = `${nOrders[0].customer} ne ₹${(nOrders[0].total||0).toLocaleString('en-IN')} ka VIP order diya!`; document.getElementById('newOrderAlert').style.display = 'block';
                 }
-                allOrders = newOrdersList; isInitialOrderLoad = false; renderCustomerOrders();
+                allOrders = nOrders; isInitialOrderLoad = false; renderCustomerOrders();
                 if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
                 if(document.getElementById('riderApp').classList.contains('active')) renderRiderDashboard();
             });
-
-            db.ref('users').on('value', snap => { 
-                allUsers = safeParse(snap.val()); 
-                if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
-            });
-            
+            db.ref('users').on('value', snap => { allUsers = safeParse(snap.val()); if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard(); });
             db.ref('riders').on('value', snap => { allRiders = safeParse(snap.val()); if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard(); });
-
-            const savedSession = localStorage.getItem('shop_session_cloud'); if(savedSession) { loggedInUser = JSON.parse(savedSession); updateAppForLoggedInUser(); }
-            const savedRider = localStorage.getItem('rider_session_cloud'); if(savedRider) { loggedInRider = JSON.parse(savedRider); }
-            lucide.createIcons();
-        } catch(err) { console.error("Firebase load error", err); }
+        } catch(err) { console.error(err); }
+        if(localStorage.getItem('shop_session_cloud')) { loggedInUser = JSON.parse(localStorage.getItem('shop_session_cloud')); updateAppForLoggedInUser(); }
+        if(localStorage.getItem('rider_session_cloud')) { loggedInRider = JSON.parse(localStorage.getItem('rider_session_cloud')); }
+        lucide.createIcons();
     };
 
-    async function uploadAdminQr() {
-        const f = document.getElementById('adminPaymentQrFile');
-        if(!f.files[0]) return showToast("Select QR Image");
-        const b64 = await processImageFileAsync(f.files[0]);
-        db.ref('settings/payment/qrCode').set(b64);
-        showToast("QR Saved!"); f.value = '';
-    }
-
     function toggleSupportMenu() { document.getElementById('supportMenu').classList.toggle('active'); }
-    document.addEventListener('click', function(event) { const menu = document.getElementById('supportMenu'), fab = document.querySelector('.support-fab'); if (menu && menu.classList.contains('active') && !menu.contains(event.target) && !fab.contains(event.target)) { menu.classList.remove('active'); } });
-
-    function contactSupport(type) {
-        document.getElementById('supportMenu').classList.remove('active');
-        if(type === 'wa') { window.open(`https://wa.me/${appSettings.support.whatsapp}?text=Hello Biju Mart Support`, '_blank'); } else { window.open(`mailto:${appSettings.support.email}`, '_blank'); }
-    }
+    document.addEventListener('click', e => { const m = document.getElementById('supportMenu'), f = document.querySelector('.support-fab'); if (m && m.classList.contains('active') && !m.contains(e.target) && !f.contains(e.target)) m.classList.remove('active'); });
+    function contactSupport(type) { document.getElementById('supportMenu').classList.remove('active'); if(type === 'wa') window.open(`https://wa.me/${appSettings.support.whatsapp}?text=Hello Biju Mart`, '_blank'); else window.open(`mailto:${appSettings.support.email}`, '_blank'); }
 
     function updateAppConfig() {
-        const wa = document.getElementById('adminSupportWa').value, email = document.getElementById('adminSupportEmail').value, minOrder = document.getElementById('adminMinOrder').value; 
-        if(wa) db.ref('settings/support/whatsapp').set(wa); if(email) db.ref('settings/support/email').set(email); if(minOrder !== "") db.ref('settings/payment/minOrderAmount').set(parseInt(minOrder));
-        showToast("Config Saved!");
+        const wa = document.getElementById('adminSupportWa').value, email = document.getElementById('adminSupportEmail').value, min = document.getElementById('adminMinOrder').value; 
+        if(wa) db.ref('settings/support/whatsapp').set(wa); if(email) db.ref('settings/support/email').set(email); if(min !== "") db.ref('settings/payment/minOrderAmount').set(parseInt(min)); showToast("Config Saved!");
     }
 
-    function renderCategories() {
-        const filterContainer = document.getElementById('categoryFilters');
-        let html = `<div class="cat-item ${currentCategory === 'All' ? 'active' : ''}" onclick="setCategory('All', this)"><div class="cat-icon-circle"><i data-lucide="layout-grid"></i></div><span>For You</span></div>`;
-        allCategories.forEach(cat => {
-            if(!cat) return;
-            const displayImg = cat.image ? `<img src="${cat.image}">` : `<i data-lucide="box"></i>`;
-            html += `<div class="cat-item ${currentCategory === cat.name ? 'active' : ''}" onclick="setCategory('${cat.name}', this)"><div class="cat-icon-circle">${displayImg}</div><span>${cat.name}</span></div>`;
-        });
-        if(filterContainer) { filterContainer.innerHTML = html; lucide.createIcons(); }
+    async function uploadAdminQr() { const f = document.getElementById('adminPaymentQrFile'); if(!f.files[0]) return showToast("Select QR Image"); db.ref('settings/payment/qrCode').set(await processImageFileAsync(f.files[0])); showToast("QR Saved!"); f.value = ''; }
+    async function updateAppLogo() { const f = document.getElementById('adminLogoFile'); if(!f.files[0]) return showToast("Select Logo Image"); db.ref('settings/logo').set(await processImageFileAsync(f.files[0])); showToast("Logo Updated!"); f.value=''; }
+    async function addPromoBanner() { const f = document.getElementById('adminBannerFile'); if(!f.files[0]) return showToast("Select Banner Image"); db.ref('settings/banners/BNR-'+Date.now()).set(await processImageFileAsync(f.files[0])); showToast("Banner Uploaded!"); f.value=''; }
+    function deletePromoBanner(id) { if(confirm("Delete banner?")) { db.ref('settings/banners/'+id).remove(); showToast("Deleted"); } }
 
-        if(document.getElementById('pCat')) document.getElementById('pCat').innerHTML = allCategories.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
-        if(document.getElementById('adminCatList')) {
-            document.getElementById('adminCatList').innerHTML = allCategories.map(cat => {
-                if(!cat) return '';
-                return `<div style="display:flex; align-items:center; justify-content:space-between; background:var(--card-bg); padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border-color);"><div style="display:flex; align-items:center; gap:12px;">${cat.image ? `<img src="${cat.image}" style="width:35px; height:35px; border-radius:6px; object-fit:cover; border:1px solid var(--primary);">` : ''}<span style="color:white; font-size:14px; font-weight:bold;">${cat.name}</span></div><button class="btn-danger-small" onclick="deleteCategory('${cat.id}', '${cat.name}')">Remove</button></div>`;
-            }).join('');
-        }
+    function renderCategories() {
+        let html = `<div class="cat-item ${currentCategory === 'All'?'active':''}" onclick="setCategory('All', this)"><div class="cat-icon-circle"><i data-lucide="layout-grid"></i></div><span>For You</span></div>`;
+        allCategories.forEach(c => { if(c) html += `<div class="cat-item ${currentCategory === c.name?'active':''}" onclick="setCategory('${c.name}', this)"><div class="cat-icon-circle">${c.image?`<img src="${c.image}">`:'<i data-lucide="box"></i>'}</div><span>${c.name}</span></div>`; });
+        const fc = document.getElementById('categoryFilters'); if(fc) { fc.innerHTML = html; lucide.createIcons(); }
+        const sc = document.getElementById('pCat'); if(sc) sc.innerHTML = allCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        const cl = document.getElementById('adminCatList'); if(cl) cl.innerHTML = allCategories.map(c => c ? `<div style="display:flex; justify-content:space-between; background:var(--card-bg); padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border-color);"><div style="display:flex; align-items:center; gap:12px;">${c.image?`<img src="${c.image}" style="width:35px; height:35px; border-radius:6px; object-fit:cover; border:1px solid var(--primary);">`:''}<span style="color:white; font-size:14px; font-weight:bold;">${c.name}</span></div><button class="btn-danger-small" onclick="deleteCategory('${c.id}', '${c.name}')">Remove</button></div>` : '').join('');
     }
 
     async function addCategory() {
-        const catName = document.getElementById('newCatName').value.trim(), fileInput = document.getElementById('newCatImage');
-        if(!catName) return showToast("Enter category name");
-        const catId = catName.replace(/[^a-zA-Z0-9]/g, '');
-        let base64Image = await processImageFileAsync(fileInput.files[0]);
-        db.ref('categories/' + catId).set({ id: catId, name: catName, image: base64Image }); document.getElementById('newCatName').value = ''; fileInput.value = ''; showToast("Category Added!");
+        const name = document.getElementById('newCatName').value.trim(), file = document.getElementById('newCatImage');
+        if(!name) return showToast("Enter category name"); const id = name.replace(/[^a-zA-Z0-9]/g, '');
+        db.ref('categories/' + id).set({ id, name, image: await processImageFileAsync(file.files[0]) }); document.getElementById('newCatName').value = ''; file.value = ''; showToast("Category Added!");
     }
-
-    function deleteCategory(catId, catName) { if(confirm(`Delete "${catName}"?`)) { db.ref('categories/' + catId).remove(); showToast("Deleted"); if(currentCategory === catName) { currentCategory = 'All'; filterAndSortProducts(); } } }
+    function deleteCategory(id, name) { if(confirm(`Delete "${name}"?`)) { db.ref('categories/'+id).remove(); showToast("Deleted"); if(currentCategory === name) { currentCategory = 'All'; filterAndSortProducts(); } } }
 
     function applySettingsToUI() {
-        const logoHTML = (appSettings.logo && isImage(appSettings.logo)) ? `<img src="${appSettings.logo}" alt="Biju Mart Logo">` : "Biju Mart";
-        if(document.getElementById('dynamicLogoCustomer')) document.getElementById('dynamicLogoCustomer').innerHTML = logoHTML;
-        if(document.getElementById('dynamicLogoAdmin')) document.getElementById('dynamicLogoAdmin').innerHTML = logoHTML;
-        
-        if(document.getElementById('adminSupportWa')) {
-            document.getElementById('adminSupportWa').value = appSettings.support.whatsapp || ''; document.getElementById('adminSupportEmail').value = appSettings.support.email || '';
-            document.getElementById('adminMinOrder').value = appSettings.payment.minOrderAmount || 0;
-        }
-
-        if(document.getElementById('adminQrPreview')) document.getElementById('adminQrPreview').src = appSettings.payment.qrCode || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
-        if(document.getElementById('adminPaymentQrImg')) document.getElementById('adminPaymentQrImg').src = appSettings.payment.qrCode || "";
-
-        const bannerContainer = document.getElementById('promoBanners');
-        const bannerKeys = Object.keys(appSettings.banners);
-        if(bannerContainer) {
-            if(bannerKeys.length > 0) {
-                bannerContainer.style.display = 'flex'; bannerContainer.innerHTML = bannerKeys.map(key => `<img src="${appSettings.banners[key]}" class="banner-slide">`).join('');
-                if(bannerKeys.length > 1) { clearInterval(autoSlideInterval); autoSlideInterval = setInterval(() => { if (bannerContainer.scrollLeft + bannerContainer.clientWidth >= bannerContainer.scrollWidth - 10) bannerContainer.scrollTo({ left: 0, behavior: 'smooth' }); else bannerContainer.scrollBy({ left: bannerContainer.clientWidth, behavior: 'smooth' }); }, 4000); }
-            } else { bannerContainer.style.display = 'none'; clearInterval(autoSlideInterval); }
+        const logoHTML = appSettings.logo ? `<img src="${appSettings.logo}">` : "Biju Mart";
+        ['dynamicLogoCustomer', 'dynamicLogoAdmin'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerHTML = logoHTML; });
+        if(document.getElementById('adminSupportWa')) { document.getElementById('adminSupportWa').value = appSettings.support.whatsapp||''; document.getElementById('adminSupportEmail').value = appSettings.support.email||''; document.getElementById('adminMinOrder').value = appSettings.payment.minOrderAmount||0; }
+        if(document.getElementById('adminQrPreview')) document.getElementById('adminQrPreview').src = appSettings.payment.qrCode||"";
+        if(document.getElementById('adminPaymentQrImg')) document.getElementById('adminPaymentQrImg').src = appSettings.payment.qrCode||"";
+        const bc = document.getElementById('promoBanners'), bKeys = Object.keys(appSettings.banners);
+        if(bc) {
+            if(bKeys.length > 0) { bc.style.display = 'flex'; bc.innerHTML = bKeys.map(k => `<img src="${appSettings.banners[k]}" class="banner-slide">`).join(''); if(bKeys.length > 1) { clearInterval(autoSlideInterval); autoSlideInterval = setInterval(() => { if (bc.scrollLeft + bc.clientWidth >= bc.scrollWidth - 10) bc.scrollTo({ left: 0, behavior: 'smooth' }); else bc.scrollBy({ left: bc.clientWidth, behavior: 'smooth' }); }, 4000); } } 
+            else { bc.style.display = 'none'; clearInterval(autoSlideInterval); }
         }
     }
-
-    async function updateAppLogo() { const f = document.getElementById('adminLogoFile'); if(!f.files[0]) return showToast("Select Logo Image"); const b64 = await processImageFileAsync(f.files[0]); db.ref('settings/logo').set(b64); showToast("Logo Updated!"); f.value=''; }
-    async function addPromoBanner() { const f = document.getElementById('adminBannerFile'); if(!f.files[0]) return showToast("Select Banner Image"); const b64 = await processImageFileAsync(f.files[0]); db.ref('settings/banners/BNR-' + Date.now()).set(b64); showToast("Banner Uploaded!"); f.value=''; }
-    function deletePromoBanner(bannerId) { if(confirm("Delete banner?")) { db.ref('settings/banners/' + bannerId).remove(); showToast("Deleted"); } }
 
     function openAuthPage() { document.getElementById('authPage').classList.add('active'); switchAuthTab('login'); resetAuthForms(); }
     function closeAuthPage() { document.getElementById('authPage').classList.remove('active'); }
-    
-    function resetAuthForms() {
-        document.getElementById('authFormsSection').style.display = 'block'; document.getElementById('authOtpSection').style.display = 'none';
-        ['logPhone', 'regFirstName', 'regPhone', 'otp1', 'otp2', 'otp3', 'otp4'].forEach(id => { const el = document.getElementById(id); if(el) { el.value = ''; el.style.borderColor = 'var(--border-color)'; } });
-        document.getElementById('autoDetectMsg').innerText = 'Waiting for secure code...'; document.getElementById('autoDetectMsg').style.color = 'var(--text-muted)';
-        document.getElementById('verifyOtpBtn').style.opacity = '0.5'; document.getElementById('verifyOtpBtn').style.pointerEvents = 'none';
-    }
-
-    function switchAuthTab(mode) {
-        currentAuthMode = mode;
-        document.getElementById('tabLogin').classList.remove('active'); document.getElementById('tabRegister').classList.remove('active');
-        document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'none';
-        if(mode === 'login') { document.getElementById('tabLogin').classList.add('active'); document.getElementById('loginForm').style.display = 'block'; } 
-        else { document.getElementById('tabRegister').classList.add('active'); document.getElementById('registerForm').style.display = 'block'; }
-    }
+    function resetAuthForms() { document.getElementById('authFormsSection').style.display='block'; document.getElementById('authOtpSection').style.display='none'; ['logPhone','regFirstName','regPhone','otp1','otp2','otp3','otp4'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; }); document.getElementById('autoDetectMsg').innerText='Waiting...'; document.getElementById('verifyOtpBtn').style.opacity='0.5'; document.getElementById('verifyOtpBtn').style.pointerEvents='none'; }
+    function switchAuthTab(mode) { currentAuthMode = mode; document.getElementById('tabLogin').classList.remove('active'); document.getElementById('tabRegister').classList.remove('active'); document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='none'; document.getElementById(mode==='login'?'tabLogin':'tabRegister').classList.add('active'); document.getElementById(mode==='login'?'loginForm':'registerForm').style.display='block'; }
 
     function requestAuthOTP() {
-        let phone, firstName;
-        if (currentAuthMode === 'login') {
-            phone = document.getElementById('logPhone').value.trim(); if (phone.length !== 10) return showToast("Enter valid 10 digit number");
-            const existingUser = allUsers.find(u => u && String(u.phone) === String(phone)); if (!existingUser) { showToast("Account not found. Sign Up."); return switchAuthTab('register'); }
-            pendingAuthData = existingUser;
-        } else {
-            firstName = document.getElementById('regFirstName').value.trim(); phone = document.getElementById('regPhone').value.trim();
-            if (!firstName || phone.length !== 10) return showToast("Enter Name and valid number");
-            const existingUser = allUsers.find(u => u && String(u.phone) === String(phone)); if (existingUser) { showToast("Number registered. Login."); return switchAuthTab('login'); }
-            pendingAuthData = { firstName, phone }; 
-        }
-        document.getElementById('authFormsSection').style.display = 'none'; document.getElementById('authOtpSection').style.display = 'block'; document.getElementById('displayOtpPhone').innerText = "+91 " + phone;
-        simulateAutomaticOTP();
+        let phone = document.getElementById(currentAuthMode==='login'?'logPhone':'regPhone').value.trim();
+        if(phone.length !== 10) return showToast("Enter valid 10 digit number");
+        const existing = allUsers.find(u => String(u.phone) === phone);
+        if(currentAuthMode==='login' && !existing) { showToast("Account not found. Sign Up."); return switchAuthTab('register'); }
+        if(currentAuthMode==='register' && existing) { showToast("Number registered. Login."); return switchAuthTab('login'); }
+        pendingAuthData = currentAuthMode==='login' ? existing : { firstName: document.getElementById('regFirstName').value.trim(), phone };
+        if(currentAuthMode==='register' && !pendingAuthData.firstName) return showToast("Enter Name");
+        document.getElementById('authFormsSection').style.display='none'; document.getElementById('authOtpSection').style.display='block'; document.getElementById('displayOtpPhone').innerText = "+91 " + phone;
+        const msg = document.getElementById('autoDetectMsg'); msg.innerText = "Encrypting...";
+        setTimeout(() => { msg.innerText = "VIP Code Detected!"; msg.style.color = "var(--primary)"; [1,2,3,4].forEach((n,i) => setTimeout(() => { document.getElementById('otp'+n).value = i===0||i===3?'7':'0'; document.getElementById('otp'+n).style.borderColor="var(--primary)"; }, 300*(i+1))); setTimeout(() => { msg.innerText="✓ Access Granted."; document.getElementById('verifyOtpBtn').style.opacity='1'; document.getElementById('verifyOtpBtn').style.pointerEvents='auto'; setTimeout(verifyCustomerOTP, 800); }, 1500); }, 1500);
     }
+    function verifyCustomerOTP() { if(currentAuthMode==='register') db.ref('users/'+pendingAuthData.phone).set(pendingAuthData); loggedInUser = pendingAuthData; localStorage.setItem('shop_session_cloud', JSON.stringify(loggedInUser)); closeAuthPage(); showToast("Welcome VIP!"); updateAppForLoggedInUser(); }
+    function logoutCustomer() { loggedInUser = null; localStorage.removeItem('shop_session_cloud'); document.getElementById('loginBannerBtn').style.display='flex'; switchCustomerTab('home', document.getElementById('navHome')); renderCustomerOrders(); showToast("Logged out."); }
+    function updateAppForLoggedInUser() { document.getElementById('loginBannerBtn').style.display='none'; document.getElementById('cName').value=loggedInUser.firstName; document.getElementById('cPhone').value=loggedInUser.phone; document.getElementById('profileNameDisplay').innerText=loggedInUser.firstName; document.getElementById('profilePhoneDisplay').innerText="+91 "+loggedInUser.phone; document.getElementById('gridGreetingTitle').innerText=`${loggedInUser.firstName}, Exclusive for you`; }
+    function handleAccountTabClick(el) { if(loggedInUser) switchCustomerTab('profile', el); else openAuthPage(); }
 
-    function simulateAutomaticOTP() {
-        const msg = document.getElementById('autoDetectMsg'); msg.innerText = "Encrypting connection...";
-        setTimeout(() => {
-            msg.innerText = "VIP Code Detected! Verifying..."; msg.style.color = "var(--primary)";
-            setTimeout(() => { document.getElementById('otp1').value = '7'; document.getElementById('otp1').style.borderColor = "var(--primary)"; }, 300); 
-            setTimeout(() => { document.getElementById('otp2').value = '0'; document.getElementById('otp2').style.borderColor = "var(--primary)";}, 600);
-            setTimeout(() => { document.getElementById('otp3').value = '0'; document.getElementById('otp3').style.borderColor = "var(--primary)";}, 900); 
-            setTimeout(() => { document.getElementById('otp4').value = '7'; document.getElementById('otp4').style.borderColor = "var(--primary)";}, 1200);
-            setTimeout(() => { msg.innerText = "✓ Access Granted."; document.getElementById('verifyOtpBtn').style.opacity = '1'; document.getElementById('verifyOtpBtn').style.pointerEvents = 'auto'; setTimeout(() => verifyCustomerOTP(), 800); }, 1500);
-        }, 1500);
-    }
-
-    function verifyCustomerOTP() {
-        if(currentAuthMode === 'register') db.ref('users/' + pendingAuthData.phone).set(pendingAuthData);
-        loggedInUser = pendingAuthData; localStorage.setItem('shop_session_cloud', JSON.stringify(loggedInUser));
-        closeAuthPage(); showToast(currentAuthMode === 'login' ? "Welcome back VIP!" : "VIP Account created!"); updateAppForLoggedInUser();
-    }
-
-    function logoutCustomer() {
-        loggedInUser = null; localStorage.removeItem('shop_session_cloud'); document.getElementById('cName').value = ""; document.getElementById('cPhone').value = "";
-        document.getElementById('loginBannerBtn').style.display = 'flex'; document.getElementById('accountNavText').innerText = "Profile";
-        switchCustomerTab('home', document.getElementById('navHome')); renderCustomerOrders(); showToast("Logged out securely.");
-    }
-
-    function updateAppForLoggedInUser() {
-        document.getElementById('loginBannerBtn').style.display = 'none'; document.getElementById('cName').value = loggedInUser.firstName; document.getElementById('cPhone').value = loggedInUser.phone;
-        document.getElementById('profileNameDisplay').innerText = loggedInUser.firstName; document.getElementById('profilePhoneDisplay').innerText = "+91 " + loggedInUser.phone;
-        document.getElementById('gridGreetingTitle').innerText = `${loggedInUser.firstName}, Exclusive for you`;
-    }
-
-    function handleAccountTabClick(element) { if (loggedInUser) switchCustomerTab('profile', element); else openAuthPage(); }
-    function setCategory(cat, element) { currentCategory = cat; renderCategories(); filterAndSortProducts(); }
-
-    function shareProduct(id) {
-        const p = allProducts.find(x => String(x.id) === String(id)); if(!p) return;
-        const shareText = `💎 Checkout the Premium ${p.name} for just ₹${p.price} at Biju Mart!\nOrder now:`;
-        if (navigator.share) { navigator.share({ title: 'Biju Mart', text: shareText, url: window.location.href }).catch(console.error); } 
-        else { const dummy = document.createElement('textarea'); document.body.appendChild(dummy); dummy.value = shareText + "\n" + window.location.href; dummy.select(); document.execCommand('copy'); document.body.removeChild(dummy); showToast("Premium Link copied!"); }
-    }
+    function setCategory(cat, el) { currentCategory = cat; renderCategories(); filterAndSortProducts(); }
+    function shareProduct(id) { const p = allProducts.find(x=>String(x.id)===String(id)); if(!p) return; const txt = `💎 Checkout ${p.name} for ₹${p.price} at Biju Mart!\nOrder now:`; if(navigator.share) navigator.share({title:'Biju Mart', text:txt, url:window.location.href}).catch(console.error); else { const d=document.createElement('textarea'); document.body.appendChild(d); d.value=txt+"\n"+window.location.href; d.select(); document.execCommand('copy'); d.remove(); showToast("Link copied!"); } }
 
     function filterAndSortProducts() {
-        let products = allProducts; const searchQ = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
-        if (currentCategory !== 'All') products = products.filter(p => p && (p.category || 'Grocery') === currentCategory);
-        if (searchQ) products = products.filter(p => p && p.name && p.name.toLowerCase().includes(searchQ));
-        renderCustomerProducts(products);
+        let p = allProducts; const q = document.getElementById('searchInput')?document.getElementById('searchInput').value.toLowerCase():'';
+        if(currentCategory !== 'All') p = p.filter(x=>x.category === currentCategory);
+        if(q) p = p.filter(x=>x.name.toLowerCase().includes(q));
+        const grid = document.getElementById('customerProductsGrid'); if(!grid) return;
+        if(p.length===0) { grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">No products found</div>`; return; }
+        grid.innerHTML = p.map(x => {
+            const stock = x.stock<=0 ? `<div class="stock-badge low">SOLD OUT</div>` : `<div class="stock-badge ok">${x.stock} LEFT</div>`;
+            const img = isImage(x.emoji) ? `<img src="${x.emoji}" class="product-img-real">` : `<div style="font-size:50px;">${x.emoji}</div>`;
+            let act = ''; if(x.sizeType && x.sizeType!=='None') { act = `<button class="btn-add-cart" onclick="openProductDetails('${x.id}')">Select Size</button>`; } else { let ci = cart.find(i=>String(i.id)===String(x.id)); if(ci) { act = `<div class="qty-controls"><button class="btn-qty" onclick="updateQty('${x.id}', -1, null)">-</button><span class="qty-val">${ci.qty}</span><button class="btn-qty" onclick="updateQty('${x.id}', 1, null)">+</button></div>`; } else if(x.stock<=0) { act = `<button class="btn-add-cart" disabled>Unavailable</button>`; } else { act = `<button class="btn-add-cart" onclick="updateQty('${x.id}', 1, null)">Add to Cart</button>`; } }
+            return `<div class="product-card">${stock}<div class="share-badge" onclick="shareProduct('${x.id}')"><i data-lucide="share-2" style="width:14px; height:14px;"></i></div><div class="product-image" onclick="openProductDetails('${x.id}')">${img}</div><div class="product-info"><div class="product-name" onclick="openProductDetails('${x.id}')">${x.name}</div><div class="product-price">₹${(x.price||0).toLocaleString('en-IN')}</div>${act}</div></div>`;
+        }).join(''); lucide.createIcons();
     }
 
-    function updateQty(id, delta, size = null) {
-        const product = allProducts.find(p => String(p.id) === String(id)); if(!product) return;
-        let cartKey = size ? `${id}_${size}` : `${id}`; let item = cart.find(i => i.cartKey === cartKey);
-        if(item) {
-            item.qty += delta; if(item.qty <= 0) cart = cart.filter(i => i.cartKey !== cartKey); else if (item.qty > product.stock) { item.qty = product.stock; showToast("Stock limit reached!"); }
-        } else if (delta > 0) {
-            if(product.stock > 0) { cart.push({...product, qty: 1, size: size, cartKey: cartKey}); showToast("Added to VIP Cart"); } else showToast("Sold Out");
-        }
-        const badge = document.getElementById('cartBadge'); const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-        if(totalQty > 0) { badge.style.display = 'flex'; badge.innerText = totalQty; } else { badge.style.display = 'none'; }
+    function updateQty(id, delta, size=null) {
+        const p = allProducts.find(x=>String(x.id)===String(id)); if(!p) return;
+        let cKey = size ? `${id}_${size}` : `${id}`; let item = cart.find(i=>i.cartKey===cKey);
+        if(item) { item.qty += delta; if(item.qty<=0) cart = cart.filter(i=>i.cartKey!==cKey); else if (item.qty>p.stock) { item.qty=p.stock; showToast("Stock limit!"); } } 
+        else if(delta>0) { if(p.stock>0) { cart.push({...p, qty:1, size:size, cartKey:cKey}); showToast("Added to Cart"); } else showToast("Sold Out"); }
+        const b = document.getElementById('cartBadge'); const tot = cart.reduce((s,i)=>s+i.qty,0); b.style.display=tot>0?'flex':'none'; b.innerText=tot;
         filterAndSortProducts(); if(document.getElementById('cartModal').classList.contains('active')) openCart(); 
     }
 
     function openProductDetails(id) {
-        activeModalProduct = allProducts.find(p => String(p.id) === String(id)); if(!activeModalProduct) return;
-        selectedModalSize = null; document.getElementById('modalProdName').innerText = activeModalProduct.name; document.getElementById('modalProdPrice').innerText = `₹${activeModalProduct.price.toLocaleString('en-IN')}`;
-        let imgsHTML = '';
-        if(activeModalProduct.emoji) imgsHTML += `<div class="prod-img-box"><img src="${activeModalProduct.emoji}"></div>`;
-        if(activeModalProduct.image2) imgsHTML += `<div class="prod-img-box"><img src="${activeModalProduct.image2}"></div>`;
-        if(activeModalProduct.image3) imgsHTML += `<div class="prod-img-box"><img src="${activeModalProduct.image3}"></div>`;
-        document.getElementById('modalImgSlider').innerHTML = imgsHTML;
-
-        const sizeBox = document.getElementById('sizeSelectionBox'), sContainer = document.getElementById('sizeButtonsContainer');
-        if(activeModalProduct.sizeType && activeModalProduct.sizeType !== 'None') {
-            sizeBox.style.display = 'block';
-            let sizes = activeModalProduct.sizeType === 'Clothing' ? ['S', 'M', 'L', 'XL', 'XXL'] : ['6', '7', '8', '9', '10', '11'];
-            sContainer.innerHTML = sizes.map(s => `<div class="size-btn" onclick="selectModalSize('${s}', this)">${s}</div>`).join('');
-        } else { sizeBox.style.display = 'none'; }
+        activeModalProduct = allProducts.find(p=>String(p.id)===String(id)); if(!activeModalProduct) return;
+        selectedModalSize = null; document.getElementById('modalProdName').innerText=activeModalProduct.name; document.getElementById('modalProdPrice').innerText=`₹${activeModalProduct.price.toLocaleString('en-IN')}`;
+        let imgs = ''; [activeModalProduct.emoji, activeModalProduct.image2, activeModalProduct.image3].forEach(img => { if(img) imgs += `<div class="prod-img-box"><img src="${img}"></div>`; });
+        document.getElementById('modalImgSlider').innerHTML = imgs;
+        const sBox = document.getElementById('sizeSelectionBox'), sCont = document.getElementById('sizeButtonsContainer');
+        if(activeModalProduct.sizeType && activeModalProduct.sizeType!=='None') {
+            sBox.style.display='block'; let sizes = activeModalProduct.sizeType==='Clothing' ? ['S','M','L','XL','XXL'] : ['6','7','8','9','10','11'];
+            sCont.innerHTML = sizes.map(s => `<div class="size-btn" onclick="selectModalSize('${s}', this)">${s}</div>`).join('');
+        } else { sBox.style.display='none'; }
         document.getElementById('modalShareBtn').onclick = () => shareProduct(id); document.getElementById('productModal').classList.add('active');
     }
-
-    function selectModalSize(size, el) { selectedModalSize = size; document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active')); el.classList.add('active'); }
-    function addToCartFromModal() { if(activeModalProduct.sizeType && activeModalProduct.sizeType !== 'None' && !selectedModalSize) { return showToast("Please select a size first!"); } updateQty(activeModalProduct.id, 1, selectedModalSize); closeModal('productModal'); }
-
-    function renderCustomerProducts(products) {
-        const grid = document.getElementById('customerProductsGrid'); if(!grid) return;
-        if(products.length === 0) { grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:#878787;">No products found</div>`; return; }
-
-        grid.innerHTML = products.map(p => {
-            const isOutOfStock = p.stock <= 0; const stockBadge = isOutOfStock ? `<div class="stock-badge low">SOLD OUT</div>` : `<div class="stock-badge ok">${p.stock} LEFT</div>`;
-            const displayVisual = isImage(p.emoji) ? `<img src="${p.emoji}" class="product-img-real">` : `<div style="font-size:50px;">${p.emoji}</div>`;
-            let actionHTML = '';
-            if(p.sizeType && p.sizeType !== 'None') { actionHTML = `<button class="btn-add-cart" onclick="openProductDetails('${p.id}')">Select Size</button>`; } 
-            else {
-                let cartItem = cart.find(i => String(i.id) === String(p.id));
-                if(cartItem) { actionHTML = `<div class="qty-controls"><button class="btn-qty" onclick="updateQty('${p.id}', -1, null)">-</button><span class="qty-val">${cartItem.qty}</span><button class="btn-qty" onclick="updateQty('${p.id}', 1, null)">+</button></div>`; } 
-                else if(isOutOfStock) { actionHTML = `<button class="btn-add-cart" disabled>Unavailable</button>`; } 
-                else { actionHTML = `<button class="btn-add-cart" onclick="updateQty('${p.id}', 1, null)">Add to Cart</button>`; }
-            }
-            return `
-            <div class="product-card">
-                ${stockBadge}
-                <div class="share-badge" onclick="shareProduct('${p.id}')"><i data-lucide="share-2" style="width:14px; height:14px;"></i></div>
-                <div class="product-image" onclick="openProductDetails('${p.id}')">${displayVisual}</div>
-                <div class="product-info"><div class="product-name" onclick="openProductDetails('${p.id}')">${p.name}</div><div class="product-price">₹${(p.price||0).toLocaleString('en-IN')}</div>${actionHTML}</div>
-            </div>`;
-        }).join('');
-        lucide.createIcons();
-    }
+    function selectModalSize(s, el) { selectedModalSize=s; document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
+    function addToCartFromModal() { if(activeModalProduct.sizeType && activeModalProduct.sizeType!=='None' && !selectedModalSize) return showToast("Select a size first!"); updateQty(activeModalProduct.id, 1, selectedModalSize); closeModal('productModal'); }
 
     function openCart() {
         document.getElementById('cartModal').classList.add('active'); const list = document.getElementById('cartItemsList');
-        if(cart.length === 0) { list.innerHTML = "<p style='text-align:center; margin-top:30px; color:var(--primary); font-weight:bold; font-size:16px;'>Your Luxury Cart is empty</p>"; document.getElementById('cartTotal').innerText = '₹0'; return; }
-        let total = 0;
-        list.innerHTML = cart.map(item => {
-            total += (item.price||0) * item.qty;
-            const displayVisual = isImage(item.emoji) ? `<img src="${item.emoji}" class="cart-img-real">` : `<div style="font-size:30px; width:60px; text-align:center;">${item.emoji}</div>`;
-            const sizeLabel = item.size ? `<span style="background:var(--primary); color:#000; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:900; margin-left:8px;">Size: ${item.size}</span>` : '';
-            return `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:var(--card-bg); border-radius:12px; margin-bottom:12px; border:1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                    <div style="display:flex; gap:15px; align-items:center;">${displayVisual}<div><div style="font-weight:700; font-size:13px; color:var(--text-main);">${item.name} ${sizeLabel}</div><div style="color:var(--primary); font-weight:900; font-size:16px; margin-top:6px;">₹${(item.price||0).toLocaleString('en-IN')}</div></div></div>
-                    <div class="qty-controls" style="margin-top:0; width:85px; background:#222;"><button class="btn-qty" onclick="updateQty('${item.id}', -1, '${item.size||''}')">-</button><span class="qty-val">${item.qty}</span><button class="btn-qty" onclick="updateQty('${item.id}', 1, '${item.size||''}')">+</button></div>
-                </div>`;
-        }).join('');
+        if(cart.length===0) { list.innerHTML = "<p style='text-align:center; margin-top:30px; color:var(--primary); font-weight:bold;'>Cart is empty</p>"; document.getElementById('cartTotal').innerText='₹0'; return; }
+        let total = 0; list.innerHTML = cart.map(i => { total += (i.price||0)*i.qty; const img = isImage(i.emoji) ? `<img src="${i.emoji}" class="cart-img-real">` : `<div style="font-size:30px; width:60px; text-align:center;">${i.emoji}</div>`; const sz = i.size ? `<span style="background:var(--primary); color:#000; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:900; margin-left:8px;">Size: ${i.size}</span>` : '';
+        return `<div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:var(--card-bg); border-radius:12px; margin-bottom:12px; border:1px solid var(--border-color);"><div style="display:flex; gap:15px; align-items:center;">${img}<div><div style="font-weight:700; font-size:13px;">${i.name} ${sz}</div><div style="color:var(--primary); font-weight:900; font-size:16px; margin-top:6px;">₹${(i.price||0).toLocaleString('en-IN')}</div></div></div><div class="qty-controls" style="width:85px;"><button class="btn-qty" onclick="updateQty('${i.id}', -1, '${i.size||''}')">-</button><span class="qty-val">${i.qty}</span><button class="btn-qty" onclick="updateQty('${i.id}', 1, '${i.size||''}')">+</button></div></div>`; }).join('');
         document.getElementById('cartTotal').innerText = '₹' + total.toLocaleString('en-IN'); document.getElementById('checkoutTotal').innerText = '₹' + total.toLocaleString('en-IN');
     }
 
-    function captureLocation() { showToast("Fetching Location..."); customerLat = "20.12"; customerLng = "85.45"; document.getElementById('locStatus').innerText = "✅ Verified VIP Location!"; document.getElementById('locStatus').style.color="var(--success)";}
-
-    function proceedToCheckout() {
-        if(cart.length === 0) return showToast("Cart is empty");
-        if(!loggedInUser) { showToast("Sign in to place VIP order!"); closeModal('cartModal'); openAuthPage(); return; }
-        let total = cart.reduce((sum, item) => sum + ((item.price||0) * item.qty), 0); let minAmount = parseInt(appSettings.payment?.minOrderAmount) || 0;
-        if (total < minAmount) return showToast("Minimum Premium Order is ₹" + minAmount);
-        selectPaymentMethod('UPI'); closeModal('cartModal'); document.getElementById('checkoutModal').classList.add('active');
-    }
-
-    function selectPaymentMethod(method) { selectedPaymentMethod = method; document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('active')); document.getElementById('pay' + method).classList.add('active'); }
+    function captureLocation() { showToast("Fetching Location..."); customerLat = "20.12"; customerLng = "85.45"; document.getElementById('locStatus').innerText = "✅ Location Attached!"; document.getElementById('locStatus').style.color="var(--success)";}
+    function proceedToCheckout() { if(cart.length===0) return showToast("Cart is empty"); if(!loggedInUser) { showToast("Sign in required"); closeModal('cartModal'); openAuthPage(); return; } let t = cart.reduce((s,i)=>s+(i.price*i.qty),0), m = parseInt(appSettings.payment.minOrderAmount)||0; if(t<m) return showToast("Min Order: ₹"+m); selectPaymentMethod('UPI'); closeModal('cartModal'); document.getElementById('checkoutModal').classList.add('active'); }
+    function selectPaymentMethod(m) { selectedPaymentMethod = m; document.querySelectorAll('.payment-option').forEach(e=>e.classList.remove('active')); document.getElementById('pay'+m).classList.add('active'); }
 
     function handleOrderPlacement() {
         if(selectedPaymentMethod === 'UPI') {
-            if(!appSettings.payment.qrCode) return showToast("Admin hasn't setup QR Code yet. Please use COD.");
-            let total = cart.reduce((sum, item) => sum + ((item.price||0) * item.qty), 0);
-            document.getElementById('qrPayAmount').innerText = total.toLocaleString('en-IN');
-            document.getElementById('qrPaymentModal').classList.add('active');
-        } else {
-            placeOrder('COD');
-        }
+            if(!appSettings.payment.qrCode) return showToast("Admin QR not setup. Use COD.");
+            document.getElementById('qrPayAmount').innerText = cart.reduce((s,i)=>s+(i.price*i.qty),0).toLocaleString('en-IN'); document.getElementById('qrPaymentModal').classList.add('active');
+        } else placeOrder('COD');
     }
-
     function confirmQrOrder() { placeOrder('UPI (Paid via QR)'); closeModal('qrPaymentModal'); }
-
-    function placeOrder(finalMethod = null) {
-        const name = document.getElementById('cName').value.trim(), phone = document.getElementById('cPhone').value.trim(), address = document.getElementById('cAddress').value.trim(), pin = document.getElementById('cPin').value.trim();
-        if(!name || !phone || !address || !pin) return showToast("Fill all Delivery Details");
-        let total = cart.reduce((sum, item) => sum + ((item.price||0) * item.qty), 0);
-        const orderId = 'ORD-' + Date.now();
-        const itemsStr = cart.map(i => `${i.name} ${i.size ? `[Size:${i.size}]` : ''} (x${i.qty})`).join(', ');
-        const detailedCart = cart.map(i => ({ name: `${i.name} ${i.size ? `[${i.size}]` : ''}`, qty: i.qty, price: i.price, amount: i.price*i.qty }));
-
-        db.ref('orders/' + orderId).set({ id: orderId, timestamp: Date.now(), customer: name, phone, address: address + " - " + pin, lat: customerLat, lng: customerLng, paymentMethod: finalMethod || selectedPaymentMethod, items: itemsStr, cartItems: detailedCart, total, status: 'Pending', date: new Date().toLocaleDateString() });
-
-        cart.forEach(cItem => { const p = allProducts.find(p => String(p.id) === String(cItem.id)); if(p) db.ref('products/' + p.id).update({ stock: p.stock - cItem.qty }); });
-        cart = []; document.getElementById('cartBadge').style.display = 'none'; closeModal('checkoutModal'); switchCustomerTab('orders', document.getElementById('navOrders'));
-        showToast("Premium Order Placed Successfully!");
+    function placeOrder(m=null) {
+        const n=document.getElementById('cName').value.trim(), p=document.getElementById('cPhone').value.trim(), a=document.getElementById('cAddress').value.trim(), z=document.getElementById('cPin').value.trim();
+        if(!n||!p||!a||!z) return showToast("Fill all Details");
+        const oid = 'ORD-'+Date.now(), tot = cart.reduce((s,i)=>s+(i.price*i.qty),0), is = cart.map(i=>`${i.name} ${i.size?`[Size:${i.size}]`:''} (x${i.qty})`).join(', ');
+        db.ref('orders/'+oid).set({id:oid, timestamp:Date.now(), customer:n, phone:p, address:a+" - "+z, lat:customerLat, lng:customerLng, paymentMethod:m||selectedPaymentMethod, items:is, cartItems:cart.map(i=>({name:`${i.name} ${i.size?`[${i.size}]`:''}`, qty:i.qty, price:i.price, amount:i.price*i.qty})), total:tot, status:'Pending', date:new Date().toLocaleDateString()});
+        cart.forEach(c => { const pr=allProducts.find(x=>String(x.id)===String(c.id)); if(pr) db.ref('products/'+pr.id).update({stock:pr.stock-c.qty}); });
+        cart=[]; document.getElementById('cartBadge').style.display='none'; closeModal('checkoutModal'); switchCustomerTab('orders', document.getElementById('navOrders')); showToast("Order Placed!");
     }
-
-    function requestCancelOrder(orderId) { if(confirm("Request cancellation?")) { db.ref('orders/' + orderId).update({ status: 'Cancel Requested' }); showToast("Request Sent"); } }
-
+    function requestCancelOrder(id) { if(confirm("Request cancellation?")) { db.ref('orders/'+id).update({status:'Cancel Requested'}); showToast("Sent"); } }
     function renderCustomerOrders() {
         const list = document.getElementById('customerOrdersList'); if(!list) return;
-        let myOrders = loggedInUser ? allOrders.filter(o => String(o.phone) === String(loggedInUser.phone)) : [];
-        if(myOrders.length === 0) { list.innerHTML = "<p style='color:var(--text-muted); text-align:center; font-weight:bold; font-size:15px; margin-top:20px;'>No Premium Orders found.</p>"; return; }
-        list.innerHTML = myOrders.map(o => {
-            let color = o.status === 'Delivered' ? 'var(--success)' : (o.status === 'Cancelled' ? 'var(--danger)' : (o.status === 'Cancel Requested' ? '#ef4444' : 'var(--primary)'));
-            let cancelBtn = o.status === 'Pending' ? `<button onclick="requestCancelOrder('${o.id}')" style="margin-top:12px; width:100%; padding:10px; background:rgba(239, 83, 80, 0.1); color:var(--danger); border:1px solid var(--danger); border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer;">Request Cancel</button>` : '';
-            return `<div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);"><div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid var(--border-color); padding-bottom:12px;"><b style="color:var(--text-main); font-size:13px;">${o.id}</b><span style="font-weight:900; font-size:12px; color:${color}; letter-spacing:0.5px; text-transform:uppercase;">${o.status}</span></div><div style="font-size:14px; color:var(--text-muted); line-height:1.6;">${o.items}<br><div style="margin-top:6px; font-size:18px; font-weight:900; color:var(--primary); text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Total: ₹${(o.total||0).toLocaleString('en-IN')}</div></div>${cancelBtn}</div>`;
+        let m = loggedInUser ? allOrders.filter(o=>String(o.phone)===String(loggedInUser.phone)) : [];
+        if(m.length===0) { list.innerHTML="<p style='text-align:center; color:var(--text-muted);'>No Orders.</p>"; return; }
+        list.innerHTML = m.map(o => {
+            let col = o.status==='Delivered'?'var(--success)':(o.status==='Cancelled'?'var(--danger)':(o.status==='Cancel Requested'?'#ef4444':'var(--primary)'));
+            let cb = o.status==='Pending'?`<button onclick="requestCancelOrder('${o.id}')" style="margin-top:12px;width:100%;padding:10px;background:rgba(239,83,80,0.1);color:var(--danger);border:1px solid var(--danger);border-radius:6px;font-weight:bold;">Cancel</button>`:'';
+            return `<div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color);"><div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid var(--border-color); padding-bottom:12px;"><b style="color:var(--text-main); font-size:13px;">${o.id}</b><span style="font-weight:900; font-size:12px; color:${col}; text-transform:uppercase;">${o.status}</span></div><div style="font-size:14px; color:var(--text-muted);">${o.items}<br><div style="margin-top:6px; font-size:18px; font-weight:900; color:var(--primary);">Total: ₹${(o.total||0).toLocaleString('en-IN')}</div></div>${cb}</div>`;
         }).join('');
     }
+    function switchCustomerTab(t, el) { document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); if(el) el.classList.add('active'); document.getElementById('customerDashboard').style.display='none'; document.getElementById('customerOrdersView').style.display='none'; document.getElementById('customerProfileView').style.display='none'; if(t==='home') { document.getElementById('customerDashboard').style.display='block'; filterAndSortProducts(); } else if (t==='orders') { if(!loggedInUser) { showToast("Sign in required"); openAuthPage(); document.getElementById('navOrders').classList.remove('active'); document.getElementById('navHome').classList.add('active'); return; } document.getElementById('customerOrdersView').style.display='block'; renderCustomerOrders(); } else if (t==='profile') { document.getElementById('customerProfileView').style.display='block'; } }
 
-    function switchCustomerTab(tab, element) {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); if(element) element.classList.add('active');
-        document.getElementById('customerDashboard').style.display = 'none'; document.getElementById('customerOrdersView').style.display = 'none'; document.getElementById('customerProfileView').style.display = 'none';
-        if(tab === 'home') { document.getElementById('customerDashboard').style.display = 'block'; filterAndSortProducts(); } 
-        else if (tab === 'orders') { if(!loggedInUser) { showToast("Sign in required"); openAuthPage(); document.getElementById('navOrders').classList.remove('active'); document.getElementById('navHome').classList.add('active'); return; } document.getElementById('customerOrdersView').style.display = 'block'; renderCustomerOrders(); } 
-        else if (tab === 'profile') { document.getElementById('customerProfileView').style.display = 'block'; }
-    }
-
-    // 🚀 RESTORED ADMIN SECURE LOGIN
-    function openAdminLogin() { 
-        document.getElementById('adminLoginModal').classList.add('active'); 
-    }
-    
-    function verifyAdmin() {
-        const user = document.getElementById('adminUser').value, pass = document.getElementById('adminPass').value;
-        if(btoa(user) === 'YWRtaW4xMjM=' && btoa(pass) === 'YWRtaW5AMTIz') { 
-            closeModal('adminLoginModal'); 
-            document.getElementById('customerApp').classList.remove('active'); 
-            document.getElementById('adminApp').classList.add('active'); 
-            loadAdminDashboard(); 
-            showToast("Welcome Admin"); 
-            document.getElementById('adminUser').value = ''; 
-            document.getElementById('adminPass').value = ''; 
-        } 
-        else { showToast("Invalid Credentials!"); }
-    }
-
+    function openAdminLogin() { document.getElementById('adminLoginModal').classList.add('active'); }
+    function verifyAdmin() { const u=document.getElementById('adminUser').value, p=document.getElementById('adminPass').value; if(btoa(u)==='YWRtaW4xMjM='&&btoa(p)==='YWRtaW5AMTIz') { closeModal('adminLoginModal'); document.getElementById('customerApp').classList.remove('active'); document.getElementById('adminApp').classList.add('active'); loadAdminDashboard(); showToast("Admin Login"); document.getElementById('adminUser').value=''; document.getElementById('adminPass').value=''; } else showToast("Invalid!"); }
     function logoutAdmin() { document.getElementById('adminApp').classList.remove('active'); document.getElementById('customerApp').classList.add('active'); switchCustomerTab('home', document.getElementById('navHome')); }
-    function switchAdminTab(tabId) { document.querySelectorAll('.admin-section').forEach(el => el.classList.remove('active')); document.querySelectorAll('.admin-tab-btn').forEach(el => el.classList.remove('active')); document.getElementById('sec-' + tabId).classList.add('active'); document.getElementById('btn-tab-' + tabId).classList.add('active'); if(tabId === 'dashboard') loadAdminDashboard(); }
+    function switchAdminTab(t) { document.querySelectorAll('.admin-section').forEach(e=>e.classList.remove('active')); document.querySelectorAll('.admin-tab-btn').forEach(e=>e.classList.remove('active')); document.getElementById('sec-'+t).classList.add('active'); document.getElementById('btn-tab-'+t).classList.add('active'); if(t==='dashboard') loadAdminDashboard(); }
+    function removeRider(p) { if(confirm("Remove rider?")) { db.ref('riders/'+p).remove(); showToast("Removed"); } }
+    function assignRiderToOrder(id, p) { if(!p) return; db.ref('orders/'+id).update({assignedRider:p, status:'Out for Delivery'}); showToast("Assigned"); }
 
     function loadAdminDashboard() {
-        let totalRev = 0, upiRev = 0, codRev = 0;
-        allOrders.forEach(o => { if(o.status !== 'Cancelled') { totalRev += (o.total || 0); if (o.paymentMethod && o.paymentMethod.includes('UPI')) upiRev += (o.total || 0); else codRev += (o.total || 0); } });
-        document.getElementById('metricRevenue').innerText = '₹' + totalRev.toLocaleString('en-IN'); document.getElementById('metricOrders').innerText = allOrders.length;
-        document.getElementById('metricUPI').innerText = '₹' + upiRev.toLocaleString('en-IN'); document.getElementById('metricCOD').innerText = '₹' + codRev.toLocaleString('en-IN');
-        
-        if(document.getElementById('metricUsers')) document.getElementById('metricUsers').innerText = allUsers.length;
-
-        const cList = document.getElementById('adminCustomersList');
-        if(cList) {
-            cList.innerHTML = allUsers.map(u => `<div style="background:#222; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border-color);"><div style="color:var(--primary); font-weight:bold; font-size:15px;">${u.firstName}</div><div style="color:var(--text-main); font-size:13px; margin-top:5px;">📞 +91 ${u.phone}</div></div>`).join('') || "<p style='color:var(--text-muted);'>No customers yet.</p>";
-        }
-
-        const rList = document.getElementById('adminRidersList');
-        if(rList) {
-            rList.innerHTML = allRiders.map(r => `<div style="display:flex; justify-content:space-between; align-items:center; background:#222; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border-color);"><div><div style="color:var(--primary); font-weight:900; font-size:15px; letter-spacing:0.5px;">${r.name}</div><div style="color:var(--text-main); font-size:13px; margin-top:4px;">+91 ${r.phone}</div></div><button class="btn-danger-small" onclick="removeRider('${r.phone}')">Remove</button></div>`).join('') || "<p style='color:var(--text-muted); font-size:13px; font-weight:bold;'>No riders registered.</p>";
-        }
-
-        document.getElementById('adminStockList').innerHTML = allProducts.map(p => {
-            const displayVisual = isImage(p.emoji) ? `<img src="${p.emoji}" style="width:40px; height:40px; border-radius:6px; object-fit:contain; background:white; border:1px solid #333; padding:2px;">` : `<span style="font-size:24px;">${p.emoji}</span>`;
-            return `<div style="background:#222; padding:15px; border-radius:8px; margin-bottom:12px; border:1px solid var(--border-color);"><div style="display:flex; justify-content:space-between; margin-bottom:12px;"><div style="display:flex; align-items:center; gap:12px;">${displayVisual}<span style="font-size:15px; font-weight:900; color:var(--text-main); letter-spacing:0.5px;">${p.name}</span></div><div style="font-size:12px; font-weight:900; padding:4px 8px; border-radius:4px; background:${p.stock <= 2 ? 'rgba(239,83,80,0.2)' : 'rgba(212,175,55,0.2)'}; color:${p.stock <= 2 ? 'var(--danger)' : 'var(--primary)'}">Stock: ${p.stock}</div></div>
-                <div style="display:flex; justify-content:space-between; align-items:center;"><span style="color:var(--primary); font-weight:900; font-size:18px;">₹${(p.price||0).toLocaleString('en-IN')}</span><div style="display:flex; gap:10px;"><button onclick="editProduct('${p.id}')" style="background:#1e88e5; border:none; padding:8px 15px; border-radius:6px; color:white; font-size:12px; font-weight:bold; cursor:pointer;">Edit</button><button onclick="deleteProduct('${p.id}')" style="background:var(--danger); border:none; padding:8px 15px; border-radius:6px; color:white; font-size:12px; font-weight:bold; cursor:pointer;">Delete</button></div></div></div>`;
-        }).join('');
-
+        let tr=0, ur=0, cr=0; allOrders.forEach(o => { if(o.status!=='Cancelled') { tr+=o.total||0; if(o.paymentMethod.includes('UPI')) ur+=o.total||0; else cr+=o.total||0; } });
+        document.getElementById('metricRevenue').innerText='₹'+tr.toLocaleString('en-IN'); document.getElementById('metricOrders').innerText=allOrders.length; document.getElementById('metricUPI').innerText='₹'+ur.toLocaleString('en-IN'); document.getElementById('metricCOD').innerText='₹'+cr.toLocaleString('en-IN');
+        if(document.getElementById('metricUsers')) document.getElementById('metricUsers').innerText=allUsers.length;
+        if(document.getElementById('adminCustomersList')) document.getElementById('adminCustomersList').innerHTML = allUsers.map(u => `<div style="background:#222; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border-color);"><div style="color:var(--primary); font-weight:bold;">${u.firstName}</div><div style="color:var(--text-main); font-size:13px; margin-top:5px;">📞 +91 ${u.phone}</div></div>`).join('')||"<p style='color:var(--text-muted);'>No customers</p>";
+        if(document.getElementById('adminRidersList')) document.getElementById('adminRidersList').innerHTML = allRiders.map(r => `<div style="display:flex; justify-content:space-between; align-items:center; background:#222; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border-color);"><div><div style="color:var(--primary); font-weight:900;">${r.name}</div><div style="color:var(--text-main); font-size:13px;">+91 ${r.phone}</div></div><button class="btn-danger-small" onclick="removeRider('${r.phone}')">Remove</button></div>`).join('')||"<p style='color:var(--text-muted);'>No riders</p>";
+        document.getElementById('adminStockList').innerHTML = allProducts.map(p => `<div style="background:#222; padding:15px; border-radius:8px; margin-bottom:12px; border:1px solid var(--border-color);"><div style="display:flex; justify-content:space-between; margin-bottom:12px;"><div style="display:flex; align-items:center; gap:12px;">${isImage(p.emoji)?`<img src="${p.emoji}" style="width:40px;height:40px;border-radius:6px;object-fit:contain;background:white;">`:`<span style="font-size:24px;">${p.emoji}</span>`}<span style="font-weight:900;">${p.name}</span></div><div style="font-size:12px; font-weight:900; padding:4px 8px; border-radius:4px; background:${p.stock<=2?'rgba(239,83,80,0.2)':'rgba(212,175,55,0.2)'}; color:${p.stock<=2?'var(--danger)':'var(--primary)'}">Stock: ${p.stock}</div></div><div style="display:flex; justify-content:space-between; align-items:center;"><span style="color:var(--primary); font-weight:900; font-size:18px;">₹${(p.price||0).toLocaleString('en-IN')}</span><div style="display:flex; gap:10px;"><button onclick="editProduct('${p.id}')" style="background:#1e88e5; border:none; padding:8px 15px; border-radius:6px; color:white; font-weight:bold; cursor:pointer;">Edit</button><button onclick="deleteProduct('${p.id}')" style="background:var(--danger); border:none; padding:8px 15px; border-radius:6px; color:white; font-weight:bold; cursor:pointer;">Delete</button></div></div></div>`).join('');
         document.getElementById('adminOrdersList').innerHTML = allOrders.map(o => {
-            let highlight = o.status === 'Cancel Requested' ? 'border: 2px solid var(--danger); box-shadow: 0 0 10px rgba(239,83,80,0.3);' : 'border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);';
-            let riderOptions = `<option value="">-- Assign Rider --</option>`;
-            allRiders.forEach(r => { riderOptions += `<option value="${r.phone}" ${String(o.assignedRider) === String(r.phone) ? 'selected' : ''}>🏍️ ${r.name}</option>`; });
-            return `
-            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:20px; ${highlight}"><div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;"><b style="color:var(--primary); font-size:14px; letter-spacing:0.5px;">${o.id}</b><span style="font-size:12px; color:var(--text-muted); font-weight:bold;">${o.date}</span></div><div style="font-size:14px; color:var(--text-main); margin-bottom:15px; line-height:1.6;"><b style="color:var(--primary); font-size:16px;">${o.customer}</b> (+91 ${o.phone})<br><span style="color:var(--text-muted);">Address:</span> ${o.address || 'N/A'}<br><span style="color:var(--text-muted);">Items:</span> <span style="font-weight:bold;">${o.items}</span><br><div style="margin-top:6px; font-size:18px; font-weight:900; color:var(--primary); text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Total: ₹${(o.total||0).toLocaleString('en-IN')}</div></div>
-                <div style="display:flex; gap:12px; margin-bottom:15px;"><select style="background:#222; color:white; border:1px solid var(--border-color); padding:10px; border-radius:8px; flex:1; outline:none; font-weight:bold;" onchange="updateOrderStatus('${o.id}', this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>⏳ Pending</option><option value="Packed" ${o.status==='Packed'?'selected':''}>📦 Packed</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>🏍️ Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>✅ Delivered</option><option value="Cancel Requested" ${o.status==='Cancel Requested'?'selected':''} disabled>⚠️ Cancel Requested</option><option value="Cancelled" ${o.status==='Cancelled'?'selected':''}>❌ Cancelled</option></select></div>
-                <div style="margin-bottom:15px;"><select style="background:rgba(212,175,55,0.1); color:var(--primary); border:1px solid var(--primary); padding:10px; border-radius:8px; width:100%; outline:none; font-weight:900; letter-spacing:0.5px;" onchange="assignRiderToOrder('${o.id}', this.value)">${riderOptions}</select></div>
-                <div style="background:#222; padding:15px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px;"><div style="font-size:11px; color:var(--primary); font-weight:900; margin-bottom:8px; letter-spacing:1px;">SET VIP DELIVERY SCHEDULE</div><div style="display:flex; gap:8px;"><input type="date" id="delDate_${o.id}" class="admin-input" style="padding:10px; margin:0;" value="${o.deliveryDate || ''}"><input type="time" id="delTime_${o.id}" class="admin-input" style="padding:10px; margin:0; width:110px;" value="${o.deliveryTime || ''}"><button class="btn-small" style="padding:10px 15px; background:var(--gold-gradient); color:var(--text-dark); border:none;" onclick="saveDeliverySchedule('${o.id}')">Save</button></div></div>
-                <div style="display:flex; gap:12px; margin-bottom:12px;"><button onclick="downloadPDF('${o.id}')" style="background:#1e88e5; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; flex:1; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">📄 PDF</button><button onclick="printBill('${o.id}')" style="background:#8e24aa; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; flex:1; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">🖨️ Print</button></div>
-                <div style="display:flex; gap:12px;"><button onclick="shareBillWhatsApp('${o.id}')" style="background:var(--whatsapp); color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:900; flex:1; text-transform:uppercase; letter-spacing:0.5px;">💬 WhatsApp Bill</button><button onclick="deleteOrder('${o.id}')" style="background:var(--danger); color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; width:55px; font-weight:bold; font-size:16px;">🗑️</button></div>
-            </div>`;
-        }).join('') || "<p style='color:var(--text-muted); font-weight:bold; text-align:center;'>No orders yet.</p>";
+            let hl = o.status==='Cancel Requested'?'border:2px solid var(--danger);':'border:1px solid var(--border-color);'; let ro = `<option value="">-- Assign Rider --</option>` + allRiders.map(r=>`<option value="${r.phone}" ${String(o.assignedRider)===String(r.phone)?'selected':''}>🏍️ ${r.name}</option>`).join('');
+            return `<div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:20px; ${hl}"><div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid var(--border-color); padding-bottom:10px;"><b style="color:var(--primary);">${o.id}</b><span style="font-size:12px; color:var(--text-muted);">${o.date}</span></div><div style="font-size:14px; margin-bottom:15px;"><b style="color:var(--primary); font-size:16px;">${o.customer}</b> (+91 ${o.phone})<br><span style="color:var(--text-muted);">Addr:</span> ${o.address||'N/A'}<br><span style="color:var(--text-muted);">Items:</span> <b>${o.items}</b><br><div style="margin-top:6px; font-size:18px; font-weight:900; color:var(--primary);">Total: ₹${(o.total||0).toLocaleString('en-IN')}</div></div><div style="display:flex; gap:12px; margin-bottom:15px;"><select style="background:#222; color:white; border:1px solid var(--border-color); padding:10px; border-radius:8px; flex:1; outline:none; font-weight:bold;" onchange="updateOrderStatus('${o.id}', this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>⏳ Pending</option><option value="Packed" ${o.status==='Packed'?'selected':''}>📦 Packed</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>🏍️ Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>✅ Delivered</option><option value="Cancel Requested" ${o.status==='Cancel Requested'?'selected':''} disabled>⚠️ Cancel Req</option><option value="Cancelled" ${o.status==='Cancelled'?'selected':''}>❌ Cancelled</option></select></div><div style="margin-bottom:15px;"><select style="background:rgba(212,175,55,0.1); color:var(--primary); border:1px solid var(--primary); padding:10px; border-radius:8px; width:100%; outline:none; font-weight:900;" onchange="assignRiderToOrder('${o.id}', this.value)">${ro}</select></div><div style="display:flex; gap:12px; margin-bottom:12px;"><button onclick="downloadPDF('${o.id}')" style="background:#1e88e5; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; flex:1; font-weight:900;">📄 PDF</button><button onclick="printBill('${o.id}')" style="background:#8e24aa; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; flex:1; font-weight:900;">🖨️ Print</button></div><div style="display:flex; gap:12px;"><button onclick="shareBillWhatsApp('${o.id}')" style="background:var(--whatsapp); color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:900; flex:1;">💬 WhatsApp</button><button onclick="deleteOrder('${o.id}')" style="background:var(--danger); color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; width:55px; font-weight:bold;">🗑️</button></div></div>`;
+        }).join('') || "<p style='color:var(--text-muted); text-align:center;'>No orders.</p>";
     }
 
-    function populateBillTemplate(orderId) {
-        const o = allOrders.find(x => String(x.id) === String(orderId)); if(!o) return false;
-        document.getElementById('billCustomerName').innerText = o.customer; document.getElementById('billOrderId').innerText = o.id; document.getElementById('billDate').innerText = o.date; document.getElementById('billPayment').innerText = o.paymentMethod; document.getElementById('billTotalAmount').innerText = (o.total||0).toLocaleString('en-IN');
-        const tbody = document.getElementById('billTableBody');
-        if(o.cartItems && o.cartItems.length > 0) tbody.innerHTML = o.cartItems.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>₹${(i.price||0).toLocaleString('en-IN')}</td><td style="text-align:right;">₹${(i.amount||0).toLocaleString('en-IN')}</td></tr>`).join('');
-        else tbody.innerHTML = `<tr><td colspan="4">${o.items}</td></tr>`; return true;
-    }
-    function printBill(orderId) { if(populateBillTemplate(orderId)) window.print(); }
-    function downloadPDF(orderId) {
-        if(!populateBillTemplate(orderId)) return; showToast("Generating Premium PDF..."); const element = document.getElementById('printBillArea'); element.style.display = 'block'; 
-        html2pdf().set({ margin: 10, filename: `BijuMart_VIP_Bill_${orderId}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' } }).from(element).save().then(() => { element.style.display = 'none'; showToast("PDF Downloaded!"); });
-    }
-    function deleteOrder(orderId) { if(confirm("Permanently delete?")) { db.ref('orders/' + orderId).remove(); showToast("Deleted!"); } }
-    function updateOrderStatus(orderId, newStatus) { db.ref('orders/' + orderId).update({ status: newStatus }); showToast("Status Updated!"); }
-    function saveDeliverySchedule(orderId) { const dDate = document.getElementById(`delDate_${orderId}`).value, dTime = document.getElementById(`delTime_${orderId}`).value; db.ref('orders/' + orderId).update({ deliveryDate: dDate, deliveryTime: dTime }); showToast("Delivery Schedule Saved!"); }
-    function shareBillWhatsApp(orderId) {
-        const o = allOrders.find(order => String(order.id) === String(orderId)); if(!o) return;
-        let message = `👑 *BIJU MART PREMIUM - VIP BILL*\n-------------------------\n*Order ID:* ${o.id}\n*Date:* ${o.date}\n*Customer:* ${o.customer}\n-------------------------\n*Items Ordered:*\n${o.items.replace(/, /g, '\n')}\n-------------------------\n*Payment Method:* ${o.paymentMethod}\n*Total Amount:* ₹${(o.total||0).toLocaleString('en-IN')}\n*Status:* ${o.status}\n`;
-        if(o.deliveryDate) message += `*Expected VIP Delivery:* ${o.deliveryDate} ${o.deliveryTime}\n`; message += `-------------------------\nThank you for shopping with Biju Mart Premium! 💎`;
-        window.open(`https://wa.me/91${o.phone}?text=${encodeURIComponent(message)}`, '_blank'); showToast("Opening WhatsApp...");
-    }
+    function populateBillTemplate(id) { const o = allOrders.find(x=>String(x.id)===String(id)); if(!o) return false; document.getElementById('billCustomerName').innerText=o.customer; document.getElementById('billOrderId').innerText=o.id; document.getElementById('billDate').innerText=o.date; document.getElementById('billPayment').innerText=o.paymentMethod; document.getElementById('billTotalAmount').innerText=(o.total||0).toLocaleString('en-IN'); const tb = document.getElementById('billTableBody'); if(o.cartItems&&o.cartItems.length>0) tb.innerHTML = o.cartItems.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>₹${(i.price||0).toLocaleString('en-IN')}</td><td style="text-align:right;">₹${(i.amount||0).toLocaleString('en-IN')}</td></tr>`).join(''); else tb.innerHTML = `<tr><td colspan="4">${o.items}</td></tr>`; return true; }
+    function printBill(id) { if(populateBillTemplate(id)) window.print(); }
+    function downloadPDF(id) { if(!populateBillTemplate(id)) return; showToast("Generating PDF..."); const el=document.getElementById('printBillArea'); el.style.display='block'; html2pdf().set({margin:10, filename:`BijuMart_VIP_${id}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a5',orientation:'portrait'}}).from(el).save().then(()=>{el.style.display='none'; showToast("Downloaded!");}); }
+    function deleteOrder(id) { if(confirm("Permanently delete?")) { db.ref('orders/'+id).remove(); showToast("Deleted!"); } }
+    function updateOrderStatus(id, s) { db.ref('orders/'+id).update({status:s}); showToast("Status Updated!"); }
+    function shareBillWhatsApp(id) { const o = allOrders.find(x=>String(x.id)===String(id)); if(!o) return; let msg = `👑 *BIJU MART PREMIUM*\n*Order ID:* ${o.id}\n*Date:* ${o.date}\n*Customer:* ${o.customer}\n*Items:*\n${o.items.replace(/, /g,'\n')}\n*Payment:* ${o.paymentMethod}\n*Total:* ₹${(o.total||0).toLocaleString('en-IN')}\n*Status:* ${o.status}\nThank you! 💎`; window.open(`https://wa.me/91${o.phone}?text=${encodeURIComponent(msg)}`, '_blank'); }
 
     async function saveProductEntry() {
-        const name = document.getElementById('pName').value.trim(), price = parseInt(document.getElementById('pPrice').value), stock = parseInt(document.getElementById('pStock').value), cat = document.getElementById('pCat').value, sizeType = document.getElementById('pSizeType').value;
-        if(!name || isNaN(price) || isNaN(stock)) return showToast("Enter Valid Name, Price & Stock");
+        const n=document.getElementById('pName').value.trim(), pr=parseInt(document.getElementById('pPrice').value), s=parseInt(document.getElementById('pStock').value), c=document.getElementById('pCat').value, st=document.getElementById('pSizeType').value;
+        if(!n||isNaN(pr)||isNaN(s)) return showToast("Valid Name, Price & Stock needed");
         const id = editingProductId || Date.now().toString();
-        let f1 = document.getElementById('pImageFile1').files[0], f2 = document.getElementById('pImageFile2').files[0], f3 = document.getElementById('pImageFile3').files[0];
-        let img1 = f1 ? await processImageFileAsync(f1) : document.getElementById('pExistingImage1').value || '📦';
-        let img2 = f2 ? await processImageFileAsync(f2) : document.getElementById('pExistingImage2').value || '';
-        let img3 = f3 ? await processImageFileAsync(f3) : document.getElementById('pExistingImage3').value || '';
-        db.ref('products/' + id).set({ id, name, price, stock, category: cat, sizeType: sizeType, emoji: img1, image2: img2, image3: img3 });
-        showToast(editingProductId ? "Product Updated!" : "Product Added!"); editingProductId = null; document.getElementById('adminAddBtn').innerText = "Save Product";
-        ['pName', 'pPrice', 'pStock', 'pImageFile1', 'pImageFile2', 'pImageFile3', 'pExistingImage1', 'pExistingImage2', 'pExistingImage3'].forEach(el => document.getElementById(el).value = '');
+        let i1=document.getElementById('pImageFile1').files[0], i2=document.getElementById('pImageFile2').files[0], i3=document.getElementById('pImageFile3').files[0];
+        let v1 = i1?await processImageFileAsync(i1):document.getElementById('pExistingImage1').value||'📦', v2 = i2?await processImageFileAsync(i2):document.getElementById('pExistingImage2').value||'', v3 = i3?await processImageFileAsync(i3):document.getElementById('pExistingImage3').value||'';
+        db.ref('products/'+id).set({id, name:n, price:pr, stock:s, category:c, sizeType:st, emoji:v1, image2:v2, image3:v3});
+        showToast("Product Saved!"); editingProductId=null; document.getElementById('adminAddBtn').innerText="Save Product"; ['pName','pPrice','pStock','pImageFile1','pImageFile2','pImageFile3','pExistingImage1','pExistingImage2','pExistingImage3'].forEach(e=>document.getElementById(e).value='');
     }
-
-    function editProduct(id) {
-        const p = allProducts.find(x => String(x.id) === String(id)); if(!p) return;
-        document.getElementById('pName').value = p.name; document.getElementById('pPrice').value = p.price; document.getElementById('pStock').value = p.stock; document.getElementById('pCat').value = p.category; 
-        if(p.sizeType) document.getElementById('pSizeType').value = p.sizeType;
-        document.getElementById('pExistingImage1').value = p.emoji || ''; document.getElementById('pExistingImage2').value = p.image2 || ''; document.getElementById('pExistingImage3').value = p.image3 || '';
-        editingProductId = id; document.getElementById('adminAddBtn').innerText = "Update Product"; document.getElementById('sec-products').scrollTo({top: 0, behavior: 'smooth'});
-    }
-    function deleteProduct(id) { if(confirm("Delete this product?")) { db.ref('products/' + id).remove(); showToast("Deleted"); } }
-
+    function editProduct(id) { const p=allProducts.find(x=>String(x.id)===String(id)); if(!p) return; document.getElementById('pName').value=p.name; document.getElementById('pPrice').value=p.price; document.getElementById('pStock').value=p.stock; document.getElementById('pCat').value=p.category; if(p.sizeType) document.getElementById('pSizeType').value=p.sizeType; document.getElementById('pExistingImage1').value=p.emoji||''; document.getElementById('pExistingImage2').value=p.image2||''; document.getElementById('pExistingImage3').value=p.image3||''; editingProductId=id; document.getElementById('adminAddBtn').innerText="Update Product"; document.getElementById('sec-products').scrollTo({top:0, behavior:'smooth'}); }
+    function deleteProduct(id) { if(confirm("Delete product?")) { db.ref('products/'+id).remove(); showToast("Deleted"); } }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    function showToast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3500); }
+    function showToast(msg) { const t=document.createElement('div'); t.className='toast'; t.innerText=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 3500); }
+
+    function openRiderLogin() { if(loggedInRider) { document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active'); renderRiderDashboard(); } else document.getElementById('riderLoginModal').classList.add('active'); }
+    function saveRider() { const n=document.getElementById('rName').value.trim(), p=document.getElementById('rPhone').value.trim(), ps=document.getElementById('rPass').value.trim(); if(!n||p.length!==10||!ps) return showToast("Enter Name, 10-digit Phone, Password"); db.ref('riders/'+p).set({name:n, phone:p, password:ps}); showToast("Registered!"); ['rName','rPhone','rPass'].forEach(e=>document.getElementById(e).value=''); }
+    function verifyRider() { const p=document.getElementById('riderPhoneLogin').value.trim(), ps=document.getElementById('riderPassLogin').value.trim(); if(!p||!ps) return showToast("Enter credentials"); const r=allRiders.find(x=>String(x.phone)===String(p)&&String(x.password)===String(ps)); if(r) { loggedInRider=r; localStorage.setItem('rider_session_cloud',JSON.stringify(r)); closeModal('riderLoginModal'); document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active'); renderRiderDashboard(); showToast("Welcome Partner!"); document.getElementById('riderPhoneLogin').value=''; document.getElementById('riderPassLogin').value=''; } else showToast("Invalid Credentials"); }
+    function logoutRider() { loggedInRider=null; localStorage.removeItem('rider_session_cloud'); document.getElementById('riderApp').classList.remove('active'); document.getElementById('customerApp').classList.add('active'); showToast("Logged Out"); }
+    function renderRiderDashboard() {
+        if(!loggedInRider) return; document.getElementById('riderGreeting').innerText=`Welcome, ${loggedInRider.name}`;
+        let a = allOrders.filter(o=>String(o.assignedRider)===String(loggedInRider.phone)); document.getElementById('riderDeliveredCount').innerText=a.filter(o=>o.status==='Delivered').length; let act = a.filter(o=>o.status!=='Delivered'&&o.status!=='Cancelled'); const l=document.getElementById('riderOrdersList');
+        if(act.length===0) { l.innerHTML=`<div style="text-align:center; padding:20px; color:var(--text-muted);">No active deliveries. Relax!</div>`; return; }
+        l.innerHTML=act.map(o => {
+            let mBtn = o.lat&&o.lng ? `<button onclick="window.open('http://googleusercontent.com/maps.google.com/maps?q=${o.lat},${o.lng}', '_blank')" style="background:rgba(212,175,55,0.1); color:var(--primary); border:1px solid var(--primary); padding:10px; border-radius:8px; width:100%; font-weight:bold; margin-bottom:12px; cursor:pointer;">Navigate</button>`:'';
+            return `<div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color);"><div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid var(--border-color); padding-bottom:10px;"><b style="color:var(--text-main); font-size:13px;">${o.id}</b><span style="font-weight:900; font-size:11px; color:var(--text-dark); background:var(--primary); padding:4px 8px; border-radius:6px;">${o.status}</span></div><div style="font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:12px;"><b style="color:var(--primary); font-size:15px;">${o.customer}</b><br>${o.address||'N/A'}<br><div style="margin-top:5px; padding:5px; background:#222; border-radius:4px; font-size:12px;">Items: <span style="color:white;">${o.items}</span></div></div>${mBtn}<div style="display:flex; gap:10px; margin-bottom:12px;"><button onclick="window.location.href='tel:${o.phone}'" style="flex:1; background:#222; color:var(--text-main); border:1px solid var(--border-color); padding:12px; border-radius:8px; font-weight:bold;">📞 Call</button><button onclick="showRiderQR('${o.total}')" style="flex:1; background:var(--gold-gradient); color:var(--text-dark); border:none; padding:12px; border-radius:8px; font-weight:900;">📱 ₹${(o.total||0).toLocaleString('en-IN')}</button></div><button onclick="markOrderDelivered('${o.id}')" style="width:100%; background:var(--success); color:white; border:none; padding:14px; border-radius:8px; font-weight:900;">✅ Delivered</button></div>`;
+        }).join('');
+    }
+    function showRiderQR(a) { document.getElementById('riderQrModal').classList.add('active'); document.getElementById('qrAmountDisplay').innerText="₹"+Number(a).toLocaleString('en-IN'); let u = appSettings.payment.upiId||""; document.getElementById('qrUpiDisplay').innerText=u; document.getElementById('dynamicQrImage').src=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=${u}&pn=Biju%20Mart&am=${a}&cu=INR`)}`; }
+    function markOrderDelivered(id) { if(confirm("Delivered and payment collected?")) { db.ref('orders/'+id).update({status:'Delivered', paymentMethod:'Paid on Delivery'}); showToast("Order Delivered."); } }
+
   </script>
 </body>
 </html>
