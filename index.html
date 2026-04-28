@@ -4,113 +4,172 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Biju Mart Premium</title>
+  
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
   <style>
-    :root { --primary: #D4AF37; --gold-gradient: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C); --dark-bg: #000; --light-bg: #121212; --card-bg: #1a1a1a; --border-color: #333; --text-main: #f1f1f1; --text-muted: #888; --text-dark: #000; --success: #4caf50; --danger: #ef5350; --whatsapp: #25D366; }
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100dvh; font-family: Roboto, sans-serif; background: var(--light-bg); overflow: hidden; color: var(--text-main); }
-    body { max-width: 480px; margin: 0 auto; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
-    .app-view { display: none; width: 100%; height: 100dvh; flex-direction: column; overflow: hidden; position: absolute; top:0; left:0; background: var(--light-bg); }
-    .app-view.active { display: flex; }
-    .header { flex-shrink: 0; background: var(--card-bg); padding: 10px 15px; z-index: 40; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border-color); }
-    .main-content { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 90px; }
-    .main-content::-webkit-scrollbar { display: none; }
-    .bottom-nav { flex-shrink: 0; position: absolute; bottom: 0; width: 100%; background: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
-    .header-top-row { display: flex; justify-content: space-between; align-items: center; }
-    .header-logo { font-size: 22px; font-weight: 900; color: var(--primary); display: flex; align-items: center; font-style: italic; text-shadow: 0 2px 4px rgba(212,175,55,0.2); }
-    .header-logo img { height: 32px; max-width: 140px; object-fit: contain; }
-    .icon-btn { background: transparent; border: none; color: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-    .badge { position: absolute; top: -2px; right: -2px; background: var(--primary); color: var(--text-dark); font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg); }
-    .search-wrapper { display: flex; background: #222; border-radius: 8px; padding: 12px 15px; align-items: center; border: 1px solid var(--border-color); margin-bottom: 10px; }
-    .search-wrapper input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 14px; color: var(--text-main); background: transparent; }
-    .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 15px 15px 0; gap: 10px; }
-    .banner-slider::-webkit-scrollbar { display: none; }
-    .banner-slide { min-width: 100%; height: 160px; border-radius: 12px; scroll-snap-align: center; object-fit: cover; background: #2a2a2a; border: 1px solid var(--border-color); }
-    .cat-scroll { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding: 15px; background: var(--card-bg); margin-bottom: 10px; border-bottom: 1px solid var(--border-color); }
-    .cat-scroll::-webkit-scrollbar { display: none; }
-    .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; opacity: 0.7; min-width: 65px; }
-    .cat-item.active { opacity: 1; }
-    .cat-icon-circle { width: 50px; height: 50px; background: #222; border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); overflow:hidden; }
-    .cat-icon-circle img { width: 100%; height: 100%; object-fit: cover; }
-    .cat-item.active .cat-icon-circle { background: var(--gold-gradient); color: var(--text-dark); border: none; }
-    .cat-item span { font-size: 11px; font-weight: 600; color: var(--text-main); white-space: nowrap; }
-    .products-grid-container { padding-top: 10px; padding-bottom: 20px; min-height: 50vh; }
-    .grid-greeting { padding: 0 15px 15px; font-size: 18px; font-weight: 800; color: var(--primary); }
-    .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
-    .product-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; position: relative; border: 1px solid var(--border-color); cursor:pointer; }
-    .share-badge { position: absolute; top: 8px; left: 8px; width: 30px; height: 30px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid var(--primary); color: var(--primary); backdrop-filter: blur(4px); }
-    .product-image { background: #fff; height: 160px; display: flex; align-items: center; justify-content: center; font-size: 50px; overflow: hidden; position: relative; padding: 15px; border-bottom: 1px solid var(--border-color); }
-    .product-img-real { width: 100%; height: 100%; object-fit: contain; }
-    .stock-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.8); z-index: 10; border: 1px solid var(--border-color); color: var(--text-main); }
-    .stock-badge.low { color: var(--danger); border-color: var(--danger); }
-    .stock-badge.ok { color: var(--primary); border-color: var(--primary); }
-    .product-info { padding: 12px; flex: 1; display: flex; flex-direction: column; }
-    .product-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .product-price { font-size: 18px; font-weight: 900; color: var(--primary); margin-bottom: 12px; margin-top: 4px; }
-    .btn-add-cart { background: var(--gold-gradient); color: var(--text-dark); border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: auto; text-transform: uppercase; width: 100%; }
-    .btn-add-cart:disabled { background: #333; color: #777; cursor: not-allowed; }
-    .qty-controls { display:flex; justify-content:space-between; align-items:center; background:#222; border-radius:6px; padding:4px; margin-top:auto; border: 1px solid var(--border-color); }
-    .btn-qty { border: none; background: transparent; color: var(--primary); width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-    .qty-val { font-weight: bold; font-size: 15px; color: var(--text-main); }
-    .prod-img-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #fff; padding: 15px; gap: 10px; scrollbar-width: none; border-bottom: 1px solid var(--border-color); }
-    .prod-img-slider::-webkit-scrollbar { display: none; }
-    .prod-img-box { min-width: 100%; height: 320px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; font-size: 80px; }
-    .prod-img-box img { width: 100%; height: 100%; object-fit: contain; }
-    .size-btn { border: 1px solid var(--border-color); background: #222; padding: 10px 18px; border-radius: 6px; font-weight: bold; color: var(--text-main); cursor: pointer; }
-    .size-btn.active { background: var(--gold-gradient); color: var(--text-dark); border: none; }
-    .support-fab { position: absolute; bottom: 80px; right: 20px; background: var(--gold-gradient); color: var(--text-dark); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 90; cursor: pointer; border: 2px solid #000; }
-    .support-menu { position: absolute; bottom: 145px; right: 20px; background: var(--card-bg); border-radius: 12px; padding: 10px; display: none; flex-direction: column; gap: 10px; z-index: 91; border: 1px solid var(--border-color); }
-    .support-menu.active { display: flex; }
-    .support-btn { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border: none; background: #222; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 160px; color: var(--text-main); border: 1px solid var(--border-color); }
-    .admin-bg { background: var(--dark-bg); color: var(--text-main); }
-    .admin-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items:center; flex-shrink:0; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
-    .admin-tab-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 15px 20px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); scrollbar-width: none; flex-shrink:0; }
-    .admin-tab-scroll::-webkit-scrollbar { display: none; }
-    .admin-tab-btn { background: #222; color: var(--text-muted); border: 1px solid var(--border-color); font-weight: bold; font-size: 13px; white-space: nowrap; padding: 10px 18px; cursor: pointer; border-radius: 30px; }
-    .admin-tab-btn.active { background: var(--gold-gradient); color: var(--text-dark); border: none; }
-    .admin-section { display: none; padding-top:20px; }
-    .admin-section.active { display: block; }
-    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px 15px; }
-    .metric-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); display:flex; flex-direction:column; justify-content:center; }
-    .metric-title { font-size: 11px; color: var(--primary); margin-bottom: 8px; font-weight:bold; letter-spacing:1px; text-transform: uppercase; }
-    .metric-value { font-size: 24px; font-weight: 900; color: white; }
-    .admin-card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin: 0 20px 20px; border: 1px solid var(--border-color); }
-    .admin-input { width: 100%; padding: 14px; background: #222; border: 1px solid var(--border-color); color: white; border-radius: 8px; margin-bottom: 15px; font-size: 14px; outline: none; }
-    .admin-input:focus { border-color: var(--primary); }
-    input[type="file"].admin-input { background: #222; color: var(--text-muted); padding: 10px; cursor: pointer; }
-    input[type="file"].admin-input::-webkit-file-upload-button { background: var(--gold-gradient); color: var(--text-dark); border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 15px; }
-    .btn-admin { background: var(--gold-gradient); color: var(--text-dark); padding: 15px; border: none; border-radius: 8px; font-weight: 900; font-size: 14px; cursor: pointer; width: 100%; text-transform: uppercase; }
-    .btn-small { background: #333; color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-    .btn-danger-small { background: rgba(239, 83, 80, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; }
-    .nav-item.active { color: var(--primary); text-shadow: 0 0 10px rgba(212,175,55,0.5); }
-    .modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--dark-bg); z-index: 100; flex-direction: column; }
-    .modal.active { display: flex; }
-    .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--primary); color: var(--text-dark); padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 9999; border: 2px solid #000; }
-    .payment-option { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px; cursor: pointer; }
-    .payment-option.active { border-color: var(--primary); background: rgba(212,175,55,0.05); }
-    .radio-custom { width: 22px; height: 22px; border: 2px solid #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .payment-option.active .radio-custom { border-color: var(--primary); }
-    .payment-option.active .radio-custom::after { content: ''; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; }
-    .auth-page { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--dark-bg); z-index: 200; flex-direction: column; overflow-y: auto; }
-    .auth-page.active { display: flex; }
-    .auth-header { padding: 20px; display: flex; align-items: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid var(--border-color); flex-shrink:0; background: var(--card-bg); }
-    .auth-tabs { display: flex; margin: 20px 20px 0; background: #222; border-radius: 12px; padding: 5px; flex-shrink:0; border: 1px solid var(--border-color); }
-    .auth-tab { flex: 1; text-align: center; padding: 12px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-radius: 8px; font-size: 14px; }
-    .auth-tab.active { background: var(--card-bg); color: var(--primary); border: 1px solid var(--border-color); }
-    .auth-body { padding: 30px 20px; flex: 1; overflow-y:auto; }
-    .otp-container { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
-    .otp-box { width: 55px; height: 60px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 26px; text-align: center; font-weight: 900; outline: none; color: var(--primary); background: #222; }
-    .otp-msg { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px; color: var(--text-muted); height: 20px; }
-    .cart-img-real { width: 60px; height: 60px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border-color); padding: 4px; background: white; }
-    .print-only { display: none; }
-    @media print { .no-print { display: none !important; } .print-only { display: block !important; position: absolute; top:0; left:0; width: 100%; background: white; z-index: 99999; padding: 20px; color: black; font-family: sans-serif; } body { background: white; } }
-    .bill-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 12px; }
-    .bill-table th, .bill-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    .bill-table th { background-color: #f8fafc; font-weight: bold; }
+        :root { 
+            --primary: #D4AF37; 
+            --gold-gradient: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            --dark-bg: #000000; 
+            --light-bg: #121212; 
+            --card-bg: #1a1a1a; 
+            --border-color: #333333;
+            --text-main: #f1f1f1; 
+            --text-muted: #888888; 
+            --text-dark: #000000; 
+            --success: #4caf50; 
+            --danger: #ef5350; 
+            --whatsapp: #25D366; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100dvh; font-family: Roboto, sans-serif; background: var(--light-bg); overflow: hidden; color: var(--text-main); }
+        body { max-width: 480px; margin: 0 auto; position: relative; background: var(--light-bg); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        
+        .app-view { display: none; width: 100%; height: 100dvh; flex-direction: column; overflow: hidden; position: absolute; top:0; left:0; background: var(--light-bg); }
+        .app-view.active { display: flex; }
+        
+        .header { flex-shrink: 0; background: var(--card-bg); padding: 10px 15px; z-index: 40; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border-color); }
+        .main-content { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 90px; }
+        .main-content::-webkit-scrollbar { display: none; }
+        .bottom-nav { flex-shrink: 0; position: absolute; bottom: 0; width: 100%; max-width: 480px; background: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
+
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 22px; font-weight: 900; color: var(--primary); display: flex; align-items: center; font-style: italic; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(212,175,55,0.2); }
+        .header-logo img { height: 32px; max-width: 140px; object-fit: contain; }
+        
+        /* 🚀 CLICK FIX FOR ICONS */
+        .icon-btn { background: transparent; border: none; color: var(--primary); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: 0.2s; }
+        .icon-btn svg { pointer-events: none; } 
+        
+        .badge { position: absolute; top: -2px; right: -2px; background: var(--primary); color: var(--text-dark); font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg); box-shadow: 0 0 5px rgba(212,175,55,0.5); }
+
+        .search-wrapper { display: flex; background: #222222; border-radius: 8px; padding: 12px 15px; align-items: center; border: 1px solid var(--border-color); margin-bottom: 10px; }
+        .search-wrapper input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 14px; color: var(--text-main); background: transparent; }
+        .search-wrapper input::placeholder { color: var(--text-muted); }
+        
+        .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 15px 15px 0; gap: 10px; scroll-behavior: smooth; }
+        .banner-slider::-webkit-scrollbar { display: none; }
+        .banner-slide { min-width: 100%; height: 160px; border-radius: 12px; scroll-snap-align: center; object-fit: cover; background: #2a2a2a; border: 1px solid var(--border-color); }
+        
+        .cat-scroll { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding: 15px; background: var(--card-bg); margin-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .cat-scroll::-webkit-scrollbar { display: none; }
+        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; opacity: 0.7; transition: 0.3s; min-width: 65px; }
+        .cat-item.active { opacity: 1; }
+        .cat-icon-circle { width: 50px; height: 50px; background: #222222; border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 0.3s; overflow:hidden; }
+        .cat-icon-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .cat-item.active .cat-icon-circle { background: var(--gold-gradient); color: var(--text-dark); box-shadow: 0 4px 15px rgba(212,175,55,0.4); border: none; }
+        .cat-item span { font-size: 11px; font-weight: 600; color: var(--text-main); white-space: nowrap; }
+
+        .products-grid-container { background: transparent; padding-top: 10px; padding-bottom: 20px; min-height: 50vh; }
+        .grid-greeting { padding: 0 15px 15px; font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
+        
+        .product-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; border: 1px solid var(--border-color); cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .share-badge { position: absolute; top: 8px; left: 8px; width: 30px; height: 30px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid var(--primary); cursor: pointer; color: var(--primary); backdrop-filter: blur(4px); }
+        
+        .product-image { background: #ffffff; height: 160px; display: flex; align-items: center; justify-content: center; font-size: 50px; overflow: hidden; position: relative; padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .product-img-real { width: 100%; height: 100%; object-fit: contain; }
+        
+        .stock-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.8); z-index: 10; border: 1px solid var(--border-color); color: var(--text-main); backdrop-filter: blur(4px); }
+        .stock-badge.low { color: var(--danger); border-color: var(--danger); }
+        .stock-badge.ok { color: var(--primary); border-color: var(--primary); }
+        
+        .product-info { padding: 12px; flex: 1; display: flex; flex-direction: column; }
+        .product-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-price { font-size: 18px; font-weight: 900; color: var(--primary); margin-bottom: 12px; margin-top: 4px; }
+        
+        .btn-add-cart { background: var(--gold-gradient); color: var(--text-dark); border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: auto; transition: 0.2s; text-transform: uppercase; width: 100%; box-shadow: 0 4px 10px rgba(212,175,55,0.2); }
+        .btn-add-cart:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
+        
+        .qty-controls { display:flex; justify-content:space-between; align-items:center; background:#222; border-radius:6px; padding:4px; margin-top:auto; border: 1px solid var(--border-color); }
+        .btn-qty { border: none; background: transparent; color: var(--primary); width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .qty-val { font-weight: bold; font-size: 15px; color: var(--text-main); }
+
+        .prod-img-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #ffffff; padding: 15px; gap: 10px; scrollbar-width: none; border-bottom: 1px solid var(--border-color); }
+        .prod-img-slider::-webkit-scrollbar { display: none; }
+        .prod-img-box { min-width: 100%; height: 320px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; background: transparent; border-radius: 12px; font-size: 80px; }
+        .prod-img-box img { width: 100%; height: 100%; object-fit: contain; }
+        .size-btn { border: 1px solid var(--border-color); background: #222; padding: 10px 18px; border-radius: 6px; font-weight: bold; color: var(--text-main); cursor: pointer; transition: 0.2s; }
+        .size-btn.active { background: var(--gold-gradient); color: var(--text-dark); border: none; box-shadow: 0 4px 10px rgba(212,175,55,0.3); }
+
+        .support-fab { position: absolute; bottom: 80px; right: 20px; background: var(--gold-gradient); color: var(--text-dark); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(212,175,55,0.4); z-index: 90; cursor: pointer; border: 2px solid #000; }
+        .support-menu { position: absolute; bottom: 145px; right: 20px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); padding: 10px; display: none; flex-direction: column; gap: 10px; z-index: 91; border: 1px solid var(--border-color); }
+        .support-menu.active { display: flex; animation: fadeIn 0.2s; }
+        .support-btn { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border: none; background: #222; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 160px; color: var(--text-main); border: 1px solid var(--border-color); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .admin-bg { background: var(--dark-bg); color: var(--text-main); }
+        .admin-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items:center; flex-shrink:0; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
+        .admin-tab-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 15px 20px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); scrollbar-width: none; flex-shrink:0; }
+        .admin-tab-scroll::-webkit-scrollbar { display: none; }
+        .admin-tab-btn { background: #222; color: var(--text-muted); border: 1px solid var(--border-color); font-weight: bold; font-size: 13px; white-space: nowrap; padding: 10px 18px; cursor: pointer; border-radius: 30px; transition: 0.3s; }
+        .admin-tab-btn.active { background: var(--gold-gradient); color: var(--text-dark); border: none; box-shadow: 0 4px 10px rgba(212,175,55,0.2); }
+        .admin-section { display: none; padding-top:20px; }
+        .admin-section.active { display: block; animation: fadeIn 0.3s; }
+
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px 15px; }
+        .metric-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); display:flex; flex-direction:column; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .metric-title { font-size: 11px; color: var(--primary); margin-bottom: 8px; font-weight:bold; letter-spacing:1px; text-transform: uppercase; }
+        .metric-value { font-size: 24px; font-weight: 900; color: white; }
+        
+        .admin-card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin: 0 20px 20px; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .admin-input { width: 100%; padding: 14px; background: #222; border: 1px solid var(--border-color); color: white; border-radius: 8px; margin-bottom: 15px; font-size: 14px; outline: none; transition: 0.3s; }
+        .admin-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(212,175,55,0.2); }
+        
+        input[type="file"].admin-input { background: #222; color: var(--text-muted); padding: 10px; cursor: pointer; }
+        input[type="file"].admin-input::-webkit-file-upload-button { background: var(--gold-gradient); color: var(--text-dark); border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 15px; }
+
+        .btn-admin { background: var(--gold-gradient); color: var(--text-dark); padding: 15px; border: none; border-radius: 8px; font-weight: 900; font-size: 14px; cursor: pointer; width: 100%; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(212,175,55,0.3); }
+        .btn-small { background: #333; color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .btn-danger-small { background: rgba(239, 83, 80, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--primary); text-shadow: 0 0 10px rgba(212,175,55,0.5); }
+        
+        /* 🚀 Z-INDEX FIX: Modals ab sabse upar khulenge */
+        .modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--dark-bg); z-index: 99999; flex-direction: column; }
+        .modal.active { display: flex; animation: fadeIn 0.2s; }
+        
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--primary); color: var(--text-dark); padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 999999; box-shadow: 0 10px 20px rgba(0,0,0,0.5); text-align:center; width:max-content; max-width:90%; border: 2px solid #000; }
+
+        .payment-option { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; }
+        .payment-option.active { border-color: var(--primary); background: rgba(212,175,55,0.05); }
+        .radio-custom { width: 22px; height: 22px; border: 2px solid #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .payment-option.active .radio-custom { border-color: var(--primary); }
+        .payment-option.active .radio-custom::after { content: ''; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 5px var(--primary); }
+
+        .auth-page { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100dvh; background: var(--dark-bg); z-index: 200; flex-direction: column; overflow-y: auto; }
+        .auth-page.active { display: flex; animation: slideInRight 0.3s forwards; }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        
+        .auth-header { padding: 20px; display: flex; align-items: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid var(--border-color); flex-shrink:0; background: var(--card-bg); }
+        .auth-tabs { display: flex; margin: 20px 20px 0; background: #222; border-radius: 12px; padding: 5px; flex-shrink:0; border: 1px solid var(--border-color); }
+        .auth-tab { flex: 1; text-align: center; padding: 12px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.3s; font-size: 14px; }
+        .auth-tab.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.5); border: 1px solid var(--border-color); }
+        .auth-body { padding: 30px 20px; flex: 1; overflow-y:auto; }
+        
+        .otp-container { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
+        .otp-box { width: 55px; height: 60px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 26px; text-align: center; font-weight: 900; outline: none; transition: 0.3s; color: var(--primary); background: #222; }
+        .otp-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(212,175,55, 0.2); }
+        .otp-msg { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px; color: var(--text-muted); height: 20px; }
+        
+        .cart-img-real { width: 60px; height: 60px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border-color); padding: 4px; background: white; }
+
+        .print-only { display: none; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; position: absolute; top:0; left:0; width: 100%; background: white; z-index: 99999; padding: 20px; color: black; font-family: sans-serif; }
+            body { background: white; }
+        }
+        .bill-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 12px; }
+        .bill-table th, .bill-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .bill-table th { background-color: #f8fafc; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -152,12 +211,13 @@
     </div>
 
     <div class="main-content" id="customerProfileView" style="display:none; padding: 20px;">
-        <div style="background: var(--card-bg); padding: 30px 20px; border-radius: 12px; text-align: center; border: 1px solid var(--primary);">
-            <div style="width: 90px; height: 90px; background: #222; border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+        <div style="background: var(--card-bg); padding: 30px 20px; border-radius: 12px; text-align: center; border: 1px solid var(--primary); box-shadow: 0 10px 30px rgba(212,175,55,0.1);">
+            <div style="width: 90px; height: 90px; background: #222; border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 0 15px rgba(212,175,55,0.3);">
                 <i data-lucide="user" style="width: 45px; height: 45px; color: var(--primary);"></i>
             </div>
             <h2 id="profileNameDisplay" style="font-size: 24px; font-weight: 900; margin-bottom: 5px; color: var(--text-main);">User</h2>
-            <p id="profilePhoneDisplay" style="color: var(--primary); font-size: 15px; font-weight: bold; margin-bottom: 25px;">+91 XXXXXXXXXX</p>
+            <p id="profilePhoneDisplay" style="color: var(--primary); font-size: 15px; font-weight: bold; margin-bottom: 25px; letter-spacing: 1px;">+91 XXXXXXXXXX</p>
+            
             <div style="display: flex; gap: 15px; flex-direction: column;">
                 <button class="search-wrapper" style="width: 100%; justify-content: space-between; font-weight: bold; cursor: pointer; padding: 15px; background: #222; border-color: var(--border-color);" onclick="switchCustomerTab('orders', document.getElementById('navOrders'))">
                     <span style="display: flex; gap: 12px; color: var(--text-main);"><i data-lucide="package" style="color: var(--primary);"></i> My Orders</span>
@@ -170,8 +230,8 @@
 
     <div class="support-fab" onclick="toggleSupportMenu()"><i data-lucide="headphones"></i></div>
     <div class="support-menu" id="supportMenu">
-        <button class="support-btn btn-wa" onclick="contactSupport('wa')"><i data-lucide="message-circle"></i> WhatsApp Support</button>
-        <button class="support-btn btn-email" onclick="contactSupport('email')"><i data-lucide="mail"></i> Email Support</button>
+        <button class="support-btn" onclick="contactSupport('wa')" style="color:var(--whatsapp)"><i data-lucide="message-circle"></i> WhatsApp Support</button>
+        <button class="support-btn" onclick="contactSupport('email')" style="color:var(--primary)"><i data-lucide="mail"></i> Email Support</button>
     </div>
 
     <div class="bottom-nav">
@@ -191,18 +251,20 @@
         </div>
         <div style="flex:1; overflow-y:auto; background:var(--light-bg); padding-bottom:20px;">
             <div class="prod-img-slider" id="modalImgSlider"></div>
-            <div style="text-align:center; font-size:11px; color:var(--primary); margin-bottom:20px; font-weight: bold; margin-top: 10px;">SWIPE LEFT TO SEE MORE</div>
+            <div style="text-align:center; font-size:11px; color:var(--primary); margin-bottom:20px; font-weight: bold; margin-top: 10px; letter-spacing: 0.5px;">SWIPE LEFT TO SEE MORE</div>
+            
             <div style="padding:0 20px;">
                 <h2 id="modalProdName" style="font-size:20px; margin-bottom:8px; color:var(--text-main); font-weight: 800;"></h2>
-                <div id="modalProdPrice" style="font-size:26px; font-weight:900; color:var(--primary); margin-bottom:20px;"></div>
-                <div id="sizeSelectionBox" style="display:none; margin-bottom:20px; padding:20px; background:var(--card-bg); border-radius:12px; border:1px solid var(--border-color);">
-                    <div style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:15px;">SELECT PREMIUM SIZE</div>
+                <div id="modalProdPrice" style="font-size:26px; font-weight:900; color:var(--primary); margin-bottom:20px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></div>
+                
+                <div id="sizeSelectionBox" style="display:none; margin-bottom:20px; padding:20px; background:var(--card-bg); border-radius:12px; border:1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                    <div style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:15px; letter-spacing: 1px;">SELECT PREMIUM SIZE</div>
                     <div style="display:flex; gap:12px; flex-wrap:wrap;" id="sizeButtonsContainer"></div>
                 </div>
             </div>
         </div>
         <div style="padding: 15px 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); flex-shrink:0;">
-            <button class="btn-add-cart" id="modalAddToCartBtn" onclick="addToCartFromModal()" style="padding:16px; font-size:15px;">Add to Luxury Cart</button>
+            <button class="btn-add-cart" id="modalAddToCartBtn" onclick="addToCartFromModal()" style="padding:16px; font-size:15px; letter-spacing: 1px;">Add to Luxury Cart</button>
         </div>
     </div>
 
@@ -216,7 +278,7 @@
         <div style="padding: 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
             <div>
                 <div style="font-size:12px; color:var(--text-muted); font-weight:bold; text-transform: uppercase;">Total Value</div>
-                <div id="cartTotal" style="color:var(--primary); font-weight:900; font-size:22px;">₹0</div>
+                <div id="cartTotal" style="color:var(--primary); font-weight:900; font-size:22px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">₹0</div>
             </div>
             <button class="btn-add-cart" style="width:55%; font-size:14px; padding:15px;" onclick="proceedToCheckout()">Checkout</button>
         </div>
@@ -225,15 +287,15 @@
     <div class="modal" id="checkoutModal" style="background: var(--dark-bg);">
         <div class="header" style="flex-direction:row; flex-shrink:0;">
             <i data-lucide="arrow-left" onclick="closeModal('checkoutModal')" style="cursor:pointer; width:24px; color: var(--primary);"></i> 
-            <span style="font-weight:900; font-size:16px; color: var(--primary);">SECURE CHECKOUT</span> 
+            <span style="font-weight:900; font-size:16px; color: var(--primary); letter-spacing: 1px;">SECURE CHECKOUT</span> 
             <div style="width:24px;"></div>
         </div>
         <div style="padding: 15px; flex:1; overflow-y:auto; background:var(--light-bg);">
-            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color);">
-                <h3 style="font-size: 12px; margin-bottom: 15px; color: var(--primary); font-weight:bold;">DELIVERY ADDRESS</h3>
+            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <h3 style="font-size: 12px; margin-bottom: 15px; color: var(--primary); font-weight:bold; letter-spacing: 1px;">DELIVERY ADDRESS</h3>
                 <input type="text" id="cName" class="search-wrapper" style="width:100%; background: #222; border-color: var(--border-color); color: white;" placeholder="Full Name">
                 <input type="tel" id="cPhone" class="search-wrapper" style="width:100%; background: #222; border-color: var(--border-color); color: white;" placeholder="Mobile Number" maxlength="10">
-                <textarea id="cAddress" class="search-wrapper" style="width:100%; height:70px; background: #222; border-color: var(--border-color); color: white;" placeholder="Full Address (House No, Area)"></textarea>
+                <textarea id="cAddress" class="search-wrapper" style="width:100%; height:70px; background: #222; border-color: var(--border-color); color: white;" placeholder="Full Address (House No, Area, Landmark)"></textarea>
                 <input type="number" id="cPin" class="search-wrapper" style="width:100%; background: #222; border-color: var(--border-color); color: white;" placeholder="Pincode">
                 <button onclick="captureLocation()" style="width:100%; background:rgba(212,175,55,0.1); color:var(--primary); border:1px solid var(--primary); padding:12px; border-radius:8px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
                     <i data-lucide="map-pin" style="width:18px;"></i> Attach Live Location
@@ -241,14 +303,14 @@
                 <div id="locStatus" style="font-size:11px; text-align:center; margin-top:8px; color:var(--text-muted);">For precise VIP delivery</div>
             </div>
             
-            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color);">
-                <h3 style="font-size: 12px; margin-bottom: 15px; color: var(--primary); font-weight:bold;">PAYMENT METHOD</h3>
+            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; border:1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <h3 style="font-size: 12px; margin-bottom: 15px; color: var(--primary); font-weight:bold; letter-spacing: 1px;">PAYMENT METHOD</h3>
                 <div class="payment-option active" id="payUPI" onclick="selectPaymentMethod('UPI')">
                     <div class="radio-custom"></div>
                     <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                         <div>
                             <div style="font-weight: 800; font-size: 15px; color: var(--text-main);">Scan Premium QR Code</div>
-                            <div style="font-size: 11px; color: var(--primary); font-weight:bold; margin-top:4px;">Secure via PhonePe, GPay</div>
+                            <div style="font-size: 11px; color: var(--primary); font-weight:bold; margin-top:4px;">Secure via PhonePe, GPay, Paytm</div>
                         </div>
                         <i data-lucide="qr-code" style="color:var(--primary); width:24px; height:24px;"></i>
                     </div>
@@ -259,14 +321,17 @@
                 </div>
             </div>
         </div>
-        <div style="padding: 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;">
-            <div><div style="font-size:12px; color:var(--text-muted); font-weight:bold;">Payable</div><div id="checkoutTotal" style="color:var(--primary); font-weight:900; font-size:22px;">₹0</div></div>
+        <div style="padding: 20px; background: var(--card-bg); border-top: 1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+            <div>
+                <div style="font-size:12px; color:var(--text-muted); font-weight:bold; text-transform: uppercase;">Payable</div>
+                <div id="checkoutTotal" style="color:var(--primary); font-weight:900; font-size:22px;">₹0</div>
+            </div>
             <button class="btn-add-cart" style="width:55%; font-size:15px; padding:15px;" onclick="handleOrderPlacement()">Confirm Order</button>
         </div>
     </div>
 
-    <div class="modal" id="qrPaymentModal" style="background:rgba(0,0,0,0.9); justify-content:center; padding:20px; z-index: 999;">
-        <div style="background:var(--card-bg); border-radius:16px; padding:25px; text-align:center; position:relative; width:100%; max-width:350px; margin:0 auto; border: 1px solid var(--primary);">
+    <div class="modal" id="qrPaymentModal" style="background:rgba(0,0,0,0.9); justify-content:center; padding:20px;">
+        <div style="background:var(--card-bg); border-radius:16px; padding:25px; text-align:center; position:relative; width:100%; max-width:350px; margin:0 auto; border: 1px solid var(--primary); box-shadow: 0 10px 40px rgba(212,175,55,0.2);">
             <i data-lucide="x" onclick="closeModal('qrPaymentModal')" style="position:absolute; top:15px; right:15px; cursor:pointer; color:var(--text-muted);"></i>
             <h3 style="margin-bottom:8px; font-size:20px; color: var(--text-main); font-weight: 900;">Scan & Pay</h3>
             <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Please pay <span style="color:var(--primary); font-weight:bold; font-size: 16px;">₹<span id="qrPayAmount">0</span></span> securely</p>
@@ -278,7 +343,7 @@
     </div>
 
     <div class="auth-page" id="authPage">
-        <div class="auth-header" style="flex-direction:row; flex-shrink:0;"><i data-lucide="arrow-left" onclick="closeAuthPage()" style="cursor:pointer; margin-right: 15px; color: var(--primary);"></i><span style="color: var(--primary); font-weight: 900;">VIP LOGIN</span></div>
+        <div class="auth-header" style="flex-direction:row; flex-shrink:0;"><i data-lucide="arrow-left" onclick="closeAuthPage()" style="cursor:pointer; margin-right: 15px; color: var(--primary);"></i><span style="color: var(--primary); font-weight: 900; letter-spacing: 1px;">VIP LOGIN</span></div>
         <div class="auth-tabs">
             <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
             <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Sign Up</div>
@@ -286,14 +351,14 @@
         <div class="auth-body">
             <div id="authFormsSection">
                 <div id="registerForm" style="display:none;">
-                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block;">FIRST NAME</label>
+                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block; letter-spacing: 1px;">FIRST NAME</label>
                     <input type="text" id="regFirstName" class="search-wrapper" style="width:100%; padding:16px; background:#222; border-color:var(--border-color); color: white; margin-bottom:20px;" placeholder="e.g. Brahma">
-                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block;">MOBILE NUMBER</label>
+                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block; letter-spacing: 1px;">MOBILE NUMBER</label>
                     <input type="tel" id="regPhone" class="search-wrapper" style="width:100%; padding:16px; background:#222; border-color:var(--border-color); color: white; margin-bottom:30px;" placeholder="10-digit number" maxlength="10">
-                    <button class="btn-admin" style="padding:16px;" onclick="requestAuthOTP()">Continue</button>
+                    <button class="btn-admin" style="padding:16px;" onclick="requestAuthOTP()">Continue to Luxury</button>
                 </div>
                 <div id="loginForm">
-                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block;">MOBILE NUMBER</label>
+                    <label style="font-size:12px; font-weight:bold; color:var(--primary); margin-bottom:8px; display:block; letter-spacing: 1px;">MOBILE NUMBER</label>
                     <input type="tel" id="logPhone" class="search-wrapper" style="width:100%; padding:16px; background:#222; border-color:var(--border-color); color: white; margin-bottom:30px;" placeholder="Enter registered number" maxlength="10">
                     <button class="btn-admin" style="padding:16px;" onclick="requestAuthOTP()">Secure Login</button>
                 </div>
@@ -307,55 +372,55 @@
                     <input type="text" class="otp-box" id="otp3" maxlength="1" readonly>
                     <input type="text" class="otp-box" id="otp4" maxlength="1" readonly>
                 </div>
-                <div class="otp-msg" id="autoDetectMsg">Waiting for SMS...</div>
+                <div id="autoDetectMsg" style="text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 20px; color: var(--text-muted); height: 20px;">Waiting for SMS...</div>
                 <button class="btn-admin" id="verifyOtpBtn" style="padding:16px; opacity:0.5; pointer-events:none;" onclick="verifyCustomerOTP()">Verify Securely</button>
             </div>
         </div>
     </div>
+  </div>
 
-    <div class="modal" id="adminLoginModal" style="background: var(--dark-bg);">
-        <div class="header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); color:var(--primary); flex-direction:row; flex-shrink:0;">
-            <i data-lucide="arrow-left" onclick="closeModal('adminLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900;">ADMIN ACCESS</span> <div style="width:24px;"></div>
-        </div>
-        <div style="padding: 30px; text-align:center; margin-top:30px;">
-            <i data-lucide="lock" style="width:70px; height:70px; color:var(--primary); margin-bottom:25px;"></i>
-            <input type="text" id="adminUser" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px; background:#222; color:white; outline:none;" placeholder="Enter Username">
-            <input type="password" id="adminPass" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:25px; background:#222; color:white; outline:none;" placeholder="Enter Password">
-            <button class="btn-admin" onclick="verifyAdmin()">Login Dashboard</button>
-        </div>
-    </div>
+  <div class="modal" id="adminLoginModal">
+      <div class="header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); color:var(--primary); flex-direction:row; flex-shrink:0;">
+          <i data-lucide="arrow-left" onclick="closeModal('adminLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900; letter-spacing: 1px;">ADMIN ACCESS</span> <div style="width:24px;"></div>
+      </div>
+      <div style="padding: 30px; text-align:center; margin-top:30px;">
+          <i data-lucide="lock" style="width:70px; height:70px; color:var(--primary); margin-bottom:25px;"></i>
+          <input type="text" id="adminUser" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px; background:#222; color:white; outline:none;" placeholder="Username (admin123)">
+          <input type="password" id="adminPass" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:25px; background:#222; color:white; outline:none;" placeholder="Password (admin@123)">
+          <button class="btn-admin" onclick="verifyAdmin()">Login Dashboard</button>
+      </div>
+  </div>
 
-    <div class="modal" id="riderLoginModal" style="background: var(--dark-bg);">
-        <div class="header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); color:var(--primary); flex-direction:row; flex-shrink:0;">
-            <i data-lucide="arrow-left" onclick="closeModal('riderLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900;">RIDER ACCESS</span> <div style="width:24px;"></div>
-        </div>
-        <div style="padding: 30px; text-align:center; margin-top:30px;">
-            <i data-lucide="bike" style="width:70px; height:70px; color:var(--primary); margin-bottom:25px;"></i>
-            <input type="tel" id="riderPhoneLogin" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px; background:#222; color:white; outline:none;" placeholder="Registered Mobile Number">
-            <input type="password" id="riderPassLogin" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:25px; background:#222; color:white; outline:none;" placeholder="Password">
-            <button class="btn-admin" onclick="verifyRider()">Start Duty</button>
-        </div>
-    </div>
+  <div class="modal" id="riderLoginModal">
+      <div class="header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); color:var(--primary); flex-direction:row; flex-shrink:0;">
+          <i data-lucide="arrow-left" onclick="closeModal('riderLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900; letter-spacing: 1px;">RIDER ACCESS</span> <div style="width:24px;"></div>
+      </div>
+      <div style="padding: 30px; text-align:center; margin-top:30px;">
+          <i data-lucide="bike" style="width:70px; height:70px; color:var(--primary); margin-bottom:25px;"></i>
+          <input type="tel" id="riderPhoneLogin" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px; background:#222; color:white; outline:none;" placeholder="Registered Mobile Number">
+          <input type="password" id="riderPassLogin" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:25px; background:#222; color:white; outline:none;" placeholder="Password">
+          <button class="btn-admin" onclick="verifyRider()">Start Duty</button>
+      </div>
   </div>
 
   <div class="app-view admin-bg" id="riderApp">
       <div class="header" style="background:var(--card-bg); color:var(--primary); border-bottom:1px solid var(--border-color); flex-direction:row;">
-          <div style="font-weight:900; font-size:18px;"><i data-lucide="bike" style="vertical-align:middle; margin-right:8px;"></i> RIDER HUB</div>
+          <div style="font-weight:900; font-size:18px; letter-spacing: 1px;"><i data-lucide="bike" style="vertical-align:middle; margin-right:8px;"></i> RIDER HUB</div>
           <button class="icon-btn" onclick="logoutRider()" style="background:#222; color:var(--text-main); width:auto; padding:0 15px; font-size:12px; font-weight:bold; border:1px solid var(--border-color); border-radius:6px;">Logout</button>
       </div>
       <div class="main-content" style="padding:15px;">
-          <div style="background:var(--card-bg); border-radius:12px; padding:25px; text-align:center; border:1px solid var(--border-color); margin-bottom:20px;">
+          <div style="background:var(--card-bg); border-radius:12px; padding:25px; text-align:center; border:1px solid var(--border-color); margin-bottom:20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
               <h2 id="riderGreeting" style="font-size:20px; margin-bottom:10px; color: var(--text-main);">Welcome</h2>
-              <div style="font-size:12px; color:var(--primary); font-weight: bold;">TODAY'S DELIVERIES</div>
-              <div id="riderDeliveredCount" style="font-size:36px; font-weight:900; color:var(--primary);">0</div>
+              <div style="font-size:12px; color:var(--primary); font-weight: bold; letter-spacing: 1px;">TODAY'S DELIVERIES</div>
+              <div id="riderDeliveredCount" style="font-size:36px; font-weight:900; color:var(--primary); text-shadow: 0 2px 5px rgba(0,0,0,0.5);">0</div>
           </div>
-          <h3 style="font-size:14px; margin-bottom:15px; color:var(--primary); font-weight:bold;">ASSIGNED ORDERS</h3>
+          <h3 style="font-size:14px; margin-bottom:15px; color:var(--primary); font-weight:bold; letter-spacing: 1px;">ASSIGNED ORDERS</h3>
           <div id="riderOrdersList"></div>
       </div>
   </div>
 
   <div class="app-view admin-bg" id="adminApp">
-    <div id="newOrderAlert" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--primary); color:var(--text-dark); padding:15px; border-radius:10px; z-index:9999; width:90%; max-width:400px; text-align:center; animation: slideDown 0.3s forwards; border: 2px solid #000;">
+    <div id="newOrderAlert" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--primary); color:var(--text-dark); padding:15px; border-radius:10px; z-index:9999; width:90%; max-width:400px; text-align:center; border: 2px solid #000;">
         <h3 style="margin-bottom:5px; font-size:16px; font-weight: 900;">🔔 New VIP Order!</h3>
         <p id="newOrderAlertDetails" style="font-size:13px; font-weight:bold; margin-bottom:12px;"></p>
         <button onclick="document.getElementById('newOrderAlert').style.display='none'; switchAdminTab('orders');" style="background:#000; color:var(--primary); border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">View Order</button>
@@ -366,7 +431,7 @@
     </div>
     <div class="admin-tab-scroll">
         <button class="admin-tab-btn active" id="btn-tab-dashboard" onclick="switchAdminTab('dashboard')">Dashboard</button>
-        <button class="admin-tab-btn" id="btn-tab-orders" onclick="switchAdminTab('orders')">Orders</button>
+        <button class="admin-tab-btn" id="btn-tab-orders" onclick="switchAdminTab('orders')">Live Orders</button>
         <button class="admin-tab-btn" id="btn-tab-products" onclick="switchAdminTab('products')">Products</button>
         <button class="admin-tab-btn" id="btn-tab-customers" onclick="switchAdminTab('customers')">Customers</button>
         <button class="admin-tab-btn" id="btn-tab-categories" onclick="switchAdminTab('categories')">Categories</button>
@@ -385,36 +450,58 @@
             </div>
         </div>
 
-        <div class="admin-section" id="sec-orders"><div class="admin-card"><h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Live Orders Management</h3><div id="adminOrdersList"></div></div></div>
+        <div class="admin-section" id="sec-orders">
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Live Orders Management</h3>
+                <div id="adminOrdersList"></div>
+            </div>
+        </div>
 
         <div class="admin-section" id="sec-products">
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Add / Edit Luxury Products</h3>
                 <input type="text" id="pName" class="admin-input" placeholder="Product Name">
-                <div style="display:flex; gap:10px;"><input type="number" id="pPrice" class="admin-input" placeholder="Price (₹)"><input type="number" id="pStock" class="admin-input" placeholder="Stock Qty"></div>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">SIZE VARIATIONS</label>
-                <select id="pSizeType" class="admin-input"><option value="None">None (Standard Product)</option><option value="Clothing">Clothing (S, M, L, XL, XXL)</option><option value="Shoes">Shoes (6, 7, 8, 9, 10, 11)</option></select>
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="pPrice" class="admin-input" placeholder="Price (₹)">
+                    <input type="number" id="pStock" class="admin-input" placeholder="Stock Qty">
+                </div>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">SIZE VARIATIONS</label>
+                <select id="pSizeType" class="admin-input">
+                    <option value="None">None (Standard Product)</option>
+                    <option value="Clothing">Clothing (S, M, L, XL, XXL)</option>
+                    <option value="Shoes">Shoes (6, 7, 8, 9, 10, 11)</option>
+                </select>
                 <select id="pCat" class="admin-input"></select>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">MAIN IMAGE (Required)</label>
+                
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">MAIN IMAGE (Required)</label>
                 <input type="file" id="pImageFile1" class="admin-input" accept="image/*">
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">IMAGE 2 (Optional)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">IMAGE 2 (Optional)</label>
                 <input type="file" id="pImageFile2" class="admin-input" accept="image/*">
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">IMAGE 3 (Optional)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">IMAGE 3 (Optional)</label>
                 <input type="file" id="pImageFile3" class="admin-input" accept="image/*">
                 <input type="hidden" id="pExistingImage1"><input type="hidden" id="pExistingImage2"><input type="hidden" id="pExistingImage3">
+                
                 <button class="btn-admin" id="adminAddBtn" onclick="saveProductEntry()">Save Product</button>
                 <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top:15px;" id="adminStockList"></div>
             </div>
         </div>
 
-        <div class="admin-section" id="sec-customers"><div class="admin-card"><h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Registered Customers</h3><div id="adminCustomersList"></div></div></div>
+        <div class="admin-section" id="sec-customers">
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Registered Customers</h3>
+                <div id="adminCustomersList"></div>
+            </div>
+        </div>
 
         <div class="admin-section" id="sec-categories">
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Category Management</h3>
                 <input type="text" id="newCatName" class="admin-input" placeholder="New Category Name">
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">CATEGORY ICON/IMAGE</label>
-                <div style="display:flex; gap:10px;"><input type="file" id="newCatImage" class="admin-input" accept="image/*" style="margin-bottom:0;"><button class="btn-admin" style="width: auto; padding: 12px 25px;" onclick="addCategory()">Add</button></div>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">CATEGORY ICON/IMAGE (Optional)</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="file" id="newCatImage" class="admin-input" accept="image/*" style="margin-bottom:0;">
+                    <button class="btn-admin" style="width: auto; padding: 12px 25px;" onclick="addCategory()">Add</button>
+                </div>
                 <div style="margin-top: 20px;" id="adminCatList"></div>
             </div>
         </div>
@@ -423,40 +510,58 @@
             <div class="admin-card" style="border-color:var(--primary);">
                 <h3 style="margin-bottom: 15px; font-size:16px; color:var(--primary);">Register Delivery Partner</h3>
                 <input type="text" id="rName" class="admin-input" placeholder="Partner Name">
-                <input type="tel" id="rPhone" class="admin-input" placeholder="Mobile Number" maxlength="10">
+                <input type="tel" id="rPhone" class="admin-input" placeholder="Mobile Number (Login ID)" maxlength="10">
                 <input type="password" id="rPass" class="admin-input" placeholder="Create Password">
                 <button class="btn-admin" onclick="saveRider()">Register Partner</button>
             </div>
-            <div class="admin-card"><h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Active Partners</h3><div id="adminRidersList"></div></div>
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Active Partners</h3>
+                <div id="adminRidersList"></div>
+            </div>
         </div>
 
         <div class="admin-section" id="sec-settings">
-            <div class="admin-card" style="border-color:var(--success);">
+            <div class="admin-card" style="border-color:var(--success); box-shadow: 0 0 15px rgba(76,175,80,0.2);">
                 <h3 style="margin-bottom: 15px; font-size:16px; color:var(--success);">UPI QR Code Setup</h3>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">MY QR CODE IMAGE (GPay/PhonePe)</label>
-                <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;"><input type="file" id="adminPaymentQrFile" class="admin-input" accept="image/*" style="margin-bottom:0;"><button class="btn-small" style="background:var(--success);" onclick="uploadAdminQr()">Save QR</button></div>
-                <div id="qrPreviewArea" style="text-align:center; padding:15px; background:#111; border-radius:8px; border: 1px solid #333;"><p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">CURRENT ACTIVE QR</p><img id="adminQrPreview" src="" style="width:120px; height:120px; object-fit:contain; border:2px solid var(--primary); border-radius: 8px; background: white; padding: 5px;"></div>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">MY QR CODE IMAGE (GPay/PhonePe)</label>
+                <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;">
+                    <input type="file" id="adminPaymentQrFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
+                    <button class="btn-small" style="background:var(--success);" onclick="uploadAdminQr()">Save QR</button>
+                </div>
+                <div id="qrPreviewArea" style="text-align:center; padding:15px; background:#111; border-radius:8px; border: 1px solid #333;">
+                    <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px; letter-spacing: 1px;">CURRENT ACTIVE QR</p>
+                    <img id="adminQrPreview" src="" style="width:120px; height:120px; object-fit:contain; border:2px solid var(--primary); border-radius: 8px; background: white; padding: 5px;">
+                </div>
             </div>
+
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Delivery Config</h3>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">MINIMUM ORDER AMOUNT (₹)</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">MINIMUM ORDER AMOUNT (₹)</label>
                 <input type="number" id="adminMinOrder" class="admin-input" placeholder="e.g. 100">
                 <button class="btn-admin" style="margin-top:10px;" onclick="updateAppConfig()">Save Delivery Setting</button>
             </div>
+            
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">App Support Info</h3>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">WHATSAPP NUMBER</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">WHATSAPP NUMBER</label>
                 <input type="number" id="adminSupportWa" class="admin-input" placeholder="e.g. 919348954360">
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">SUPPORT EMAIL</label>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">SUPPORT EMAIL</label>
                 <input type="email" id="adminSupportEmail" class="admin-input" placeholder="e.g. help@bijumart.com">
                 <button class="btn-admin" style="margin-top:10px;" onclick="updateAppConfig()">Save Configuration</button>
             </div>
+
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Premium Branding</h3>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">APP LOGO</label>
-                <div style="display:flex; gap:10px; margin-bottom:25px;"><input type="file" id="adminLogoFile" class="admin-input" accept="image/*" style="margin-bottom:0;"><button class="btn-small" style="background: #222;" onclick="updateAppLogo()">Upload</button></div>
-                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px;">PROMO BANNER</label>
-                <div style="display:flex; gap:10px;"><input type="file" id="adminBannerFile" class="admin-input" accept="image/*" style="margin-bottom:0;"><button class="btn-admin" style="width: auto; padding: 12px 20px;" onclick="addPromoBanner()">Add Banner</button></div>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">APP LOGO</label>
+                <div style="display:flex; gap:10px; margin-bottom:25px;">
+                    <input type="file" id="adminLogoFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
+                    <button class="btn-small" style="background: #222;" onclick="updateAppLogo()">Upload</button>
+                </div>
+                <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">PROMO BANNER</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="file" id="adminBannerFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
+                    <button class="btn-admin" style="width: auto; padding: 12px 20px;" onclick="addPromoBanner()">Add Banner</button>
+                </div>
                 <div style="margin-top: 15px;" id="adminBannerList"></div>
             </div>
         </div>
@@ -465,13 +570,20 @@
  </div> 
 
  <div id="printBillArea" class="print-only">
-    <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:15px; margin-bottom:15px;"><h1 style="font-size:28px; margin:0; font-weight:900;" id="billStoreName">BIJU MART PREMIUM</h1></div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:12px;"><div><strong>BILLED TO:</strong><br><span id="billCustomerName"></span><br><span id="billCustomerPhone"></span><br><span id="billCustomerAddress"></span></div><div style="text-align:right;"><strong>Order ID:</strong> <span id="billOrderId"></span><br><strong>Date:</strong> <span id="billDate"></span><br><strong>Payment:</strong> <span id="billPayment"></span></div></div>
-    <table class="bill-table" id="billTable"><thead><tr><th style="width:50%">Item Description</th><th style="width:15%">Qty</th><th style="width:15%">Price</th><th style="width:20%; text-align:right;">Amount</th></tr></thead><tbody id="billTableBody"></tbody></table>
+    <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:15px; margin-bottom:15px;">
+        <h1 style="font-size:28px; margin:0; font-weight:900;" id="billStoreName">BIJU MART PREMIUM</h1>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:12px;">
+        <div><strong>BILLED TO:</strong><br><span id="billCustomerName"></span><br><span id="billCustomerPhone"></span><br><span id="billCustomerAddress"></span></div>
+        <div style="text-align:right;"><strong>Order ID:</strong> <span id="billOrderId"></span><br><strong>Date:</strong> <span id="billDate"></span><br><strong>Payment:</strong> <span id="billPayment"></span></div>
+    </div>
+    <table class="bill-table" id="billTable">
+        <thead><tr><th style="width:50%">Item Description</th><th style="width:15%">Qty</th><th style="width:15%">Price</th><th style="width:20%; text-align:right;">Amount</th></tr></thead>
+        <tbody id="billTableBody"></tbody>
+    </table>
     <div style="text-align:right; font-size:16px; margin-top:15px;"><strong>Total Amount: ₹<span id="billTotalAmount"></span></strong></div>
  </div>
-
-  <script>
+ <script>
     const firebaseConfig = { apiKey: "AIzaSyA7-fLETBmZiw39_nwT8i1v4GmPGYNB_m0", authDomain: "biju-mart.firebaseapp.com", databaseURL: "https://biju-mart-default-rtdb.firebaseio.com", projectId: "biju-mart", storageBucket: "biju-mart.firebasestorage.app", messagingSenderId: "897539763161", appId: "1:897539763161:web:f07951d66e62363b85c7c8" };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -502,10 +614,12 @@
         });
     }
 
+    // 🚀 CRASH FIX: App ab purane orders load hone par band nahi hogi
     window.onload = () => {
         try {
             if(!sessionStorage.getItem('visited_biju_mart')) { db.ref('stats/totalVisits').set(firebase.database.ServerValue.increment(1)); sessionStorage.setItem('visited_biju_mart', 'true'); }
             db.ref('stats/totalVisits').on('value', snap => { if(document.getElementById('metricVisits')) document.getElementById('metricVisits').innerText = snap.val() || 0; });
+            
             db.ref('settings').on('value', snap => {
                 const data = snap.val();
                 if(data) {
@@ -514,27 +628,38 @@
                     if(data.payment) { appSettings.payment.minOrderAmount = data.payment.minOrderAmount||0; appSettings.payment.qrCode = data.payment.qrCode||""; }
                 } applySettingsToUI();
             });
+
             db.ref('categories').on('value', snap => {
                 allCategories = safeParse(snap.val()).map(c => typeof c==='string' ? {id:c.replace(/[^a-zA-Z0-9]/g,''), name:c, image:null} : c);
                 if(allCategories.length===0) { const dCats = ['Fashion','Mobiles','Beauty','Electronics','Grocery']; dCats.forEach(c => db.ref('categories/'+c.replace(/[^a-zA-Z0-9]/g,'')).set({id:c.replace(/[^a-zA-Z0-9]/g,''), name:c, image:null})); }
                 renderCategories();
             });
+
             db.ref('products').on('value', snap => { allProducts = safeParse(snap.val()); filterAndSortProducts(); if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard(); });
+            
             db.ref('orders').on('value', snap => {
-                let nOrders = safeParse(snap.val()).sort((a,b) => b.timestamp - a.timestamp);
-                if(!isInitialOrderLoad && nOrders.length > allOrders.length && document.getElementById('adminApp').classList.contains('active')) {
-                    document.getElementById('newOrderAlertDetails').innerText = `${nOrders[0].customer} ne ₹${(nOrders[0].total||0).toLocaleString('en-IN')} ka VIP order diya!`; document.getElementById('newOrderAlert').style.display = 'block';
+                let parsedOrders = safeParse(snap.val());
+                allOrders = parsedOrders.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+                
+                if(!isInitialOrderLoad && allOrders.length > 0) {
+                    const latest = allOrders[0];
+                    if(document.getElementById('adminApp').classList.contains('active')) {
+                        document.getElementById('newOrderAlertDetails').innerText = `${latest.customer || 'Customer'} ne ₹${(latest.total||0).toLocaleString('en-IN')} ka VIP order diya!`;
+                        document.getElementById('newOrderAlert').style.display = 'block';
+                    }
                 }
-                allOrders = nOrders; isInitialOrderLoad = false; renderCustomerOrders();
+                isInitialOrderLoad = false; renderCustomerOrders();
                 if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
                 if(document.getElementById('riderApp').classList.contains('active')) renderRiderDashboard();
             });
+
             db.ref('users').on('value', snap => { allUsers = safeParse(snap.val()); if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard(); });
             db.ref('riders').on('value', snap => { allRiders = safeParse(snap.val()); if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard(); });
+
+            if(localStorage.getItem('shop_session_cloud')) { loggedInUser = JSON.parse(localStorage.getItem('shop_session_cloud')); updateAppForLoggedInUser(); }
+            if(localStorage.getItem('rider_session_cloud')) { loggedInRider = JSON.parse(localStorage.getItem('rider_session_cloud')); }
+            lucide.createIcons();
         } catch(err) { console.error(err); }
-        if(localStorage.getItem('shop_session_cloud')) { loggedInUser = JSON.parse(localStorage.getItem('shop_session_cloud')); updateAppForLoggedInUser(); }
-        if(localStorage.getItem('rider_session_cloud')) { loggedInRider = JSON.parse(localStorage.getItem('rider_session_cloud')); }
-        lucide.createIcons();
     };
 
     function toggleSupportMenu() { document.getElementById('supportMenu').classList.toggle('active'); }
@@ -682,15 +807,33 @@
     }
     function switchCustomerTab(t, el) { document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); if(el) el.classList.add('active'); document.getElementById('customerDashboard').style.display='none'; document.getElementById('customerOrdersView').style.display='none'; document.getElementById('customerProfileView').style.display='none'; if(t==='home') { document.getElementById('customerDashboard').style.display='block'; filterAndSortProducts(); } else if (t==='orders') { if(!loggedInUser) { showToast("Sign in required"); openAuthPage(); document.getElementById('navOrders').classList.remove('active'); document.getElementById('navHome').classList.add('active'); return; } document.getElementById('customerOrdersView').style.display='block'; renderCustomerOrders(); } else if (t==='profile') { document.getElementById('customerProfileView').style.display='block'; } }
 
+    // 🚀 ADMIN LOGIN LOGIC (Fixed)
     function openAdminLogin() { document.getElementById('adminLoginModal').classList.add('active'); }
-    function verifyAdmin() { const u=document.getElementById('adminUser').value, p=document.getElementById('adminPass').value; if(btoa(u)==='YWRtaW4xMjM='&&btoa(p)==='YWRtaW5AMTIz') { closeModal('adminLoginModal'); document.getElementById('customerApp').classList.remove('active'); document.getElementById('adminApp').classList.add('active'); loadAdminDashboard(); showToast("Admin Login"); document.getElementById('adminUser').value=''; document.getElementById('adminPass').value=''; } else showToast("Invalid!"); }
+    
+    function verifyAdmin() { 
+        const u = document.getElementById('adminUser').value.trim();
+        const p = document.getElementById('adminPass').value.trim(); 
+        
+        if(u === 'admin123' && p === 'admin@123') { 
+            closeModal('adminLoginModal'); 
+            document.getElementById('customerApp').classList.remove('active'); 
+            document.getElementById('adminApp').classList.add('active'); 
+            loadAdminDashboard(); 
+            showToast("Welcome Admin!"); 
+            document.getElementById('adminUser').value=''; 
+            document.getElementById('adminPass').value=''; 
+        } else {
+            showToast("Invalid Credentials!"); 
+        }
+    }
+    
     function logoutAdmin() { document.getElementById('adminApp').classList.remove('active'); document.getElementById('customerApp').classList.add('active'); switchCustomerTab('home', document.getElementById('navHome')); }
     function switchAdminTab(t) { document.querySelectorAll('.admin-section').forEach(e=>e.classList.remove('active')); document.querySelectorAll('.admin-tab-btn').forEach(e=>e.classList.remove('active')); document.getElementById('sec-'+t).classList.add('active'); document.getElementById('btn-tab-'+t).classList.add('active'); if(t==='dashboard') loadAdminDashboard(); }
     function removeRider(p) { if(confirm("Remove rider?")) { db.ref('riders/'+p).remove(); showToast("Removed"); } }
     function assignRiderToOrder(id, p) { if(!p) return; db.ref('orders/'+id).update({assignedRider:p, status:'Out for Delivery'}); showToast("Assigned"); }
 
     function loadAdminDashboard() {
-        let tr=0, ur=0, cr=0; allOrders.forEach(o => { if(o.status!=='Cancelled') { tr+=o.total||0; if(o.paymentMethod.includes('UPI')) ur+=o.total||0; else cr+=o.total||0; } });
+        let tr=0, ur=0, cr=0; allOrders.forEach(o => { if(o.status!=='Cancelled') { tr+=o.total||0; if(o.paymentMethod && String(o.paymentMethod).includes('UPI')) ur+=o.total||0; else cr+=o.total||0; } });
         document.getElementById('metricRevenue').innerText='₹'+tr.toLocaleString('en-IN'); document.getElementById('metricOrders').innerText=allOrders.length; document.getElementById('metricUPI').innerText='₹'+ur.toLocaleString('en-IN'); document.getElementById('metricCOD').innerText='₹'+cr.toLocaleString('en-IN');
         if(document.getElementById('metricUsers')) document.getElementById('metricUsers').innerText=allUsers.length;
         if(document.getElementById('adminCustomersList')) document.getElementById('adminCustomersList').innerHTML = allUsers.map(u => `<div style="background:#222; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border-color);"><div style="color:var(--primary); font-weight:bold;">${u.firstName}</div><div style="color:var(--text-main); font-size:13px; margin-top:5px;">📞 +91 ${u.phone}</div></div>`).join('')||"<p style='color:var(--text-muted);'>No customers</p>";
@@ -707,7 +850,7 @@
     function downloadPDF(id) { if(!populateBillTemplate(id)) return; showToast("Generating PDF..."); const el=document.getElementById('printBillArea'); el.style.display='block'; html2pdf().set({margin:10, filename:`BijuMart_VIP_${id}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a5',orientation:'portrait'}}).from(el).save().then(()=>{el.style.display='none'; showToast("Downloaded!");}); }
     function deleteOrder(id) { if(confirm("Permanently delete?")) { db.ref('orders/'+id).remove(); showToast("Deleted!"); } }
     function updateOrderStatus(id, s) { db.ref('orders/'+id).update({status:s}); showToast("Status Updated!"); }
-    function shareBillWhatsApp(id) { const o = allOrders.find(x=>String(x.id)===String(id)); if(!o) return; let msg = `👑 *BIJU MART PREMIUM*\n*Order ID:* ${o.id}\n*Date:* ${o.date}\n*Customer:* ${o.customer}\n*Items:*\n${o.items.replace(/, /g,'\n')}\n*Payment:* ${o.paymentMethod}\n*Total:* ₹${(o.total||0).toLocaleString('en-IN')}\n*Status:* ${o.status}\nThank you! 💎`; window.open(`https://wa.me/91${o.phone}?text=${encodeURIComponent(msg)}`, '_blank'); }
+    function shareBillWhatsApp(id) { const o = allOrders.find(x=>String(x.id)===String(id)); if(!o) return; let msg = `👑 *BIJU MART PREMIUM*\n*Order ID:* ${o.id}\n*Date:* ${o.date}\n*Customer:* ${o.customer}\n*Items:*\n${(o.items||'').replace(/, /g,'\n')}\n*Payment:* ${o.paymentMethod}\n*Total:* ₹${(o.total||0).toLocaleString('en-IN')}\n*Status:* ${o.status}\nThank you! 💎`; window.open(`https://wa.me/91${o.phone}?text=${encodeURIComponent(msg)}`, '_blank'); }
 
     async function saveProductEntry() {
         const n=document.getElementById('pName').value.trim(), pr=parseInt(document.getElementById('pPrice').value), s=parseInt(document.getElementById('pStock').value), c=document.getElementById('pCat').value, st=document.getElementById('pSizeType').value;
@@ -723,10 +866,41 @@
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
     function showToast(msg) { const t=document.createElement('div'); t.className='toast'; t.innerText=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 3500); }
 
+    // 🚀 RIDER LOGIN LOGIC (Fixed)
     function openRiderLogin() { if(loggedInRider) { document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active'); renderRiderDashboard(); } else document.getElementById('riderLoginModal').classList.add('active'); }
-    function saveRider() { const n=document.getElementById('rName').value.trim(), p=document.getElementById('rPhone').value.trim(), ps=document.getElementById('rPass').value.trim(); if(!n||p.length!==10||!ps) return showToast("Enter Name, 10-digit Phone, Password"); db.ref('riders/'+p).set({name:n, phone:p, password:ps}); showToast("Registered!"); ['rName','rPhone','rPass'].forEach(e=>document.getElementById(e).value=''); }
-    function verifyRider() { const p=document.getElementById('riderPhoneLogin').value.trim(), ps=document.getElementById('riderPassLogin').value.trim(); if(!p||!ps) return showToast("Enter credentials"); const r=allRiders.find(x=>String(x.phone)===String(p)&&String(x.password)===String(ps)); if(r) { loggedInRider=r; localStorage.setItem('rider_session_cloud',JSON.stringify(r)); closeModal('riderLoginModal'); document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active'); renderRiderDashboard(); showToast("Welcome Partner!"); document.getElementById('riderPhoneLogin').value=''; document.getElementById('riderPassLogin').value=''; } else showToast("Invalid Credentials"); }
+    
+    function saveRider() { 
+        const n=document.getElementById('rName').value.trim(), p=document.getElementById('rPhone').value.trim(), ps=document.getElementById('rPass').value.trim(); 
+        if(!n||p.length!==10||!ps) return showToast("Enter Name, 10-digit Phone, Password"); 
+        db.ref('riders/'+p).set({name:n, phone:p, password:ps}); 
+        showToast("Registered!"); 
+        ['rName','rPhone','rPass'].forEach(e=>document.getElementById(e).value=''); 
+    }
+    
+    function verifyRider() { 
+        const p=document.getElementById('riderPhoneLogin').value.trim();
+        const ps=document.getElementById('riderPassLogin').value.trim(); 
+        
+        if(!p||!ps) return showToast("Enter credentials"); 
+        
+        const r=allRiders.find(x=>String(x.phone)===String(p)&&String(x.password)===String(ps)); 
+        if(r) { 
+            loggedInRider=r; 
+            localStorage.setItem('rider_session_cloud',JSON.stringify(r)); 
+            closeModal('riderLoginModal'); 
+            document.getElementById('customerApp').classList.remove('active'); 
+            document.getElementById('riderApp').classList.add('active'); 
+            renderRiderDashboard(); 
+            showToast("Welcome Partner!"); 
+            document.getElementById('riderPhoneLogin').value=''; 
+            document.getElementById('riderPassLogin').value=''; 
+        } else {
+            showToast("Invalid Credentials"); 
+        }
+    }
+    
     function logoutRider() { loggedInRider=null; localStorage.removeItem('rider_session_cloud'); document.getElementById('riderApp').classList.remove('active'); document.getElementById('customerApp').classList.add('active'); showToast("Logged Out"); }
+    
     function renderRiderDashboard() {
         if(!loggedInRider) return; document.getElementById('riderGreeting').innerText=`Welcome, ${loggedInRider.name}`;
         let a = allOrders.filter(o=>String(o.assignedRider)===String(loggedInRider.phone)); document.getElementById('riderDeliveredCount').innerText=a.filter(o=>o.status==='Delivered').length; let act = a.filter(o=>o.status!=='Delivered'&&o.status!=='Cancelled'); const l=document.getElementById('riderOrdersList');
