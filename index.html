@@ -12,18 +12,17 @@
   
   <style>
         :root { 
-            /* PREMIUM GOLD & BLACK THEME */
-            --primary: #D4AF37; /* Metallic Gold */
+            --primary: #D4AF37; 
             --primary-light: #F3E5AB; 
             --gold-gradient: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
             --secondary: #E5C158; 
-            --dark-bg: #000000; /* Pure Black */
-            --light-bg: #121212; /* Deep Grey Background */
-            --card-bg: #1a1a1a; /* Card Surface */
+            --dark-bg: #000000; 
+            --light-bg: #121212; 
+            --card-bg: #1a1a1a; 
             --border-color: #333333;
-            --text-main: #f1f1f1; /* White Text */
-            --text-muted: #888888; /* Grey Text */
-            --text-dark: #000000; /* Black text for gold backgrounds */
+            --text-main: #f1f1f1; 
+            --text-muted: #888888; 
+            --text-dark: #000000; 
             --success: #4caf50; 
             --danger: #ef5350; 
             --whatsapp: #25D366; 
@@ -71,7 +70,6 @@
         .product-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; border: 1px solid var(--border-color); cursor:pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .share-badge { position: absolute; top: 8px; left: 8px; width: 30px; height: 30px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid var(--primary); cursor: pointer; color: var(--primary); backdrop-filter: blur(4px); }
         
-        /* Product Image Background kept white so products pop out */
         .product-image { background: #ffffff; height: 160px; display: flex; align-items: center; justify-content: center; font-size: 50px; overflow: hidden; position: relative; padding: 15px; border-bottom: 1px solid var(--border-color); }
         .product-img-real { width: 100%; height: 100%; object-fit: contain; }
         
@@ -90,7 +88,6 @@
         .btn-qty { border: none; background: transparent; color: var(--primary); width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         .qty-val { font-weight: bold; font-size: 15px; color: var(--text-main); }
 
-        /* PRODUCT MODAL (3 IMAGES & SIZE) */
         .prod-img-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #ffffff; padding: 15px; gap: 10px; scrollbar-width: none; border-bottom: 1px solid var(--border-color); }
         .prod-img-slider::-webkit-scrollbar { display: none; }
         .prod-img-box { min-width: 100%; height: 320px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; background: transparent; border-radius: 12px; font-size: 80px; }
@@ -108,7 +105,6 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
-        /* --- ADMIN PANEL TABS --- */
         .admin-bg { background: var(--dark-bg); color: var(--text-main); }
         .admin-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items:center; flex-shrink:0; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
         .admin-tab-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 15px 20px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); scrollbar-width: none; flex-shrink:0; }
@@ -164,7 +160,6 @@
         
         .cart-img-real { width: 60px; height: 60px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border-color); padding: 4px; background: white; }
 
-        /* PRINT STYLES */
         .print-only { display: none; }
         @media print {
             .no-print { display: none !important; }
@@ -382,18 +377,6 @@
         </div>
     </div>
 
-    <div class="modal" id="adminLoginModal" style="background: var(--dark-bg);">
-        <div class="header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); color:var(--primary); flex-direction:row; flex-shrink:0;">
-            <i data-lucide="arrow-left" onclick="closeModal('adminLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900; letter-spacing: 1px;">ADMIN ACCESS</span> <div style="width:24px;"></div>
-        </div>
-        <div style="padding: 30px; text-align:center; margin-top:30px;">
-            <i data-lucide="lock" style="width:70px; height:70px; color:var(--primary); margin-bottom:25px;"></i>
-            <input type="text" id="adminUser" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:15px; background:#222; color:white; outline:none;" placeholder="Enter Username">
-            <input type="password" id="adminPass" style="width:100%; padding:16px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:25px; background:#222; color:white; outline:none;" placeholder="Enter Password">
-            <button class="btn-admin" onclick="verifyAdmin()">Login to Dashboard</button>
-        </div>
-    </div>
-
     <div class="modal" id="riderLoginModal" style="background: var(--dark-bg);">
         <div class="header" style="background:var(--card-bg); border-bottom:1px solid var(--border-color); color:var(--primary); flex-direction:row; flex-shrink:0;">
             <i data-lucide="arrow-left" onclick="closeModal('riderLoginModal')" style="cursor:pointer; width:24px;"></i> <span style="font-weight: 900; letter-spacing: 1px;">RIDER ACCESS</span> <div style="width:24px;"></div>
@@ -437,6 +420,7 @@
         <button class="admin-tab-btn active" id="btn-tab-dashboard" onclick="switchAdminTab('dashboard')">Dashboard</button>
         <button class="admin-tab-btn" id="btn-tab-orders" onclick="switchAdminTab('orders')">Live Orders</button>
         <button class="admin-tab-btn" id="btn-tab-products" onclick="switchAdminTab('products')">Products</button>
+        <button class="admin-tab-btn" id="btn-tab-customers" onclick="switchAdminTab('customers')">Customers</button>
         <button class="admin-tab-btn" id="btn-tab-categories" onclick="switchAdminTab('categories')">Categories</button>
         <button class="admin-tab-btn" id="btn-tab-riders" onclick="switchAdminTab('riders')">Riders</button>
         <button class="admin-tab-btn" id="btn-tab-settings" onclick="switchAdminTab('settings')">Settings</button>
@@ -448,8 +432,8 @@
                 <div class="metric-card"><div class="metric-title">TOTAL ORDERS</div><div class="metric-value" id="metricOrders">0</div></div>
             </div>
             <div class="metric-grid" style="padding-top:0;">
-                <div class="metric-card"><div class="metric-title" style="color:#a8e6cf;">UPI (ONLINE) SALES</div><div class="metric-value" id="metricUPI">₹0</div></div>
-                <div class="metric-card"><div class="metric-title" style="color:var(--text-muted);">COD SALES</div><div class="metric-value" id="metricCOD">₹0</div></div>
+                <div class="metric-card" style="border-color:#1e88e5; background:#0f172a;"><div class="metric-title" style="color:#1e88e5;">TOTAL USERS</div><div class="metric-value" id="metricUsers">0</div></div>
+                <div class="metric-card" style="border-color:#8e24aa; background:#0f172a;"><div class="metric-title" style="color:#8e24aa;">PAGE VISITS</div><div class="metric-value" id="metricVisits">0</div></div>
             </div>
         </div>
 
@@ -489,6 +473,13 @@
             </div>
         </div>
 
+        <div class="admin-section" id="sec-customers">
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Registered Customers</h3>
+                <div id="adminCustomersList"></div>
+            </div>
+        </div>
+
         <div class="admin-section" id="sec-categories">
             <div class="admin-card">
                 <h3 style="margin-bottom: 15px; font-size:16px; color: var(--primary);">Category Management</h3>
@@ -517,12 +508,12 @@
         </div>
 
         <div class="admin-section" id="sec-settings">
-            <div class="admin-card" style="border-color:var(--primary); box-shadow: 0 0 15px rgba(212,175,55,0.2);">
-                <h3 style="margin-bottom: 15px; font-size:16px; color:var(--primary);">Secure Payment Setup</h3>
+            <div class="admin-card" style="border-color:var(--success); box-shadow: 0 0 15px rgba(76,175,80,0.2);">
+                <h3 style="margin-bottom: 15px; font-size:16px; color:var(--success);">UPI QR Code Setup</h3>
                 <label style="font-size:12px; color:var(--primary); font-weight:bold; display:block; margin-bottom:8px; letter-spacing: 1px;">MY QR CODE IMAGE (GPay/PhonePe)</label>
-                <div style="display:flex; gap:10px; margin-bottom:20px; align-items:center;">
+                <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;">
                     <input type="file" id="adminPaymentQrFile" class="admin-input" accept="image/*" style="margin-bottom:0;">
-                    <button class="btn-admin" style="width: auto; padding: 12px 20px;" onclick="uploadAdminQr()">Save QR</button>
+                    <button class="btn-small" style="background:var(--success);" onclick="uploadAdminQr()">Save QR</button>
                 </div>
                 <div id="qrPreviewArea" style="text-align:center; padding:15px; background:#111; border-radius:8px; border: 1px solid #333;">
                     <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px; letter-spacing: 1px;">CURRENT ACTIVE QR</p>
@@ -629,6 +620,16 @@
 
     window.onload = () => {
         try {
+            if(!sessionStorage.getItem('visited_biju_mart')) {
+                db.ref('stats/totalVisits').set(firebase.database.ServerValue.increment(1));
+                sessionStorage.setItem('visited_biju_mart', 'true');
+            }
+
+            db.ref('stats/totalVisits').on('value', snap => {
+                const visits = snap.val() || 0;
+                if(document.getElementById('metricVisits')) document.getElementById('metricVisits').innerText = visits;
+            });
+
             db.ref('settings').on('value', snap => {
                 const data = snap.val();
                 if(data) {
@@ -650,6 +651,7 @@
             });
 
             db.ref('products').on('value', snap => { allProducts = safeParse(snap.val()); filterAndSortProducts(); if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard(); });
+            
             db.ref('orders').on('value', snap => {
                 let newOrdersList = safeParse(snap.val()).sort((a,b) => b.timestamp - a.timestamp);
                 if(!isInitialOrderLoad && newOrdersList.length > allOrders.length) {
@@ -663,7 +665,12 @@
                 if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
                 if(document.getElementById('riderApp').classList.contains('active')) renderRiderDashboard();
             });
-            db.ref('users').on('value', snap => { allUsers = safeParse(snap.val()); });
+
+            db.ref('users').on('value', snap => { 
+                allUsers = safeParse(snap.val()); 
+                if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard();
+            });
+            
             db.ref('riders').on('value', snap => { allRiders = safeParse(snap.val()); if(document.getElementById('adminApp').classList.contains('active')) loadAdminDashboard(); });
 
             const savedSession = localStorage.getItem('shop_session_cloud'); if(savedSession) { loggedInUser = JSON.parse(savedSession); updateAppForLoggedInUser(); }
@@ -969,23 +976,40 @@
         else if (tab === 'profile') { document.getElementById('customerProfileView').style.display = 'block'; }
     }
 
-    function openAdminLogin() { document.getElementById('adminLoginModal').classList.add('active'); }
+    // 🚀 RESTORED ADMIN SECURE LOGIN
+    function openAdminLogin() { 
+        document.getElementById('adminLoginModal').classList.add('active'); 
+    }
+    
     function verifyAdmin() {
         const user = document.getElementById('adminUser').value, pass = document.getElementById('adminPass').value;
-        if(btoa(user) === 'YWRtaW4xMjM=' && btoa(pass) === 'YWRtaW5AMTIz') { closeModal('adminLoginModal'); document.getElementById('customerApp').classList.remove('active'); document.getElementById('adminApp').classList.add('active'); loadAdminDashboard(); showToast("Welcome Admin"); document.getElementById('adminUser').value = ''; document.getElementById('adminPass').value = ''; } 
+        if(btoa(user) === 'YWRtaW4xMjM=' && btoa(pass) === 'YWRtaW5AMTIz') { 
+            closeModal('adminLoginModal'); 
+            document.getElementById('customerApp').classList.remove('active'); 
+            document.getElementById('adminApp').classList.add('active'); 
+            loadAdminDashboard(); 
+            showToast("Welcome Admin"); 
+            document.getElementById('adminUser').value = ''; 
+            document.getElementById('adminPass').value = ''; 
+        } 
         else { showToast("Invalid Credentials!"); }
     }
+
     function logoutAdmin() { document.getElementById('adminApp').classList.remove('active'); document.getElementById('customerApp').classList.add('active'); switchCustomerTab('home', document.getElementById('navHome')); }
     function switchAdminTab(tabId) { document.querySelectorAll('.admin-section').forEach(el => el.classList.remove('active')); document.querySelectorAll('.admin-tab-btn').forEach(el => el.classList.remove('active')); document.getElementById('sec-' + tabId).classList.add('active'); document.getElementById('btn-tab-' + tabId).classList.add('active'); if(tabId === 'dashboard') loadAdminDashboard(); }
-
-    function removeRider(phone) { if(confirm("Remove this rider permanently?")) { db.ref('riders/' + phone).remove(); showToast("Rider Removed"); } }
-    function assignRiderToOrder(orderId, riderPhone) { if(!riderPhone) return; db.ref('orders/' + orderId).update({ assignedRider: riderPhone, status: 'Out for Delivery' }); showToast("Rider Assigned!"); }
 
     function loadAdminDashboard() {
         let totalRev = 0, upiRev = 0, codRev = 0;
         allOrders.forEach(o => { if(o.status !== 'Cancelled') { totalRev += (o.total || 0); if (o.paymentMethod && o.paymentMethod.includes('UPI')) upiRev += (o.total || 0); else codRev += (o.total || 0); } });
         document.getElementById('metricRevenue').innerText = '₹' + totalRev.toLocaleString('en-IN'); document.getElementById('metricOrders').innerText = allOrders.length;
         document.getElementById('metricUPI').innerText = '₹' + upiRev.toLocaleString('en-IN'); document.getElementById('metricCOD').innerText = '₹' + codRev.toLocaleString('en-IN');
+        
+        if(document.getElementById('metricUsers')) document.getElementById('metricUsers').innerText = allUsers.length;
+
+        const cList = document.getElementById('adminCustomersList');
+        if(cList) {
+            cList.innerHTML = allUsers.map(u => `<div style="background:#222; padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border-color);"><div style="color:var(--primary); font-weight:bold; font-size:15px;">${u.firstName}</div><div style="color:var(--text-main); font-size:13px; margin-top:5px;">📞 +91 ${u.phone}</div></div>`).join('') || "<p style='color:var(--text-muted);'>No customers yet.</p>";
+        }
 
         const rList = document.getElementById('adminRidersList');
         if(rList) {
@@ -1059,67 +1083,6 @@
 
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
     function showToast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3500); }
-
-    function openRiderLogin() {
-        if(loggedInRider) {
-            document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active'); renderRiderDashboard();
-        } else { document.getElementById('riderLoginModal').classList.add('active'); }
-    }
-
-    function saveRider() {
-        const name = document.getElementById('rName').value.trim(), phone = document.getElementById('rPhone').value.trim(), pass = document.getElementById('rPass').value.trim();
-        if(!name || phone.length !== 10 || !pass) { showToast("Enter Name, 10-digit Phone, and Password"); return; }
-        db.ref('riders/' + phone).set({ name: name, phone: phone, password: pass });
-        showToast("Partner Registered!"); document.getElementById('rName').value = ''; document.getElementById('rPhone').value = ''; document.getElementById('rPass').value = '';
-    }
-
-    function verifyRider() {
-        const phone = document.getElementById('riderPhoneLogin').value.trim(), pass = document.getElementById('riderPassLogin').value.trim();
-        if(!phone || !pass) return showToast("Enter credentials");
-        const rider = allRiders.find(r => String(r.phone) === String(phone) && String(r.password) === String(pass));
-        if(rider) {
-            loggedInRider = rider; localStorage.setItem('rider_session_cloud', JSON.stringify(rider));
-            closeModal('riderLoginModal'); document.getElementById('customerApp').classList.remove('active'); document.getElementById('riderApp').classList.add('active');
-            renderRiderDashboard(); showToast("Welcome Partner!"); document.getElementById('riderPhoneLogin').value = ''; document.getElementById('riderPassLogin').value = '';
-        } else { showToast("Invalid Credentials"); }
-    }
-
-    function logoutRider() { loggedInRider = null; localStorage.removeItem('rider_session_cloud'); document.getElementById('riderApp').classList.remove('active'); document.getElementById('customerApp').classList.add('active'); showToast("Logged Out"); }
-
-    function renderRiderDashboard() {
-        if(!loggedInRider) return;
-        document.getElementById('riderGreeting').innerText = `Welcome, ${loggedInRider.name}`;
-        let assignedOrders = allOrders.filter(o => String(o.assignedRider) === String(loggedInRider.phone));
-        document.getElementById('riderDeliveredCount').innerText = assignedOrders.filter(o => o.status === 'Delivered').length;
-        let activeDeliveries = assignedOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
-        
-        const list = document.getElementById('riderOrdersList');
-        if(activeDeliveries.length === 0) { list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-weight:bold;">No active deliveries. Relax!</div>`; return; }
-
-        list.innerHTML = activeDeliveries.map(o => {
-            let mapBtn = o.lat && o.lng ? `<button onclick="window.open('http://googleusercontent.com/maps.google.com/maps?q=${o.lat},${o.lng}', '_blank')" style="background:rgba(212,175,55,0.1); color:var(--primary); border:1px solid var(--primary); padding:10px; border-radius:8px; width:100%; font-weight:bold; margin-bottom:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;"><i data-lucide="navigation" style="width:16px;"></i> Navigate</button>` : '';
-            return `
-            <div style="background:var(--card-bg); padding:20px; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 15px rgba(0,0,0,0.4); border:1px solid var(--border-color);">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid var(--border-color); padding-bottom:10px;"><b style="color:var(--text-main); font-size:14px;">${o.id}</b><span style="font-weight:900; font-size:11px; color:var(--text-dark); background:var(--primary); padding:4px 8px; border-radius:6px; letter-spacing:0.5px; text-transform:uppercase;">${o.status}</span></div>
-                <div style="font-size:14px; color:var(--text-muted); line-height:1.6; margin-bottom:12px;"><b style="color:var(--primary); font-size:16px;">${o.customer}</b><br>${o.address || 'Address N/A'}<br><div style="margin-top:8px; padding:8px; background:#222; border-radius:6px; font-size:13px; border:1px solid var(--border-color);">Items: <span style="color:white;">${o.items}</span></div></div>
-                ${mapBtn}
-                <div style="display:flex; gap:10px; margin-bottom:12px;">
-                    <button onclick="window.location.href='tel:${o.phone}'" style="flex:1; background:#222; color:var(--text-main); border:1px solid var(--border-color); padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">📞 Call</button>
-                    <button onclick="showRiderQR('${o.total}')" style="flex:1; background:var(--gold-gradient); color:var(--text-dark); border:none; padding:12px; border-radius:8px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; box-shadow: 0 4px 10px rgba(212,175,55,0.3);">📱 ₹${(o.total||0).toLocaleString('en-IN')}</button>
-                </div>
-                <button onclick="markOrderDelivered('${o.id}')" style="width:100%; background:var(--success); color:white; border:none; padding:14px; border-radius:8px; font-weight:900; font-size:15px; cursor:pointer; text-transform:uppercase; letter-spacing:1px; box-shadow: 0 4px 10px rgba(76,175,80,0.3);">✅ Mark as Delivered</button>
-            </div>`;
-        }).join('');
-        lucide.createIcons();
-    }
-
-    function showRiderQR(amount) {
-        document.getElementById('riderQrModal').classList.add('active'); document.getElementById('qrAmountDisplay').innerText = "₹" + Number(amount).toLocaleString('en-IN');
-        let upiId = appSettings.payment.upiId || "9348954360@ybl"; document.getElementById('qrUpiDisplay').innerText = upiId;
-        const upiString = `upi://pay?pa=${upiId}&pn=Biju%20Mart&am=${amount}&cu=INR`;
-        document.getElementById('dynamicQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
-    }
-
   </script>
 </body>
 </html>
